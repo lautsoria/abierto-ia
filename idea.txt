@@ -1,0 +1,51 @@
+Aquí tienes un plan de proyecto más corto y directo, enfocado en los hitos clave.
+
+Plan de App de Servicios (Versión Concisa)
+
+Stack: Flask, Jinja2, MySQL, OAuth2, Docker, GitHub Projects.
+
+Hito 1: Fundación y Base de Datos
+
+    GitHub: Crear repositorio y tablero de Proyectos.
+
+    Docker: Configurar docker-compose.yml para levantar dos servicios: web (Flask) y db (MySQL).
+
+    Flask: Crear la estructura básica (app.py, templates/, static/).
+
+    MySQL: Diseñar y crear el esquema de tablas:
+
+        User (para clientes de OAuth)
+
+        Professional (plomeros, electricistas, etc.)
+
+        Service (servicios que ofrecen)
+
+        Booking (reservas)
+
+    Datos: Insertar manualmente 2-3 profesionales de prueba en la base de datos.
+
+Hito 2: Páginas Públicas (Sin Login)
+
+    Ruta /: Página de inicio (Homepage).
+
+    Ruta /services/<trade>: Página de categoría. Lee de la tabla Professional y lista los profesionales de ese rubro (ej. "plomeros").
+
+    Ruta /professional/<id>: Página de perfil. Muestra los detalles de un profesional específico.
+
+Hito 3: Autenticación y Sesión de Usuario
+
+    OAuth2: Integrar "Login con Google" (usando una librería de Flask).
+
+    Lógica: Al hacer login, crear o encontrar al User en la BD y guardar su id en la session de Flask.
+
+    Ruta /logout: Limpiar la sesión.
+
+    UI: Mostrar "Login" o "Mis Reservas / Logout" en el header según el estado de la sesión.
+
+Hito 4: Funcionalidad del Cliente (Con Login)
+
+    Ruta /book/<professional_id>: (Requiere login). Mostrar un formulario simple (fecha, hora, problema).
+
+    Endpoint POST /api/book: (Requiere login). Recibir datos del formulario y crear un nuevo registro en la tabla Booking con estado "pendiente".
+
+    Ruta /my-bookings: (Requiere login). Consultar la tabla Booking (con JOIN a Professional) y mostrar al cliente su historial de reservas.
