@@ -1,0 +1,141 @@
+Trabajo Práctico  
+Introducción al Desarrollo de Software  
+ 
+ 
+El presente trabajo práctico de la materia Introducción al Desarrollo de Software integra todos 
+los temas aprendidos. Los equipos formados entre 4 y 6 alumnos de la materia, deberán aplicar buenas 
+prácticas de programación, y utilizar metodologías ágiles para su resolución.  
+   
+En esta oportunidad no tendremos un tema específico a resolver, sino que se presentarán varias 
+ideas  que  se  podrán  desarrollar  respetando  los  requerimientos  abajo  descritos.  También  aquellos 
+equipos que quieran desarrollar una idea en particular podrán hacerlo previa aprobación de la cátedra, 
+para  esto  tendrán  que  presentar la idea cuya fecha límite de presentación es el Martes 28 de 
+Octubre de 2025. 
+ 
+Ideas de posibles desarrollos: 
+a- Sitio web de Hospedajes. 
+Creación de un sitio web que ofrezca hospedaje, podría tratarse de un hotel, hostería, o casa 
+que quiera ofrecer alojamiento turístico. Deberá permitir reservar un hospedaje, y enviar toda la 
+información por algún medio mail-whatsapp al usuario con los datos de la reserva (checkIN, 
+checkOUT, importe a pagar, cant pax, y toda información extra de la reserva). 
+El sitio deberá tener fotos de las habitaciones, cabañas, servicios que ofrezca, tarifas, y 
+disponibilidad según las fechas. 
+ 
+b- Sistema de recolección de residuos reciclables.  
+La  empresa  ficticia  "ReciclaloTutti"  quiere  desarrollar  una  plataforma  donde  los  usuarios 
+puedan solicitar el retiro de residuos reciclables -como cartón, papel, vidrio, aceite, etc-. La 
+plataforma deberá manejar un registro de usuarios -es deseable que usen autenticación con una 
+cuenta de google- y el usuario pueda crear una solicitud de retiro de residuos. 
+La plataforma deberá geolocalizar la dirección, solicitar qué tipo de residuo va a retirar, peso 
+aproximado, y todos los datos necesarios para su retiro. 
+La plataforma deberá generar un QR que obtendrá el usuario y cuando el recolector lo escanee 
+habrá confirmado el retiro. 
+Cada  usuario  deberá  tener  un  historial de solicitudes y gráficos que informen cantidades y 
+estadísticas de sus solicitudes. 
+d- Proyecto a elección. 
+El mismo deberá ser web y mobile, ser validado por la cátedra, fecha límite de presentación 
+es el Martes 28 de Octubre de 2025. 
+ 
+ 
+ 
+ 
+ 
+ 
+Para cualquiera de las ideas se deberá tener los siguientes requerimientos. 
+Requisitos obligatorios: 
+●  Uso  de  Github.  Deben  compartirlo  con  el  corrector de la cátedra y todos deben participar 
+aportando commits y desarrollo útil. 
+●  Utilización  de  un  tablero  Kanban con tareas a desarrollar Backlog de producto, utilizando 
+github project. 
+●  Los hitos a presentar -según las fechas abajo indicadas- deberán entregar valor al cliente. 
+●  TODOS  los  integrantes  del  equipo  deberán  realizar  commits  al  repositorio,  según  vaya 
+avanzando el proyecto. Estos commits deberán estar asociados a una tarea y en el mensaje 
+del commit se deberá informar claramente qué está realizando o a qué tarea se refiere. 
+●  Utilizar una base de datos MySQL con al menos 2 tablas y un script de creación/carga. 
+●  Tener una aplicación backend utilizando Flask corriendo que se conecte a la base de datos y 
+cualquier otra dependencia. Los endpoints deberán ser realizados utilizando el “verbo” correcto 
+y se utilizará el formato JSON para el envío o recibir información. 
+●  Tener una aplicación para el frontend utilizando Flask que se conecte al backend respetando 
+RESTful. 
+●  Se deberá utilizar https://www.pythonanywhere.com/, para hostear el desarrollo. 
+●  Presentación  de  informe  detallando  las  principales  decisiones  de  diseño,  dificultades 
+encontradas y conclusiones. 
+●  En caso de utilizar dependencias se deberá tener un archivo de init.sh que tenga la instalación 
+de las mismas. 
+ 
+ 
+Requisitos deseables 
+●  Uso de Docker 
+●  Documentación sobre cada endpoint de la API y ejemplos de uso (pueden utilizar swagger para 
+esto) 
+●  Integrar una app mobile usando únicamente Kivy UI. 
+ 
+ 
+Hitos del proyecto (entregables) 
+Las formas de realizar las entregas deberán acordarse con el tutor asignado. 
+●  Jueves 30/10. Se deberá entregar, hipótesis o supuestos, alcance y un Backlog de producto, 
+mockup del sitio web (pueden usar alguna app online o directamente en un dibujo) 
+●  Martes 11/11 Creación del repositorio, vistas del proyecto ya desarrolladas (templates), listado 
+de servicios/endpoints a utilizar. Tablas SQL a utilizar 
+●  Martes 18/11. Avances en la API, comunicar Front con Back e integrar base de datos. 
+●  Martes 25/11. Se espera tener el proyecto finalizado para dar una revisión previa a la entrega. 
+●  Jueves 27/11. 1er entrega del TP Integrador y defensa a confirmar 
+●  Martes 02/12. Defensas y consultas 
+●  Jueves 05/12. 2da entrega del TP integrador y defensa 
+ 
+ 
+ 
+Defensa Oral 
+La entrega del Trabajo Práctico estará acompañada de una defensa oral tanto grupal como individual. 
+Esta se considera la instancia más importante de evaluación dentro de la materia. 
+Se espera que tanto el alumno como el grupo en su totalidad pueda responder de forma completa las 
+preguntas  que  llegara  a  plantear el docente en lo que respecta a la funcionalidad del trabajo, las 
+herramientas provistas por el lenguaje de programación y el diseño del sistema en general. 
+ 
+Documentación Requerida 
+Para  la  presentación  del  Trabajo  Práctico,  se  pide  al  equipo  la  presentación  de  un  informe  que 
+contenga. 
+●  Carátula 
+●  Integrantes 
+●  Resumen 
+●  Introducción 
+●  Solución propuesta 
+●  Tecnología utilizada 
+●  Conclusión final  
+La información volcada en el documento será utilizada por el equipo docente previo a corregir el trabajo 
+por  lo  cual  el  alumno  puede  expresar  allí lo que crea conveniente para ayudar en el proceso de 
+corrección. 
+ 
+ 
+Condiciones de Aprobación 
+NO se debe... 
+●  usar variables globales 
+●  usar ciclos infinitos 
+●  escribir código repetido 
+●  entregar un programa que no funcione 
+●  entregar un programa con errores graves 
+●  incumplir con la fecha de entrega 
+SÍ se debe... 
+●  Evitar que el programa rompa frente a la interacción con el usuario 
+●  modularizar el código 
+●  usar buenas prácticas de programación 
+●  utilizar un repositorio en github 
+●  entregar un programa que cumpla con la funcionalidad completa especificada 
+ 
+ 
+Fecha de Entrega 
+El Trabajo Práctico cuenta con 2 fechas de entrega: 27/11/2025 y el 05/12/2025. Ambas tienen hora 
+límite 18:00 hs. Mientras que la primera fecha tiene posibilidad de recuperación, la segunda no. 
+En esta línea, se espera que el grupo entregue el trabajo completo para la primera fecha, y -en 
+caso de recibir correcciones por parte del equipo docente- tendrán posibilidad de realizar una segunda 
+entrega  en  la  segunda  fecha.  Esta  primera  instancia  de  entrega  no  restará  puntos  en  caso  de 
+re-entregar en la segunda fecha. La segunda fecha definirá la nota del trabajo según corresponda. 
+Es importante saber que la primera entrega debe estar completa y sin errores graves. 
+Quienes  decidan  entregar  únicamente  en  la  segunda  fecha  (sin pasar por la primera) no tendrán 
+posibilidad de correcciones intermedias y tendrán una nota final del trabajo según corresponda. Tanto la 
+primera entrega como la segunda deben contener la totalidad de la funcionalidad solicitada, no se 
+aceptarán entregas parciales o trabajos incompletos en ninguna de las fechas. 
+ 
+Importante 
+La aprobación del Trabajo Práctico es condición necesaria (junto con la aprobación del parcial) para 
+regularizar la materia. 
