@@ -167,3 +167,207 @@ header.header {
 .nav-link:hover {
   color: #1F3A93;
 }
+
+/*Home*/
+
+/*Servicios*/
+
+.servicios {
+    background-color: #0052ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.banner-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0052ff; 
+    color: white;
+    padding: 40px 60px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 1000px; 
+    overflow: hidden;
+}
+
+.banner-content {
+    flex: 1; 
+    padding-right: 40px; 
+}
+
+.tag {
+    background-color: #ffffff;
+    color: #333;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.headline {
+    font-size: 48px;
+    font-weight: 900; 
+    line-height: 1.1;
+    margin: 20px 0;
+}
+
+.offer-blocks {
+    display: flex;
+    gap: 12px; 
+    margin-bottom: 25px;
+}
+
+.offer-box {
+    padding: 12px 18px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center;
+    min-width: 130px;
+}
+
+.offer-box span {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.offer-box strong {
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.white-box {
+    background-color: white;
+    color: #0052ff;
+}
+
+.yellow-box {
+    background-color: #ffc107; 
+    color: #000;
+}
+
+.payment-note {
+    background-color: #1a1a1a; 
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex; 
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.payment-note .icon {
+    color: #ffc107; 
+}
+
+.disclaimer {
+    font-size: 11px;
+    opacity: 0.8; 
+}
+
+
+.icon-section {
+    background-color: rgba(255, 255, 255, 0.1); 
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 16px; 
+}
+
+.icon-item {
+    background-color: rgba(0, 0, 0, 0.15); 
+    width: 65px;
+    height: 65px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+}
+
+/*Categorias*/
+
+.categorias{
+    padding: 20px;
+    background-color: rgb(202, 202, 202);
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 24px;
+}
+
+.categorias-grid {
+    display: grid;
+    /* Crea 4 columnas de igual tamaño */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px; /* Espacio entre las tarjetas */
+}
+
+.categoria-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+   
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.categoria-card:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white; 
+    margin-bottom: 16px; 
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 4px;
+}
+
+.card-subtitle {
+    font-size: 14px;
+    color: #777;
+}
+
+.icon-electricista { background-color: #ffc107; }
+.icon-plomeria    { background-color: #007bff; }
+.icon-pintura     { background-color: #9d4edd; }
+.icon-carpinteria { background-color: #b06c49; }
+.icon-cerrajeria  { background-color: #343a40; }
+.icon-limpieza    { background-color: #1abc9c; }
+.icon-aire        { background-color: #34c6eb; }
+.icon-jardineria  { background-color: #2ecc71; }
