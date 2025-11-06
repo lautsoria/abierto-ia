@@ -1,6 +1,4 @@
-Aquí tienes un plan de proyecto más corto y directo, enfocado en los hitos clave.
-
-Plan de App de Servicios (Versión Concisa)
+Plan de App de Servicios
 
 Stack: Flask, Jinja2, MySQL, OAuth2, Docker, GitHub Projects.
 
