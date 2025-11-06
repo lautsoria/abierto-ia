@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href='{{ url_for('static', filename='css/styles.css', external='true') }}'>
+  <link rel="stylesheet" href='{{ url_for('static', filename='css/base.css', external='true') }}'>
   <title>{% block title %}Base{% endblock %}</title>
 </head>
 
@@ -13,7 +13,7 @@
       <div class="header-left">
         <div class="logo">
           <span class="logo-icon">🤝</span>
-          <span class="logo-text">mercado<br><strong>libre</strong></span>
+          <span class="logo-text">Mercado<br><strong>Servicios</strong></span>
         </div>
         <div class="location">
           <span class="location-icon">📍</span>
@@ -36,24 +36,19 @@
         </form>
       </div>
 
-      <div class="header-right">
+      <!-- <div class="header-right">
         <button class="promo-btn">ENVÍO GRATIS<br><strong>EN TU PRIMERA COMPRA</strong></button>
-      </div>
-    </div>
+      </div> -->
+    
 
-    <nav class="header-nav">
-      <a href="#" class="nav-link">Categorías</a>
-      <a href="#" class="nav-link">Ofertas</a>
-      <a href="#" class="nav-link">Cupones</a>
-      <a href="#" class="nav-link">Supermercado</a>
-      <a href="#" class="nav-link">Moda</a>
-      <a href="#" class="nav-link">Mercado Play</a>
-      <a href="#" class="nav-link">Vender</a>
-      <a href="#" class="nav-link">Ayuda</a>
-      <a href="#" class="nav-link">Creá tu cuenta</a>
-      <a href="#" class="nav-link">Ingresá</a>
-      <a href="#" class="nav-link">🛒</a>
-    </nav>
+      <nav class="header-nav">
+        <a href="#" class="nav-link">Categorías</a>
+        <a href="#" class="nav-link">Ofertas</a>
+        <a href="#" class="nav-link end">Ingresá</a>
+        <a href="#" class="nav-link">Mis </a>
+        <a href="#" class="nav-link">Ver Carrito 🛒</a>
+      </nav>
+    </div>
   </header>
   {% block content %}
   {% endblock %}

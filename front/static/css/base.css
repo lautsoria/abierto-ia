@@ -12,7 +12,7 @@ body {
 /* Header */
 header.header {
   background-color: #FFF44F;
-  padding: 8px 16px;
+  padding: 20px 220px;
 }
 
 /* Top section */
@@ -148,10 +148,14 @@ header.header {
   gap: 0;
   max-width: 1200px;
   margin: 0 auto;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  /* border-top: 1px solid rgba(0, 0, 0, 0.1); */
   padding-top: 8px;
   padding-bottom: 8px;
   flex-wrap: wrap;
+}
+
+.header-nav .end {
+  margin-left: auto;
 }
 
 .nav-link {
