@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Modal con enlaces</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #044245;
+    color: white;
+    height: 100vh;
+  }
+  #fondo {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #044245;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #ventana {
+    background-color: #044245;
+    border: 4px solid white;
+    padding: 30px 20px;
+    width: 320px;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+  }
+  #btnNaranja {
+    background-color: #f1671e;
+    border: none;
+    color: white;
+    padding: 15px;
+    width: 100%;
+    margin-bottom: 18px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  #btnBlanco {
+    background-color: white;
+    border: none;
+    color: #044245;
+    padding: 15px;
+    width: 100%;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  #btnCerrar {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="fondo">
+  <div id="ventana" role="dialog" aria-modal="true" aria-labelledby="tituloModal">
+    <button id="btnNaranja" type="button">BUSCO PROFESIONALES DE SERVICIOS PARA EL HOGAR Y LA CONSTRUCCIÓN</button>
+    <button id="btnBlanco" type="button">SOY PROFESIONAL DE SERVICIOS PARA EL HOGAR Y LA CONSTRUCCIÓN</button>
+    <button id="btnCerrar" aria-label="Cerrar">&times;</button>
+  </div>
+</div>
+
+<script>
+  var fondo = document.getElementById('fondo');
+  var btnCerrar = document.getElementById('btnCerrar');
+  var btnNaranja = document.getElementById('btnNaranja');
+  var btnBlanco = document.getElementById('btnBlanco');
+
+  btnCerrar.onclick = function() {
+    fondo.style.display = 'none';
+  };
+
+  fondo.onclick = function(e) {
+    if (e.target === fondo) {
+      fondo.style.display = 'none';
+    }
+  };
+
+  btnNaranja.onclick = function() {
+    window.open('/clientes', '_blank');  // abre nueva pestaña para "busco profesionales"
+  };
+
+  btnBlanco.onclick = function() {
+    window.open('/profesionales', '_blank');  // abre nueva pestaña para "soy profesional"
+  };
+</script>
+
+</body>
+</html>

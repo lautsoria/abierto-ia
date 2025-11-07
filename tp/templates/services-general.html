@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Servicios Generales</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f9f9f9;
+    color: #064648;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #064648;
+  }
+
+  /* Contenedor de servicios tipo grid */
+  main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: auto;
+  }
+
+  /* Cada servicio */
+  section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    text-align: center;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+  }
+
+  section:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  img {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin: 0;
+    font-weight: bold;
+    color: #004d4d;
+  }
+
+  small {
+    display: block;
+    color: #6a9a96;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Servicios Generales</h1>
+
+<main>
+  <section onclick="window.location.href='/service/electricista'">
+    <img src="https://cdn-icons-png.flaticon.com/512/2933/2933180.png" alt="Electricista">
+    <p>Electricista</p>
+    <small>234 profesionales</small>
+  </section>
+
+  <section onclick="window.location.href='/service/plomeria'">
+    <img src="https://cdn-icons-png.flaticon.com/512/11250/11250228.png" alt="Plomería">
+    <p>Plomería</p>
+    <small>189 profesionales</small>
+  </section>
+
+  <section onclick="window.location.href='/service/pintura'">
+    <img src="https://cdn-icons-png.flaticon.com/512/4695/4695252.png" alt="Pintura">
+    <p>Pintura</p>
+    <small>156 profesionales</small>
+  </section>
+
+  <section onclick="window.location.href='/service/carpinteria'">
+    <img src="https://cdn-icons-png.flaticon.com/512/476/476863.png" alt="Carpintería">
+    <p>Carpintería</p>
+    <small>143 profesionales</small>
+  </section>
+
+  <section onclick="window.location.href='/service/cerrajeria'">
+    <img src="https://cdn-icons-png.flaticon.com/512/3176/3176363.png" alt="Cerrajería">
+    <p>Cerrajería</p>
+    <small>98 profesionales</small>
+  </section>
+
+  <section onclick="window.location.href='/service/limpieza'">
+    <img src="https://cdn-icons-png.flaticon.com/512/2907/2907255.png" alt="Limpieza">
+    <p>Limpieza</p>
+    <small>267 profesionales</small>
+  </section>
+
+  <section onclick="window.location.href='/service/aire-acondicionado'">
+    <img src="https://cdn-icons-png.flaticon.com/512/6368/6368716.png" alt="Aire Acondicionado">
+    <p>Aire Acondicionado</p>
+    <small>121 profesionales</small>
+  </section>
+
+  <section onclick="window.location.href='/service/jardineria'">
+    <img src="https://cdn-icons-png.flaticon.com/512/1518/1518965.png" alt="Jardinería">
+    <p>Jardinería</p>
+    <small>178 profesionales</small>
+  </section>
+</main>
+
+</body>
+</html>
+
