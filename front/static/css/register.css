@@ -18,9 +18,9 @@ h1 {
   perspective: 1000px;
 }
 .flip-card {
-   width: 300px;
+   width: 350px;
 
-    height: 400px;
+    height: 450px;
 
     position: relative;
 
@@ -73,6 +73,9 @@ h1 {
   color: #35a1df;
 }
 
+.hidden {
+  display: none;
+}
 
 form {
   display: flex;
@@ -88,6 +91,18 @@ input {
   border-radius: 5px;
 }
 input:focus {
+  outline: none;
+  border-color: #3f78f1;
+  box-shadow: 0 0 5px rgba(63, 120, 241, 0.5);
+}
+select {
+  margin-bottom: 10px ;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #12afd6f1;
+  border-radius: 5px;
+}
+select:focus {
   outline: none;
   border-color: #3f78f1;
   box-shadow: 0 0 5px rgba(63, 120, 241, 0.5);

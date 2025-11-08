@@ -39,7 +39,15 @@
                 <input type="text" id="newUsername" name="fnewUsername" placeholder="Nombre de usuario" required>
                 <input type="email" id="email" name="femail" placeholder="Correo electrónico" required>
                 <input type="password" id="newpassword" name="fnewpassword" placeholder="Contraseña" required>
-                <button type="submit">Registrarse</button>
+                <div id="inputsusuario" class="extra-inputs hidden">
+                    <input type="text" id="newDirección" name="fnewDirección" placeholder="Dirección: " required>
+                    <input type="Edad" id="newEdad" name="fnewEdad" placeholder="Edad: " required>
+                </div>
+                <div id="inputsprestador" class="extra-inputs hidden">
+                    <input type="text" id="newServicios" name="fnewServicios" placeholder="Servicios: " required>
+                    <input type="Empresa" id="newEmpresa" name="fnewEmpresa" placeholder="Empresa: " required>
+                </div>
+                <button type="submit" id="botonRegistro">Registrarse</button>
                 </form>
                 <span class="toggle-text" id="loginText">volver al <strong class="resaltado">Inicio de Sesion</strong></span>
             </div>

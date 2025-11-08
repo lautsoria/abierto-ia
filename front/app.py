@@ -23,6 +23,9 @@ def Formulario():
         return f"Datos recibidos: {nombre}, {apellido}, {celular}, {direccion}, {dni}"
     return render_template('formulario.html')
 
+@app.route('/electricismo')
+def electricismo():
+  return render_template('electricismo.html')
 @app.errorhandler(404)
 def error(e):
    return render_template('404.html'), 404
