@@ -1,0 +1,6 @@
+En esta carpeta tenemos que definir los endpoints de las rutas del back
+
+- /auth
+- /proveedores
+- /clientes
+- /reservas

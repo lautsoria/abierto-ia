@@ -1,0 +1,4 @@
+Aca debemos manejar todo lo que tiene que ver con la configuracion de la base de datos.
+(las querys se hacen en sus respectivas funciones dentro de la ruta especifica)
+
+Aca debemos conectarnos a la base de datos, generar los datos dummy y manejar cualquier error de conexion
