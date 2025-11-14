@@ -36,6 +36,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['POST'])
 def register():
   user, email, password, provider = request.json.values()
+  print(provider)
   
   try:
     # Generate salt with the specified rounds and hash the password
@@ -47,19 +48,23 @@ def register():
     cursor = conn.cursor()
 
     cursor.execute('''
-                   SELECT * 
-                   FROM usuarios 
-                   WHERE usuario = %s OR email = %s
-                   ''', (user, email)
-                  )
+      SELECT * FROM usuarios WHERE usuario = %s OR email = %s
+      ''', (user, email))
     existingUser = cursor.fetchone()
     if existingUser != None:
       # Por temas de seguirdad no informamos que el usuario existe
       return {'message': 'Error al crear el usuario'}, 400
 
     id = str(uuid.uuid4())
-    cursor.execute('''INSERT INTO usuarios (id, usuario, email, contrasena) 
-                  VALUES (%s, %s, %s, %s)''', (id, user, email, password))
+    cursor.execute('''
+      INSERT INTO usuarios (id, usuario, email, contrasena) 
+      VALUES (%s, %s, %s, %s)''', (id, user, email, password))
+    
+    if provider == 'on':
+      providerId = str(uuid.uuid4())
+      cursor.execute('''
+        INSERT INTO proveedores (id, usuario_id) 
+        VALUES (%s, %s)''', (providerId, id))
     conn.commit()
     cursor.close()
     conn.close()
@@ -79,31 +84,50 @@ def login():
     conn = db_conn()
     cursor = conn.cursor()
     cursor.execute('''
-                   SELECT id, contrasena 
-                   FROM usuarios 
-                   WHERE usuario = %s OR email = %s
-                   ''', (credential, credential)
-                  )
+      SELECT id, contrasena
+      FROM usuarios 
+      WHERE usuario = %s OR email = %s
+      ''', (credential, credential)
+    )
     userData = cursor.fetchone()
-    cursor.close()
-    conn.close()
 
+    # primero chequeamos que el usuario exista
     if userData is None:
+      cursor.close()
+      conn.close()      
       return {'message': 'Credenciales invalidas'}, 401
 
-    if (password == userData[1]):
-
+    # y que la clave sea valida
+    if (password != userData[1]):
+      cursor.close()
+      conn.close()  
+      return {'message': 'Credenciales invalidas'}, 401
+    
+    cursor.execute('''
+        SELECT p.id
+        FROM proveedores p
+        WHERE p.usuario_id = %s
+    ''', (userData[0]))
+    
+    providerData = cursor.fetchone()
+    cursor.close()
+    conn.close()             
+    
+    if (providerData is not None):
+      access_token = create_access_token( 
+        identity=userData[0],
+        additional_claims={"role":"provider"}
+      )
+    else:
       access_token = create_access_token( 
         identity=userData[0]
       )      
 
-      # debemos settear las cookies desde el back para poder acceder desde aca y desde el front
-      # de otra manera se quedaran pegadas al dominio del front
-      res = make_response({'message': 'Login exitoso'}, 200)
-      set_access_cookies(res, access_token)
-      return res
-    else:
-      return {'message': 'Credenciales invalidas'}, 401
+    # debemos settear las cookies desde el back para poder acceder desde aca y desde el front
+    # de otra manera se quedaran pegadas al dominio del front
+    res = make_response({'message': 'Login exitoso'}, 200)
+    set_access_cookies(res, access_token)
+    return res
 
   except Exception as e:
     logger.exception('Error logueando usuario')
