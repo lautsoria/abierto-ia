@@ -107,7 +107,7 @@ def login():
         SELECT p.id
         FROM proveedores p
         WHERE p.usuario_id = %s
-    ''', (userData[0]))
+    ''', (userData[0],)) 
     
     providerData = cursor.fetchone()
     cursor.close()
@@ -132,13 +132,3 @@ def login():
   except Exception as e:
     logger.exception('Error logueando usuario')
     return {'message': str(e)}, 400
-
-
-@auth_bp.route('/validate', methods=['GET'])
-@jwt_required(locations=['cookies'])  # Explicitly tell it to look in cookies!
-def validate():
-  # @jwt_required se toma el trabajo de verificar que el token sea valido o que exista
-  # entonces podemos asumir que dentro de la funcion el token existe y es valido
-  user_id = get_jwt_identity()
-  logger.info(f'Token validated successfully for user_id: {user_id}')
-  return {'valid': True, 'user_id': user_id}, 200
