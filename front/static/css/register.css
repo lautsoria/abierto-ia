@@ -120,3 +120,25 @@ button:hover {
   transform: translateY(-50%);
 }
 
+/* Styles for the new "Soy proveedor" checkbox */
+.proveedor-checkbox {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+  justify-content: flex-start; /* Align to the left */
+}
+
+.proveedor-checkbox input[type="checkbox"] {
+  margin-right: 8px; /* Space between checkbox and label */
+  width: auto; /* Override the default input width */
+  margin-bottom: 0; /* Override default margin */
+  accent-color: #12afd6f1; /* Color the checkbox */
+}
+
+.proveedor-checkbox label {
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+}
+

@@ -12,7 +12,7 @@
     <div class="flip-card" id="flipCard">
         <div class="flip-card-inner">
             <div class="flip-card-front">
-                <form id="loginForm"action="{{ url_for('Formulario') }}" method="POST">
+                <form id="loginForm">
 
                 
                 <h1>Login</h1>
@@ -40,6 +40,10 @@
                 <input type="email" id="email" name="femail" placeholder="Correo electrónico" required>
                 <input type="password" id="newpassword" name="fnewpassword" placeholder="Contraseña" required>
                 <input type="password" id="newpassword2" name="fnewpassword2" placeholder="Repetir Contraseña" required>
+                <div class="proveedor-checkbox">
+                    <input type="checkbox" id="isProveedor" name="isProveedor">
+                    <label for="isProveedor">Soy proveedor</label>
+                </div>
                 <button type="submit">Registrarse</button>
                 </form>
                 <span class="toggle-text" id="loginText">volver al <strong class="resaltado">Inicio de Sesion</strong></span>

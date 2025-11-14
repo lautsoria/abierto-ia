@@ -5,13 +5,11 @@ Aca debemos conectarnos a la base de datos, generar los datos dummy y manejar cu
 
 CREATE TABLE usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VARCHAR(255) NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  contraseña VARCHAR(255) NOT NULL,
-  rol ENUM('cliente', 'proveedor', 'admin') DEFAULT 'cliente',
+  usuario VARCHAR(25) NOT NULL,
+  email VARCHAR(15) UNIQUE NOT NULL,
+  contraseña VARCHAR(12) NOT NULL,
   fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
 
 CREATE TABLE proveedores (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -22,7 +20,6 @@ CREATE TABLE proveedores (
   calificacion_promedio FLOAT DEFAULT 0,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
-
 
 CREATE TABLE servicios (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -44,7 +41,6 @@ CREATE TABLE categorias (
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE TABLE reservas (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id INT NOT NULL,
@@ -57,7 +53,6 @@ CREATE TABLE reservas (
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 );
 
-
 CREATE TABLE reseñas (
   id INT AUTO_INCREMENT PRIMARY KEY,
   usuario_id INT NOT NULL,
@@ -67,16 +62,4 @@ CREATE TABLE reseñas (
   fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
-);
-
-
-CREATE TABLE mensajes (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  remitente_id INT NOT NULL,
-  destinatario_id INT NOT NULL,
-  mensaje TEXT NOT NULL,
-  fecha_envio DATETIME DEFAULT CURRENT_TIMESTAMP,
-  leido BOOL DEFAULT FALSE,
-  FOREIGN KEY (remitente_id) REFERENCES usuarios(id),
-  FOREIGN KEY (destinatario_id) REFERENCES usuarios(id)
 );
