@@ -12,7 +12,7 @@
     <div class="flip-card" id="flipCard">
         <div class="flip-card-inner">
             <div class="flip-card-front">
-                <form id="loginForm"action="{{ url_for('Formulario') }}" method="POST">
+                <form id="loginForm"action="{{ url_for('Loguin') }}" method="POST">
 
                 
                 <h1>Login</h1>
@@ -34,7 +34,7 @@
             <span class="toggle-text" id="Registertext">Registrarse</span>
             </div>
             <div class="flip-card-back">
-                <form id= "registerForm">
+                <form id="registerForm" action="{{ url_for('registro') }}" method="POST">
                 <h1 >Registrate</h1>
                 <input type="text" id="newUsername" name="fnewUsername" placeholder="Nombre de usuario" required>
                 <input type="email" id="email" name="femail" placeholder="Correo electrónico" required>
@@ -47,6 +47,8 @@
                     <input type="text" id="newServicios" name="fnewServicios" placeholder="Servicios: " required>
                     <input type="Empresa" id="newEmpresa" name="fnewEmpresa" placeholder="Empresa: " required>
                 </div>
+
+                </a>
                 <button type="submit" id="botonRegistro">Registrarse</button>
                 </form>
                 <span class="toggle-text" id="loginText">volver al <strong class="resaltado">Inicio de Sesion</strong></span>
