@@ -1,7 +1,12 @@
 from flask import Blueprint, jsonify, request
 import os
 import logging
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token, 
+    jwt_required, 
+    get_jwt_identity, 
+    set_access_cookies
+)
 import uuid
 # from dotenv import load_dotenv
 # import bcrypt as b
@@ -93,17 +98,9 @@ def login():
 
       # debemos settear las cookies desde el back para poder acceder desde aca y desde el front
       # de otra manera se quedaran pegadas al dominio del front
-      response = make_response({'message': 'Login exitoso'}, 200)
-      response.set_cookie(
-        'access_token',
-        value=access_token,
-        max_age=36000,
-        httponly=False,
-        secure=False,
-        samesite='Lax',
-        domain='localhost'
-      )
-      return response
+      res = make_response({'message': 'Login exitoso'}, 200)
+      set_access_cookies(res, access_token)
+      return res
     else:
       return {'message': 'Credenciales invalidas'}, 401
 
@@ -113,7 +110,7 @@ def login():
 
 
 @auth_bp.route('/validate', methods=['GET'])
-@jwt_required()
+@jwt_required(locations=['cookies'])
 def validate():
   # @jwt_required se toma el trabajo de verificar que el token sea valido o que exista
   # entonces podemos asumir que dentro de la funcion el token existe y es valido

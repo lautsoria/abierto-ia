@@ -11,6 +11,7 @@ def verify_token():
         return
     
     token = request.cookies.get('access_token')
+    print(token)
     if not token:
         print('No existe token')
         return redirect('/')
