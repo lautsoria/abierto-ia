@@ -81,10 +81,7 @@ loginForm.addEventListener('submit', async (e) => {
         return           
     }
 
-    const data = await login.json()
-    console.log(data)
-    
-    // Cookie is set by backend automatically
+    // no debemos pasar la cookie ya que el backend se encarga de meterla
     loginMessage.innerText = 'Iniciando sesión...'
     loginMessage.style.color = 'green'
     setTimeout(() => {

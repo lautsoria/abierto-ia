@@ -5,7 +5,8 @@ from flask_jwt_extended import (
     create_access_token, 
     jwt_required, 
     get_jwt_identity, 
-    set_access_cookies
+    set_access_cookies,
+    verify_jwt_in_request
 )
 import uuid
 # from dotenv import load_dotenv
@@ -92,7 +93,7 @@ def login():
 
     if (password == userData[1]):
 
-      access_token = create_access_token(
+      access_token = create_access_token( 
         identity=userData[0]
       )      
 
@@ -110,9 +111,10 @@ def login():
 
 
 @auth_bp.route('/validate', methods=['GET'])
-@jwt_required(locations=['cookies'])
+@jwt_required(locations=['cookies'])  # Explicitly tell it to look in cookies!
 def validate():
   # @jwt_required se toma el trabajo de verificar que el token sea valido o que exista
   # entonces podemos asumir que dentro de la funcion el token existe y es valido
   user_id = get_jwt_identity()
+  logger.info(f'Token validated successfully for user_id: {user_id}')
   return {'valid': True, 'user_id': user_id}, 200

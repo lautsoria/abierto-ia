@@ -1,50 +1,42 @@
-from flask import Flask, render_template, request, redirect, flash, make_response
+from flask import Flask, render_template, request, redirect, url_for
+from flask_jwt_extended import jwt_required, JWTManager, get_jwt_identity, verify_jwt_in_request
 import os
-import requests
 
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_COOKIE_SECURE'] = False
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 
-@app.before_request
-def verify_token():
-    public_routes = ['reg', 'error', 'static']
-    if request.endpoint is None or request.endpoint in public_routes:
-        return
-    
-    token = request.cookies.get('access_token')
-    print(token)
-    if not token:
-        print('No existe token')
-        return redirect('/')
-    
-    # validamos el token con el backend (NUNCA SE HACE EN EL FRONT)
-    try:
-        response = requests.get('http://localhost:5500/auth/validate', 
-                              cookies={'access_token': token},
-                              timeout=2)
-        
-        print(response)
+jwt = JWTManager(app)
 
-        if response.status_code != 200:
-            # si el token no es valido (expiro u otra cosa) lo borramos
-            print('Token invalido')
-            resp = make_response(redirect('/'))
-            resp.set_cookie('access_token', '', expires=0)
-            return resp
-    except Exception as e:
-        # ante cualquier error lo devolvemos al login para evitar problemas :)
-        print(f'Error {e}')
-        return redirect('/')
+# manejamos que hacer cuando el token no existe
+@jwt.unauthorized_loader
+def unauthorized_callback(error):
+    return redirect(url_for('reg'))
+# o cuando el token es invalido
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return redirect(url_for('reg'))
 
 @app.route('/home')
+@jwt_required(locations=['cookies'])
 def home():
+    data = get_jwt_identity()
+    print(f'User {data} logged with valid token')
     return render_template('base/base.html')
 
 @app.route('/')
 def reg():
-  return render_template('register.html')
+  try:
+    verify_jwt_in_request(locations=['cookies'])
+    return redirect(url_for('home'))
+  except:
+    return render_template('register.html')
 
 @app.route('/formulario', methods=['GET', 'POST'])
-def Formulario():
+def formulario():
     if request.method == 'POST':
         nombre = request.form['fnombre']
         apellido = request.form['fapellido']
