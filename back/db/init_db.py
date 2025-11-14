@@ -1,6 +1,9 @@
 import mysql.connector
 import os
+from dotenv import load_dotenv
 
+env_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
+load_dotenv(dotenv_path=env_path)
 # este archivo inicializa la base de datos junto con los datos dummy
 
 # ahora leemos las querys del archivo 
@@ -12,9 +15,10 @@ with open(sql_file) as f:
 
 db = mysql.connector.connect(
   # llenar estos datos con las variables del .env por seguridad
-  host='localhost',
-  user='root',
-  password='0074'
+  host=os.getenv('DB_HOST'),
+  user=os.getenv('DB_USER'),
+  password=os.getenv('DB_PASSWORD'),
+  port=int(os.getenv('DB_PORT'))
 )
 
 cursor = db.cursor()

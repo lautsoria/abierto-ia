@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 import os
 import logging
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import uuid
 # from dotenv import load_dotenv
 # import bcrypt as b
@@ -29,7 +29,7 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-  user, email, password = request.json.values()
+  user, email, password, provider = request.json.values()
   
   try:
     # Generate salt with the specified rounds and hash the password
@@ -52,17 +52,13 @@ def register():
       return {'message': 'Error al crear el usuario'}, 400
 
     id = str(uuid.uuid4())
-    cursor.execute('''INSERT INTO usuarios (id, usuario, email, contraseña) 
+    cursor.execute('''INSERT INTO usuarios (id, usuario, email, contrasena) 
                   VALUES (%s, %s, %s, %s)''', (id, user, email, password))
     conn.commit()
     cursor.close()
     conn.close()
-
-    access_token = create_access_token(
-      identity=id
-    )
   
-    return jsonify(access_token=access_token), 200
+    return {'message':f'Usuario {user} creado correctamente, por favor iniciar sesión'}, 200
   except Exception as e:
     logger.exception('Error creando usuario')
     return {'message': str(e)}, 400
@@ -70,13 +66,14 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
+  from flask import make_response
   credential, password = request.json.values()
   
   try:
     conn = db_conn()
     cursor = conn.cursor()
     cursor.execute('''
-                   SELECT id, contraseña 
+                   SELECT id, contrasena 
                    FROM usuarios 
                    WHERE usuario = %s OR email = %s
                    ''', (credential, credential)
@@ -94,10 +91,31 @@ def login():
         identity=userData[0]
       )      
 
-      return jsonify(access_token=access_token), 200
+      # debemos settear las cookies desde el back para poder acceder desde aca y desde el front
+      # de otra manera se quedaran pegadas al dominio del front
+      response = make_response({'message': 'Login exitoso'}, 200)
+      response.set_cookie(
+        'access_token',
+        value=access_token,
+        max_age=36000,
+        httponly=False,
+        secure=False,
+        samesite='Lax',
+        domain='localhost'
+      )
+      return response
     else:
       return {'message': 'Credenciales invalidas'}, 401
 
   except Exception as e:
     logger.exception('Error logueando usuario')
     return {'message': str(e)}, 400
+
+
+@auth_bp.route('/validate', methods=['GET'])
+@jwt_required()
+def validate():
+  # @jwt_required se toma el trabajo de verificar que el token sea valido o que exista
+  # entonces podemos asumir que dentro de la funcion el token existe y es valido
+  user_id = get_jwt_identity()
+  return {'valid': True, 'user_id': user_id}, 200

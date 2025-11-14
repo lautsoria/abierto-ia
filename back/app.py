@@ -15,13 +15,17 @@ from dotenv import load_dotenv
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:5000"], supports_credentials=True)
 
 env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(dotenv_path=env_path)
 
 # literalmente lo que vos quieras de 32 caracteres
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_COOKIE_SECURE'] = False
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+# app.config['JWT_COOKIE_NAME'] = 'access_token'
 
 jwt = JWTManager(app) 
 
