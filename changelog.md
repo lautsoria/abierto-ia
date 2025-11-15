@@ -1,5 +1,26 @@
 ## 15 de Noviembre, 2025
 
+### Arquitectura de Templates con Jinja2
+
+**Implementación:**
+- Implementada herencia de templates usando Jinja2
+- `home.html` ahora extiende `base.html` para reutilizar header y footer
+- Agregado sistema de bloques en `base.html`:
+  - `{% block title %}` para títulos personalizados por página
+  - `{% block styles %}` para CSS específico de cada página
+  - `{% block content %}` para el contenido principal
+  - `{% block scripts %}` para JavaScript específico de cada página
+- CSS modular: `base.css` para estilos comunes, `home.css` para estilos específicos de home
+
+**Navegación dinámica:**
+- Header en `base.html` muestra opciones diferentes según estado de autenticación y rol:
+  - Usuario no autenticado: "Categorías", "Ofertas", "Ingresá"
+  - Usuario regular autenticado: "Categorías", "Ofertas", "Mi Perfil", "Ver 🛒"
+  - Proveedor autenticado: "Registrar servicio", "Calendario", "Mi perfil", "Mis servicios"
+- La lógica usa `{% if data %}` y `{% if data.provider %}` para determinar qué mostrar
+- Variables pasadas a `render_template()` están disponibles en todo el árbol de herencia
+
+
 ### Scripts de Gestión de Servicios
 
 **Implementación:**

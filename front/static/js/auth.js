@@ -53,9 +53,9 @@ registerForm.addEventListener('submit', async (e) => {
 
     registerMessage.innerText = 'Usuario creado, Iniciar sesión!'
     registerMessage.style.color = 'green'
-    // setTimeout(() => {
-    //     window.location.href = '/'
-    // }, 2000)       
+    setTimeout(() => {
+        flipcard.style.transform = "rotateY(0deg)";
+    }, 2000)       
 })
 
 // login
@@ -87,9 +87,9 @@ loginForm.addEventListener('submit', async (e) => {
     // no debemos pasar la cookie ya que el backend se encarga de meterla
     loginMessage.innerText = 'Iniciando sesión...'
     loginMessage.style.color = 'green'
-    // setTimeout(() => {
-    //     window.location.href = '/home'
-    // }, 1000)
+    setTimeout(() => {
+        window.location.href = '/'
+    }, 1000)
 })
 
 
