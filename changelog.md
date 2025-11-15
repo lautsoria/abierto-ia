@@ -1,3 +1,30 @@
+## 15 de Noviembre, 2025
+
+### Scripts de Gestión de Servicios
+
+**Implementación:**
+- Creada carpeta `/scripts` con scripts bash para gestionar frontend y backend simultáneamente
+- Implementado `start.sh`: Inicia ambos servicios (backend en puerto 5500, frontend en puerto 5000)
+  - Activa automáticamente el entorno virtual
+  - Guarda logs en carpeta `logs/`
+  - Guarda PIDs de procesos para shutdown limpio
+- Implementado `stop.sh`: Detiene ambos servicios de forma segura
+  - Usa PIDs guardados para terminar procesos correctamente
+  - Fallback a matar por puerto si los PIDs no existen
+- Implementado `restart.sh`: Reinicia ambos servicios
+- Agregado `scripts/README.md` con documentación de uso
+
+### Mejoras en el Sistema de Roles
+
+**Frontend:**
+- Modificado `base.html` para mostrar navegación diferenciada según rol de usuario
+- Proveedores ven: "Registrar servicio", "Calendario", "Mi perfil", "Mis servicios"
+- Usuarios regulares ven: "Categorías", "Ofertas", "Ingresá", "Mis Compras", "Ver 🛒"
+- La navegación se actualiza dinámicamente usando `data.role.role` del JWT
+
+**Correcciones:**
+- Fixeado bug en `register.js`: cambiado `checkbox.value` por `checkbox.checked` para obtener el valor booleano correcto del checkbox "Soy proveedor"
+
 ## 14 de Noviembre, 2025
 
 ### Sistema de Autenticación con JWT

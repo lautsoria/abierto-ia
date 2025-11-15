@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_jwt_extended import jwt_required, JWTManager, get_jwt_identity, verify_jwt_in_request
+from flask_jwt_extended import jwt_required, JWTManager, get_jwt_identity, verify_jwt_in_request, get_jwt
 import os
 
 app = Flask(__name__)
@@ -24,8 +24,11 @@ def invalid_token_callback(error):
 @jwt_required(locations=['cookies'])
 def home():
     data = get_jwt_identity()
-    print(f'User {data} logged with valid token')
-    return render_template('base/base.html')
+    role = get_jwt()
+    provider = role['provider']
+    print(data)
+    print(f'User {data} logged with valid token. Is provider? ${provider}')
+    return render_template('base/base.html', data={'userId':data, 'provider':provider})
 
 @app.route('/')
 def reg():

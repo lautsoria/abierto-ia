@@ -23,7 +23,7 @@ registerForm.addEventListener('submit', async (e) => {
     const password = $("newPassword")
     const repeatPassword = $("newPassword2")
     const registerMessage = $("registerMessage")
-    const provider = $("isProveedor")
+    const checkbox = $("isProveedor")
     
     if (password.value !== repeatPassword.value) {
         registerMessage.innerText = 'Passwords do not match'
@@ -33,13 +33,16 @@ registerForm.addEventListener('submit', async (e) => {
     
     // enviamos un POST a la api para registrar al usuario.
     // lo hacemos de esta forma porque front y back se encuentran en 2 puertos separados
+    const req_body = JSON.stringify({ user: user.value, email: email.value, password: password.value, provider: checkbox.checked })
+    console.log(req_body)
+    
     const register = await fetch('http://localhost:5500/auth/register', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ user: user.value, email: email.value, password: password.value, provider: provider.value })
+        body: req_body
     })
 
     if (!register.ok) {
@@ -50,9 +53,9 @@ registerForm.addEventListener('submit', async (e) => {
 
     registerMessage.innerText = 'Usuario creado, Iniciar sesión!'
     registerMessage.style.color = 'green'
-    setTimeout(() => {
-        window.location.href = '/'
-    }, 2000)       
+    // setTimeout(() => {
+    //     window.location.href = '/'
+    // }, 2000)       
 })
 
 // login
@@ -84,9 +87,9 @@ loginForm.addEventListener('submit', async (e) => {
     // no debemos pasar la cookie ya que el backend se encarga de meterla
     loginMessage.innerText = 'Iniciando sesión...'
     loginMessage.style.color = 'green'
-    setTimeout(() => {
-        window.location.href = '/home'
-    }, 1000)
+    // setTimeout(() => {
+    //     window.location.href = '/home'
+    // }, 1000)
 })
 
 

@@ -60,7 +60,7 @@ def register():
       INSERT INTO usuarios (id, usuario, email, contrasena) 
       VALUES (%s, %s, %s, %s)''', (id, user, email, password))
     
-    if provider == 'on':
+    if provider:
       providerId = str(uuid.uuid4())
       cursor.execute('''
         INSERT INTO proveedores (id, usuario_id) 
@@ -116,11 +116,12 @@ def login():
     if (providerData is not None):
       access_token = create_access_token( 
         identity=userData[0],
-        additional_claims={"role":"provider"}
+        additional_claims={'provider':True}
       )
     else:
       access_token = create_access_token( 
-        identity=userData[0]
+        identity=userData[0],
+        additional_claims={'provider':False}
       )      
 
     # debemos settear las cookies desde el back para poder acceder desde aca y desde el front
