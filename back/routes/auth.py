@@ -1,0 +1,135 @@
+from flask import Blueprint, jsonify, request
+import os
+import logging
+from flask_jwt_extended import (
+    create_access_token, 
+    jwt_required, 
+    get_jwt_identity, 
+    set_access_cookies,
+    verify_jwt_in_request
+)
+import uuid
+# from dotenv import load_dotenv
+# import bcrypt as b
+
+from db.db import db_conn
+
+logger = logging.getLogger(__name__)
+
+# es mucho muy importante que definas salt
+# env_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
+# load_dotenv(dotenv_path=env_path)
+# salt = os.getenv('SALT')
+# try:
+#   if salt is None:
+#     logger.warning('SALT no esta definida')
+#   else:
+#     SALT_ROUNDS = int(salt)
+#     # bcrypt gensalt accepts a cost between 4 and 31 (practical range)
+#     if not (4 <= SALT_ROUNDS <= 31):
+#       logger.warning('SALT debe tener un valor entre 4 y 31')
+# except Exception as e:
+#   raise ValueError('Valor invalido para salt', e)
+
+auth_bp = Blueprint('auth', __name__)
+
+@auth_bp.route('/register', methods=['POST'])
+def register():
+  user, email, password, provider = request.json.values()
+  print(provider)
+  
+  try:
+    # Generate salt with the specified rounds and hash the password
+    # salt = b.gensalt(rounds=SALT_ROUNDS)
+    # hashedPassword = b.hashpw(data['password'].encode('utf-8'), salt=salt)
+    
+    # connect to the database and save user
+    conn = db_conn()
+    cursor = conn.cursor()
+
+    cursor.execute('''
+      SELECT * FROM usuarios WHERE usuario = %s OR email = %s
+      ''', (user, email))
+    existingUser = cursor.fetchone()
+    if existingUser != None:
+      # Por temas de seguirdad no informamos que el usuario existe
+      return {'message': 'Error al crear el usuario'}, 400
+
+    id = str(uuid.uuid4())
+    cursor.execute('''
+      INSERT INTO usuarios (id, usuario, email, contrasena) 
+      VALUES (%s, %s, %s, %s)''', (id, user, email, password))
+    
+    if provider:
+      providerId = str(uuid.uuid4())
+      cursor.execute('''
+        INSERT INTO proveedores (id, usuario_id) 
+        VALUES (%s, %s)''', (providerId, id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+  
+    return {'message':f'Usuario {user} creado correctamente, por favor iniciar sesión'}, 200
+  except Exception as e:
+    logger.exception('Error creando usuario')
+    return {'message': str(e)}, 400
+  
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+  from flask import make_response
+  credential, password = request.json.values()
+  
+  try:
+    conn = db_conn()
+    cursor = conn.cursor()
+    cursor.execute('''
+      SELECT id, contrasena
+      FROM usuarios 
+      WHERE usuario = %s OR email = %s
+      ''', (credential, credential)
+    )
+    userData = cursor.fetchone()
+
+    # primero chequeamos que el usuario exista
+    if userData is None:
+      cursor.close()
+      conn.close()      
+      return {'message': 'Credenciales invalidas'}, 401
+
+    # y que la clave sea valida
+    if (password != userData[1]):
+      cursor.close()
+      conn.close()  
+      return {'message': 'Credenciales invalidas'}, 401
+    
+    cursor.execute('''
+        SELECT p.id
+        FROM proveedores p
+        WHERE p.usuario_id = %s
+    ''', (userData[0],)) 
+    
+    providerData = cursor.fetchone()
+    cursor.close()
+    conn.close()             
+    
+    if (providerData is not None):
+      access_token = create_access_token( 
+        identity=userData[0],
+        additional_claims={'provider':True}
+      )
+    else:
+      access_token = create_access_token( 
+        identity=userData[0],
+        additional_claims={'provider':False}
+      )      
+
+    # debemos settear las cookies desde el back para poder acceder desde aca y desde el front
+    # de otra manera se quedaran pegadas al dominio del front
+    res = make_response({'message': 'Login exitoso'}, 200)
+    set_access_cookies(res, access_token)
+    return res
+
+  except Exception as e:
+    logger.exception('Error logueando usuario')
+    return {'message': str(e)}, 400

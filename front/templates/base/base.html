@@ -42,11 +42,18 @@
     
 
       <nav class="header-nav">
-        <a href="#" class="nav-link">Categorías</a>
-        <a href="#" class="nav-link">Ofertas</a>
-        <a href="#" class="nav-link end">Ingresá</a>
-        <a href="#" class="nav-link">Mis Compras</a>
-        <a href="#" class="nav-link">Ver Carrito 🛒</a>
+        {% if data and data.provider %}
+          <a href="#" class="nav-link">Registrar servicio</a>
+          <a href="#" class="nav-link">Calendario</a>
+          <a href="#" class="nav-link end">Mi perfil</a>
+          <a href="#" class="nav-link">Mis servicios</a>
+        {% else %}
+          <a href="#" class="nav-link">Categorías</a>
+          <a href="#" class="nav-link">Ofertas</a>
+          <a href="#" class="nav-link end">Ingresá</a>
+          <a href="#" class="nav-link">Mis Compras</a>
+          <a href="#" class="nav-link">Ver 🛒</a>
+        {% endif %}
       </nav>
     </div>
   </header>
@@ -78,7 +85,7 @@
       <div class="footer-section">
         <h3 class="footer-title">Tu cuenta</h3>
         <ul class="footer-links">
-          <li><a href="#">Ingresá</a></li>
+          <!-- <li><a href="#">Ingresá</a></li> -->
           <li><a href="#">Mis compras</a></li>
           <li><a href="#">Favoritos</a></li>
           <li><a href="#">Vender</a></li>
