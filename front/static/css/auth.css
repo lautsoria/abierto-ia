@@ -18,9 +18,9 @@ h1 {
   perspective: 1000px;
 }
 .flip-card {
-   width: 300px;
+   width: 350px;
 
-    height: 400px;
+    height: 450px;
 
     position: relative;
 
@@ -73,6 +73,9 @@ h1 {
   color: #35a1df;
 }
 
+.hidden {
+  display: none;
+}
 
 form {
   display: flex;
@@ -88,6 +91,18 @@ input {
   border-radius: 5px;
 }
 input:focus {
+  outline: none;
+  border-color: #3f78f1;
+  box-shadow: 0 0 5px rgba(63, 120, 241, 0.5);
+}
+select {
+  margin-bottom: 10px ;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #12afd6f1;
+  border-radius: 5px;
+}
+select:focus {
   outline: none;
   border-color: #3f78f1;
   box-shadow: 0 0 5px rgba(63, 120, 241, 0.5);
@@ -142,3 +157,38 @@ button:hover {
   cursor: pointer;
 }
 
+.btn-google {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #D3D3D3, #BEBEBE); /* Botón de color similar al anterior */
+    color: #000; /* Texto negro */
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra */
+    margin-top: 15px; /* Separación entre botones */
+}
+
+.btn-google:hover {
+    background: linear-gradient(45deg, #BEBEBE, #D3D3D3);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+}
+
+.btn-google img {
+    width: 25px; /* Tamaño de la imagen de Google */
+    height: auto; /* Mantiene la proporción de la imagen */
+    margin-right: 10px; /* Espacio entre la imagen y el texto */
+}
+
+.btn-google:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

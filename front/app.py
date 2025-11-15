@@ -28,6 +28,10 @@ def auth():
   except:
     return render_template('auth.html')
 
+
+API_BASE ="http//localhost:500"
+
+
 @app.route('/')
 def home():
    try:
@@ -46,18 +50,6 @@ def base():
     print(data)
     print(f'User {data} logged with valid token. Is provider? ${provider}')
     return render_template('base/base.html', data={'userId':data, 'provider':provider})
-
-@app.route('/formulario', methods=['GET', 'POST'])
-def formulario():
-    if request.method == 'POST':
-        nombre = request.form['fnombre']
-        apellido = request.form['fapellido']
-        celular = request.form['fcelular']
-        direccion = request.form['fdirec']
-        dni = request.form['fdni']
-        # Acá podés procesar o guardar los datos
-        return f"Datos recibidos: {nombre}, {apellido}, {celular}, {direccion}, {dni}"
-    return render_template('formulario.html')
 
 RESERVAS_MOCK = [
     {
@@ -125,6 +117,5 @@ def mis_reservas():
 @app.errorhandler(404)
 def error(e):
    return render_template('404.html'), 404
-
 if __name__ == '__main__':
-    app.run("localhost", port= 5000, debug=True)
+    app.run("localhost", port= 5001, debug=True)
