@@ -20,7 +20,7 @@ PUT /proveedores/<id>
     Autorización: Solo proveedores."""
 
 from flask import Blueprint, jsonify, request
-from db import get_connection
+from db.db import db_conn
 
 proveedores_bp = Blueprint('proveedores', __name__)
 
@@ -28,7 +28,7 @@ proveedores_bp = Blueprint('proveedores', __name__)
 @proveedores_bp.route('/')
 def get_proveedores():
     try:
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor(dictionary=True)
         
         # Obtener filtro de servicio si existe
@@ -68,7 +68,7 @@ def get_proveedores():
 @proveedores_bp.route('/<int:id>')
 def get_proveedor(id):
     try:
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor(dictionary=True)
         
         # datos del provedor
@@ -124,7 +124,7 @@ def create_proveedor():
         # if not validar_certificado(request):
         #     return jsonify({'error': 'Certificado no válido'}), 401
         
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor()
         
         query = """
@@ -164,7 +164,7 @@ def update_proveedor(id):
         # if not es_proveedor(request):
         #     return jsonify({'error': 'No autorizado'}), 403
         
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor()
         
         # si es provedor existente

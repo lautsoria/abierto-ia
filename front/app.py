@@ -28,10 +28,6 @@ def auth():
   except:
     return render_template('auth.html')
 
-
-API_BASE ="http//localhost:500"
-
-
 @app.route('/')
 def home():
    try:
@@ -117,5 +113,6 @@ def mis_reservas():
 @app.errorhandler(404)
 def error(e):
    return render_template('404.html'), 404
+
 if __name__ == '__main__':
-    app.run("localhost", port= 5001, debug=True)
+    app.run("localhost", port= 5000, debug=True)

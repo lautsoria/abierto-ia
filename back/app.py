@@ -9,7 +9,8 @@
 from flask import Flask
 from flask_cors import CORS
 from routes.auth import auth_bp as auth
-from routes.provedores import proveedores_bp
+from routes.provedores import proveedores_bp as proveedores
+from routes.reservas import reservas_bp as reservas
 from flask_jwt_extended import JWTManager
 import os
 from dotenv import load_dotenv
@@ -30,9 +31,9 @@ app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 jwt = JWTManager(app) 
 
 app.register_blueprint(auth, url_prefix="/auth")
-app.register_blueprint(proveedores_bp, url_prefix='/proveedores')
+app.register_blueprint(proveedores, url_prefix='/proveedores')
+app.register_blueprint(reservas, url_prefix="/reservas")
 # app.register_blueprint(clientes, url_prefix="/clientes")
-# app.register_blueprint(reservas, url_prefix="/reservas")
 
 if __name__ == "__main__":
     app.run(port=5500, debug=True)

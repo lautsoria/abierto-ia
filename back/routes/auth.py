@@ -1,12 +1,8 @@
-from flask import Blueprint, jsonify, request
-import os
+from flask import Blueprint, request
 import logging
 from flask_jwt_extended import (
     create_access_token, 
-    jwt_required, 
-    get_jwt_identity, 
-    set_access_cookies,
-    verify_jwt_in_request
+    set_access_cookies
 )
 import uuid
 # from dotenv import load_dotenv

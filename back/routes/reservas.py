@@ -1,9 +1,8 @@
 from flask import Blueprint, jsonify, request
-from db import get_connection
+from db.db import db_conn
 from datetime import datetime
 
 reservas_bp = Blueprint('reservas', __name__)
-
 
 # crear reserva
 @reservas_bp.route('/', methods=['POST'])
@@ -22,7 +21,7 @@ def create_reserva():
         if 'usuario_id' not in data:
             return jsonify({'error': 'usuario_id es requerido (temporal)'}), 400
         
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor()
         
         # si servicio existente
@@ -70,7 +69,7 @@ def get_mis_reservas():
         if not usuario_id:
             return jsonify({'error': 'usuario_id es requerido (temporal)'}), 400
         
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor(dictionary=True)
         
         # segun rol del usuario
@@ -146,7 +145,7 @@ def get_all_reservas():
         # if not es_admin(request):
         #     return jsonify({'error': 'No autorizado'}), 403
         
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor(dictionary=True)
         
         query = """
@@ -190,7 +189,7 @@ def update_reserva(id):
         # if not es_admin_o_proveedor(request, id):
         #     return jsonify({'error': 'No autorizado'}), 403
         
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor()
         
         # si la reserva existe
@@ -240,7 +239,7 @@ def update_reserva(id):
 @reservas_bp.route('/<int:id>')
 def get_reserva(id):
     try:
-        conn = get_connection()
+        conn = db_conn()
         cursor = conn.cursor(dictionary=True)
         
         query = """
