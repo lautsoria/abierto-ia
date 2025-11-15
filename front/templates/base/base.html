@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href='{{ url_for('static', filename='css/base.css', external='true') }}'>
   <title>{% block title %}Base{% endblock %}</title>
+  <link rel="stylesheet" href='{{ url_for('static', filename='css/base.css', external='true') }}'>
+  {% block styles %}{% endblock %}
 </head>
 
 <body>
@@ -42,17 +43,22 @@
     
 
       <nav class="header-nav">
-        {% if data and data.provider %}
-          <a href="#" class="nav-link">Registrar servicio</a>
-          <a href="#" class="nav-link">Calendario</a>
-          <a href="#" class="nav-link end">Mi perfil</a>
-          <a href="#" class="nav-link">Mis servicios</a>
+        {% if data %}
+          {% if data.provider %}
+            <a href="#" class="nav-link">Registrar servicio</a>
+            <a href="#" class="nav-link">Calendario</a>
+            <a href="#" class="nav-link end">Mi perfil</a>
+            <a href="#" class="nav-link">Mis servicios</a>
+          {% else %}
+            <a href="#" class="nav-link">Categorías</a>
+            <a href="#" class="nav-link">Servicios Agendados</a>
+            <a href="" class="nav-link end">Mi Perfil</a>          
+            <a href="" class="nav-link end">Ver 🛒</a>   
+          {% endif %}          
         {% else %}
           <a href="#" class="nav-link">Categorías</a>
           <a href="#" class="nav-link">Ofertas</a>
-          <a href="#" class="nav-link end">Ingresá</a>
-          <a href="#" class="nav-link">Mis Compras</a>
-          <a href="#" class="nav-link">Ver 🛒</a>
+          <a href="{{ url_for('auth') }}" class="nav-link end">Ingresá</a>
         {% endif %}
       </nav>
     </div>

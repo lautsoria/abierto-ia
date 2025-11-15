@@ -20,23 +20,32 @@ def unauthorized_callback(error):
 def invalid_token_callback(error):
     return redirect(url_for('reg'))
 
-@app.route('/home')
-@jwt_required(locations=['cookies'])
+@app.route('/auth')
+def auth():
+  try:
+    verify_jwt_in_request(locations=['cookies'])
+    return redirect(url_for('home'))
+  except:
+    return render_template('auth.html')
+
+@app.route('/')
 def home():
+   try:
+    verify_jwt_in_request(locations=['cookies'])
+    data = get_jwt()
+    return render_template('home.html', data=data)   
+   except:
+    return render_template('home.html')
+
+@app.route('/base')
+@jwt_required(locations=['cookies'])
+def base():
     data = get_jwt_identity()
     role = get_jwt()
     provider = role['provider']
     print(data)
     print(f'User {data} logged with valid token. Is provider? ${provider}')
     return render_template('base/base.html', data={'userId':data, 'provider':provider})
-
-@app.route('/')
-def reg():
-  try:
-    verify_jwt_in_request(locations=['cookies'])
-    return redirect(url_for('home'))
-  except:
-    return render_template('register.html')
 
 @app.route('/formulario', methods=['GET', 'POST'])
 def formulario():
@@ -109,10 +118,9 @@ RESERVAS_MOCK = [
     }
 ]
 
-
 @app.route("/reservas")
 def mis_reservas():
-    return render_template("eservas.html", reservas=RESERVAS_MOCK)
+    return render_template("reservas.html", reservas=RESERVAS_MOCK)
 
 @app.errorhandler(404)
 def error(e):
