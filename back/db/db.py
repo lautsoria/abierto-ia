@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 env_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
 load_dotenv(dotenv_path=env_path)
 
+
 def db_conn():
   return mysql.connector.connect(
     # llenar estos datos con las variables del .env por seguridad

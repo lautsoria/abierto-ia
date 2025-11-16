@@ -21,6 +21,7 @@ db = mysql.connector.connect(
   port=int(os.getenv('DB_PORT'))
 )
 
+
 cursor = db.cursor()
 
 for query in sql.split(';'):

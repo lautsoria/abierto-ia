@@ -11,6 +11,7 @@ from flask_cors import CORS
 from routes.auth import auth_bp as auth
 from routes.provedores import proveedores_bp as proveedores
 from routes.reservas import reservas_bp as reservas
+from routes.servicios import servicios_bp as servicios 
 from flask_jwt_extended import JWTManager
 import os
 from dotenv import load_dotenv
@@ -33,6 +34,7 @@ jwt = JWTManager(app)
 app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(proveedores, url_prefix='/proveedores')
 app.register_blueprint(reservas, url_prefix="/reservas")
+app.register_blueprint(servicios, url_prefix="/servicios")
 # app.register_blueprint(clientes, url_prefix="/clientes")
 
 if __name__ == "__main__":
