@@ -12,10 +12,10 @@
     <div class="flip-card" id="flipCard">
         <div class="flip-card-inner">
             <div class="flip-card-front">
-                <form id="loginForm" method="POST">
+                <form id="loginForm" method="POST" action="{{ url_for('login') }}">
                 <h1>Login</h1>
-                <input type="text" id="credential" name="fnombre" placeholder="Nombre de usuario" required>
-                <input type="password" id="password" name="fcontraseña" placeholder="Contraseña" required>
+                <input type="text" id="credential" name="credential" placeholder="Nombre de usuario" required>
+                <input type="password" id="password" name="password" placeholder="Contraseña" required>
                 <div style="position: relative;">                    
                     <input type="checkbox" id="recordarContraseña">
                     <label for="recordarContraseña">Recordar Constraseña</label>
@@ -29,7 +29,7 @@
             <span class="toggle-text" id="Registertext">Registrarse</span>
             </div>
             <div class="flip-card-back">
-                <form id="registerForm" method="POST">
+                <form id="registerForm" method="POST" action="{{ url_for('register') }}">
                 <h1>Registrate</h1>
                 <input type="text" id="newUser" name="fnewUsername" placeholder="Nombre de usuario" required>
                 <input type="email" id="email" name="femail" placeholder="Correo electrónico" required>
