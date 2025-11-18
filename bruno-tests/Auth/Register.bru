@@ -1,0 +1,30 @@
+meta {
+  name: Register User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "user": "test_user_{{$randomInt}}",
+    "email": "test{{$randomInt}}@example.com",
+    "password": "testpass123",
+    "provider": false
+  }
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response has message", function() {
+    expect(res.body.message).to.be.a('string');
+  });
+}

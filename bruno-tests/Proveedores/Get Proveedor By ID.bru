@@ -1,0 +1,26 @@
+meta {
+  name: Get Proveedor By ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/proveedores/1
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200 or 404", function() {
+    expect([200, 404]).to.include(res.status);
+  });
+  
+  test("If found, has proveedor details", function() {
+    if (res.status === 200) {
+      expect(res.body).to.have.property('id');
+      expect(res.body).to.have.property('descripcion');
+      expect(res.body).to.have.property('servicios');
+      expect(res.body.servicios).to.be.an('array');
+    }
+  });
+}

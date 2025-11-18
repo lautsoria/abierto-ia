@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_jwt_extended import jwt_required, JWTManager, get_jwt_identity, verify_jwt_in_request, get_jwt
+from flask_cors import CORS
 import os
 import requests
+import logging
+
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
@@ -10,6 +13,7 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 
 jwt = JWTManager(app)
+CORS(app)
 
 # manejamos que hacer cuando el token no existe
 @jwt.unauthorized_loader
@@ -29,10 +33,6 @@ def auth():
   except:
     return render_template('auth.html')
 
-
-
-
-
 @app.route('/base')
 @jwt_required(locations=['cookies'])
 def base():
@@ -43,8 +43,8 @@ def base():
     print(f'User {data} logged with valid token. Is provider? ${provider}')
     return render_template('base/base.html', data={'userId':data, 'provider':provider})
 
-ICONOS_CATEGORIAS = {
-    "iconos hardcodeados"
+icons = {
+    # iconos hardcodeados
     "Electricista": "⚡",
     "Plomería": "💧",
     "Pintura": "📌",
@@ -132,8 +132,6 @@ def obtener_cantidad_categoria(nombre):
             data = response.json()
             # la API retorna: { "categoria": "...", "total_profesionales": N }
             return data.get("total_profesionales", 0)
-
-        
         return 0
 
     except Exception as e:
@@ -142,6 +140,7 @@ def obtener_cantidad_categoria(nombre):
 
 def obtener_servicios_destacados():
     """Obtiene servicios destacados desde el backend"""
+    logging.info('Obteniendo servicios destacados')
     try:
         response = requests.get(  
             f'{BACKEND_URL}/servicios/top-rating',
@@ -150,7 +149,6 @@ def obtener_servicios_destacados():
         
         if response.status_code == 200:
             servicios = response.json()
-            print(f" Servicios obtenidos: {len(servicios)}")
             return servicios
         else:
             print(f" Error del backend: {response.status_code}")
@@ -162,7 +160,7 @@ def obtener_servicios_destacados():
         
     except requests.exceptions.ConnectionError:  
         print(" Error: No se pudo conectar al backend en puerto 5500")
-        print("   ¿Está corriendo el backend? Ejecuta: python backend/app.py")
+        print("¿Está corriendo el backend? Ejecuta: python backend/app.py")
         return []
         
     except requests.exceptions.RequestException as e:  
@@ -207,7 +205,7 @@ def obtener_proveedor_detalle(proveedor_id):
 def obtener_categorias():
     try:
         response = requests.get(  
-            f'{BACKEND_URL}/categorias/buscar_existentes',
+            f'{BACKEND_URL}/categorias',
             timeout=5
         )
         
@@ -220,42 +218,26 @@ def obtener_categorias():
         return None
 
 
-
 @app.route('/')
+@jwt_required( optional=True, locations=['cookies'])
 def home():
-    """Página principal con servicios destacados"""
-    data = None
-    
-    
-    try:
-        verify_jwt_in_request(locations=['cookies'], optional=True)
-        data = get_jwt()
-    except:
-        pass
-    
-    
+    data = get_jwt()    
+    user_data = data if data else None
+
     servicios = obtener_servicios_destacados()
     categorias = obtener_categorias()
-    
-
     categorias_completas = []
     if categorias:
         for cat in categorias:
             nombre = cat["nombre"]
-
             cantidad = obtener_cantidad_categoria(nombre)
-
             categorias_completas.append({
                 "nombre": nombre,
                 "total_profesionales": cantidad,
-                "icono": ICONOS_CATEGORIAS.get(nombre, "📁") 
+                "icono": icons.get(nombre, "📁") 
             })
 
-    
-    
-    
-    return render_template('home.html', servicios=servicios,categorias=categorias_completas, data=data)
-
+    return render_template('home.html', servicios=servicios, categorias=categorias_completas, data=user_data)
 
 if __name__ == '__main__':
     app.run("localhost", port= 5000, debug=True)

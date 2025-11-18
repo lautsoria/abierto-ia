@@ -1,12 +1,10 @@
-
-
 from flask import Blueprint, jsonify, request
 from db.db import db_conn
 
 servicios_bp = Blueprint('servicios', __name__)
 
 #filtrar servicio por categoria
-@servicios_bp.route('/categoria/<string:nombre>')
+@servicios_bp.route('/<string:nombre>')
 def servicios_por_categoria(nombre):
     try:
         conn = db_conn()
@@ -17,9 +15,9 @@ def servicios_por_categoria(nombre):
                 s.*,
                 c.nombre as categoria,
                 p.id as proveedor_id,
-                u.nombre as proveedor_nombre,
+                u.usuario as proveedor_nombre,
                 p.ubicacion as proveedor_ubicacion,
-                (SELECT AVG(rating) FROM reseñas WHERE servicio_id = s.id) as rating,
+                (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as rating,
                 (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
@@ -31,6 +29,11 @@ def servicios_por_categoria(nombre):
 
         cursor.execute(query, (nombre,))
         servicios = cursor.fetchall()
+        
+        # Convert Decimal to float for JSON serialization
+        for servicio in servicios:
+            if servicio.get('rating'):
+                servicio['rating'] = float(servicio['rating'])
 
         cursor.close()
         conn.close()
@@ -41,12 +44,11 @@ def servicios_por_categoria(nombre):
         return jsonify({'error': str(e)}), 500
 
 
-
-# buscar servicio con mejor rating, se le pone poner limite o default es 10
+# buscar servicio con mejor rating, se le pone poner limite o default es 8
 @servicios_bp.route('/top-rating')
 def servicios_top_rating():
     try:
-        limit = request.args.get('limit', default=10, type=int)
+        limit = request.args.get('limit', default=8, type=int)
 
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
@@ -56,9 +58,9 @@ def servicios_top_rating():
                 s.*,
                 c.nombre as categoria,
                 p.id as proveedor_id,
-                u.nombre as proveedor_nombre,
+                u.usuario as proveedor_nombre,
                 p.ubicacion as proveedor_ubicacion,
-                AVG(r.rating) as rating,
+                AVG(r.puntuacion) as rating,
                 COUNT(r.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
@@ -73,6 +75,11 @@ def servicios_top_rating():
 
         cursor.execute(query, (limit,))
         servicios = cursor.fetchall()
+        
+        # Convert Decimal to float for JSON serialization
+        for servicio in servicios:
+            if servicio.get('rating'):
+                servicio['rating'] = float(servicio['rating'])
 
         cursor.close()
         conn.close()
@@ -81,7 +88,6 @@ def servicios_top_rating():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 
 # buscar servicio filtrado por precio
@@ -99,9 +105,9 @@ def servicios_por_precio():
                 s.*,
                 c.nombre as categoria,
                 p.id as proveedor_id,
-                u.nombre as proveedor_nombre,
+                u.usuario as proveedor_nombre,
                 p.ubicacion as proveedor_ubicacion,
-                (SELECT AVG(rating) FROM reseñas WHERE servicio_id = s.id) as rating,
+                (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as rating,
                 (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
@@ -126,6 +132,13 @@ def servicios_por_precio():
 
         cursor.execute(query, params)
         servicios = cursor.fetchall()
+        
+        # Convert Decimal to float for JSON serialization
+        for servicio in servicios:
+            if servicio.get('rating'):
+                servicio['rating'] = float(servicio['rating'])
+            if servicio.get('precio'):
+                servicio['precio'] = float(servicio['precio'])
 
         cursor.close()
         conn.close()

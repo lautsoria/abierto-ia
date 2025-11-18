@@ -1,6 +1,9 @@
 /*Home*/
 
 /*Servicios*/
+body {
+    background-color: #ebebeb;
+}
 
 .servicios {
     background-color: #0052ff;

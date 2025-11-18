@@ -1,3 +1,106 @@
+## 17 de Noviembre, 2025
+
+### Colección de Tests API con Bruno
+
+**Implementación:**
+- Creada colección completa de tests API usando Bruno (herramienta open-source de testing)
+- Estructura organizada en carpetas: `/Auth`, `/Servicios`, `/Proveedores`, `/Categorias`
+- **11 tests totales** cubriendo todos los endpoints del backend:
+  - Auth: Register, Register Provider, Login
+  - Servicios: Top Rating, Filter by Category, Filter by Price Range
+  - Proveedores: Get All, Filter by Service, Get by ID
+  - Categorias: Get Category Count, Get All Categories
+- Configurado entorno `Local` con variables: base_url, test_user, test_email, test_password
+- Agregadas assertions automáticas para validar status codes, estructura de respuestas y tipos de datos
+- Incluido `README.md` con instrucciones de instalación y uso de Bruno CLI
+
+**Características:**
+- Variables aleatorias (`{{$randomInt}}`) en tests de registro para evitar duplicados
+- Manejo automático de cookies para JWT authentication
+- Tests parametrizados con query strings y path parameters
+- Validación de campos requeridos en respuestas
+
+### Conversión de Tipos Decimales en MySQL
+
+**Problema identificado:**
+- MySQL Connector Python retorna resultados de `AVG()` como objetos `Decimal` (no como `float`)
+- `Decimal` no es JSON serializable, causaba `TypeError` al retornar respuestas
+
+**Solución implementada:**
+- Agregada conversión manual de `Decimal` a `float` en todos los endpoints de `/servicios`:
+  - `/categoria/<nombre>`: Convierte `rating` a float
+  - `/top-rating`: Convierte `rating` a float
+  - `/precio`: Convierte `rating` y `precio` a float
+- Loop post-query convierte valores antes de `jsonify()`
+
+**Mapeo de tipos MySQL → Python:**
+- `INT`, `BIGINT` → `int`
+- `FLOAT`, `DOUBLE` → `float`
+- `DECIMAL`, `AVG()` → `Decimal` (requiere conversión manual)
+
+### Optimización de Endpoint de Categorías
+
+**Problema original:**
+- Frontend hacía **9 requests HTTP** para mostrar categorías:
+  - 1 request para obtener lista de nombres
+  - 8 requests adicionales (uno por cada categoría) para obtener conteo de profesionales
+- Endpoint `/categorias/buscar_existentes` no existía en el backend
+
+**Solución:**
+- Creado nuevo endpoint `/categorias/buscar_existentes`:
+  - Retorna TODAS las categorías con sus conteos en una sola query
+  - Usa `COUNT(DISTINCT s.proveedor_id)` con `LEFT JOIN` y `GROUP BY`
+  - Reduce de 9 requests a **1 solo request**
+- Simplificado código del frontend:
+  - Eliminado loop que hacía requests individuales
+  - Ahora solo agrega iconos a los datos ya completos del backend
+- Marcada función `obtener_cantidad_categoria()` como DEPRECATED
+
+### Corrección de Template home.html
+
+**Problemas identificados:**
+- Template esperaba campos inexistentes: `servicio.titulo`, `servicio.reviews`, `servicio.destacado`
+- Error `ValueError: Unknown format code 'f' for object of type 'str'` al formatear precios
+- Faltaba validación de datos opcionales (rating, imagen)
+
+**Correcciones aplicadas:**
+- Mapeado correcto de campos del backend:
+  - `servicio.titulo` → `servicio.nombre`
+  - `servicio.reviews` → `servicio.reviews_count`
+  - `servicio.destacado` → Lógica basada en `servicio.rating >= 4.5`
+- Agregado filtro Jinja2 para conversión de precio: `servicio.precio | float`
+- Agregadas validaciones con `{% if servicio.rating %}` para evitar errores con datos nulos
+- Placeholder de imagen si falta: `https://via.placeholder.com/300x200?text=Servicio`
+- Mensaje de fallback para servicios sin reviews
+
+### Expansión de Base de Datos
+
+**Nuevos servicios agregados (10 adicionales):**
+- Plomería: Destapación de cañerías ($4,500)
+- Electricidad: Instalación de tomas ($3,200), Revisión de tablero eléctrico ($5,500)
+- Carpintería: Reparación de puertas ($3,800), Instalación de estanterías ($6,500)
+- Limpieza: Limpieza de oficinas ($8,000), Limpieza de vidrios ($2,200)
+- Jardinería: Mantenimiento de jardín ($4,200)
+- Pintura: Pintura de interiores ($12,000), Pintura de fachadas ($18,000)
+
+**Total: 15 servicios** distribuidos en 6 categorías
+
+**Sistema de Reseñas Completo:**
+- Generadas ~40 reseñas distribuidas entre todos los servicios
+- Distribución realista de puntuaciones:
+  - 20% dan 3 estrellas
+  - 40% dan 4 estrellas
+  - 40% dan 5 estrellas (sesgo positivo realista)
+- 15 comentarios variados predefinidos
+- Reseñas distribuidas en los últimos 60 días
+- Promedio de 2-4 reseñas por servicio
+- Solo usuarios no-proveedores pueden dejar reseñas
+
+**Resultado:**
+- Todos los servicios ahora tienen ratings visibles
+- Endpoint `/servicios/top-rating` retorna datos completos
+- Home page muestra servicios destacados con estrellas y conteo de reviews
+
 ## 15 de Noviembre, 2025
 
 ### Arquitectura de Templates con Jinja2

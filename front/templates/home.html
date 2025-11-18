@@ -69,35 +69,39 @@
             {% for servicio in servicios %}
             <div class="service-card">
                 <div class="card-image-container">
-                    <img src="{{ servicio.imagen }}" alt="{{ servicio.titulo }}">
-                    {% if servicio.destacado %}
+                    <img src="{{ servicio.imagen if servicio.imagen else 'https://via.placeholder.com/300x200?text=Servicio' }}" alt="{{ servicio.nombre }}">
+                    {% if servicio.rating and servicio.rating >= 4.5 %}
                     <span class="badge">Destacado</span>
                     {% endif %}
                 </div>
                 <div class="card-body">
-                    <h3>{{ servicio.titulo }}</h3>
+                    <h3>{{ servicio.nombre }}</h3>
                     <p>{{ servicio.descripcion }}</p>
                     <div class="rating">
                         <div class="stars">
-                            {% set rating_entero = servicio.rating | int %}
-                            {% set tiene_media = (servicio.rating - rating_entero) >= 0.5 %}
-                            
-                            {# Estrellas llenas #}
-                            <span class="filled">
-                                {% for i in range(rating_entero) %}★{% endfor %}
-                            </span>
-                            
-                            {# Estrellas vacías #}
-                            <span class="empty">
-                                {% for i in range(5 - rating_entero) %}★{% endfor %}
-                            </span>
+                            {% if servicio.rating %}
+                                {% set rating_entero = servicio.rating | int %}
+                                {% set tiene_media = (servicio.rating - rating_entero) >= 0.5 %}
+                                
+                                {# Estrellas llenas #}
+                                <span class="filled">
+                                    {% for i in range(rating_entero) %}★{% endfor %}
+                                </span>
+                                
+                                {# Estrellas vacías #}
+                                <span class="empty">
+                                    {% for i in range(5 - rating_entero) %}★{% endfor %}
+                                </span>
+                            {% else %}
+                                <span class="empty">★★★★★</span>
+                            {% endif %}
                         </div>
-                        <span class="review-count">({{ servicio.reviews }})</span>
+                        <span class="review-count">({{ servicio.reviews_count if servicio.reviews_count else 0 }})</span>
                     </div>
                     <div class="card-footer">
                         <div class="price">
                             <span>Desde</span>
-                            <strong>${{ "{:,.0f}".format(servicio.precio) }}</strong>
+                            <strong>${{ "{:,.0f}".format(servicio.precio | float) }}</strong>
                         </div>
                         <a href="#" class="btn-contact" data-servicio-id="{{ servicio.id }}">Contactar</a>
                     </div>
@@ -178,8 +182,4 @@
         </div>
     </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}

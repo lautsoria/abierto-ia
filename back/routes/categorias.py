@@ -4,7 +4,7 @@ from db.db import db_conn
 
 categorias_bp = Blueprint('categorias', __name__)
 
-@categorias_bp.route('/populares/<string:categoria_nombre>')
+@categorias_bp.route('/<string:categoria_nombre>')
 def cantidad_por_categoria(categoria_nombre):
     """cantidad de profesionales de una categoria"""
     try:
@@ -40,35 +40,28 @@ def cantidad_por_categoria(categoria_nombre):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@categorias_bp.route('/buscar_existentes')
-def cantidad_por_categoria(categoria_nombre):
+@categorias_bp.route('')
+def categorias():
     """categorias existentes"""
     try:
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
-
         query = """
-            SELECT 
-                id,
-                nombre
+            SELECT nombre
             FROM categorias
             ORDER BY nombre ASC
-        
         """
-
-        cursor.execute(query, (categoria_nombre,))
-        categoria = cursor.fetchone()
+        cursor.execute(query)
+        categorias = cursor.fetchall()
 
         cursor.close()
         conn.close()
 
-        if not categoria:
-            return jsonify({
-                'categoria': categoria_nombre,
-                'total_profesionales': 0
-            }), 200
+        if not categorias:
+            categorias = []
+            return jsonify(categorias), 200
 
-        return jsonify(categoria), 200
+        return jsonify(categorias), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

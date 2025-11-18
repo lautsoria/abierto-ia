@@ -1,0 +1,26 @@
+meta {
+  name: Get Category Professional Count
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/categorias/populares/Plomería
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response has required fields", function() {
+    expect(res.body).to.have.property('categoria');
+    expect(res.body).to.have.property('total_profesionales');
+  });
+  
+  test("Total profesionales is a number", function() {
+    expect(res.body.total_profesionales).to.be.a('number');
+  });
+}

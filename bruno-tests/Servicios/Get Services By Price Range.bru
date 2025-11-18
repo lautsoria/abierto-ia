@@ -1,0 +1,33 @@
+meta {
+  name: Get Services By Price Range
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/servicios/precio?min=1000&max=5000
+  body: none
+  auth: none
+}
+
+params:query {
+  min: 1000
+  max: 5000
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response is an array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("All services are within price range", function() {
+    res.body.forEach(service => {
+      expect(service.precio).to.be.at.least(1000);
+      expect(service.precio).to.be.at.most(5000);
+    });
+  });
+}

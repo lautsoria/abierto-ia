@@ -37,7 +37,7 @@ def get_proveedores():
         if servicio:
             # filtro categoria
             query = """
-                SELECT DISTINCT p.*, u.nombre as nombre_usuario, u.email
+                SELECT DISTINCT p.*, u.usuario as nombre_usuario, u.email
                 FROM proveedores p
                 INNER JOIN usuarios u ON p.usuario_id = u.id
                 INNER JOIN servicios s ON s.proveedor_id = p.id
@@ -48,7 +48,7 @@ def get_proveedores():
         else:
             # devuelve todos (no filtro)
             query = """
-                SELECT p.*, u.nombre as nombre_usuario, u.email
+                SELECT p.*, u.usuario as nombre_usuario, u.email
                 FROM proveedores p
                 INNER JOIN usuarios u ON p.usuario_id = u.id
             """
@@ -73,7 +73,7 @@ def get_proveedor(id):
         
         # datos del provedor
         query = """
-            SELECT p.*, u.nombre as nombre_usuario, u.email
+            SELECT p.*, u.usuario as nombre_usuario, u.email
             FROM proveedores p
             INNER JOIN usuarios u ON p.usuario_id = u.id
             WHERE p.id = %s

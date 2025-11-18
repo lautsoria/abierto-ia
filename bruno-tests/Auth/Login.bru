@@ -1,0 +1,32 @@
+meta {
+  name: Login
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "credential": "{{test_user}}",
+    "password": "{{test_password}}"
+  }
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response has message", function() {
+    expect(res.body.message).to.equal('Login exitoso');
+  });
+  
+  test("Cookie is set", function() {
+    expect(res.headers['set-cookie']).to.exist;
+  });
+}
