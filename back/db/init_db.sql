@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS proveedores (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
-CREATE TABLE categorias (
+CREATE TABLE IF NOT EXISTS categorias (
   id UUID PRIMARY KEY,
   nombre VARCHAR(255) NOT NULL UNIQUE,
   descripcion TEXT,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS reservas (
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 );
 
-CREATE TABLE IF NOT EXISTS reseñas (
+CREATE TABLE IF NOT EXISTS resenas (
   id UUID PRIMARY KEY,
   usuario_id UUID NOT NULL,
   servicio_id UUID NOT NULL,
@@ -229,7 +229,7 @@ WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
 LIMIT 10;
 
 -- Insert dummy reseñas (only for completed reservas)
-INSERT INTO reseñas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
+INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
 SELECT 
   UUID(),
   r.usuario_id,
@@ -248,7 +248,7 @@ WHERE r.estado = 'realizado'
 LIMIT 6;
 
 -- Insert reseñas for ALL services (multiple reviews per service)
-INSERT INTO reseñas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
+INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
 SELECT 
   UUID(),
   u.id,
