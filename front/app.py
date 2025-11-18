@@ -314,34 +314,30 @@ def generar_qr(id_reserva, token):
     url = f"http://localhost:5000/confirmar-servicio/{id_reserva}/{token}"
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
-    return f"static/qr_reserva_{id_reserva}.png"
+    return f"static/qr_reserva_{id_reserva}.png" 
+
 
 @app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
 def confirmar_servicio(id_reserva, token):
-    
-    response = requests.get(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
-    
-    if response.status_code != 200:
-        return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido"))
-    
-    
-    return render_template("confirmado.html", id_reserva=id_reserva)
+    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
+    if response.status_code != 200:  
+        return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido")) 
+    return render_template("confirmado.html", id_reserva=id_reserva)  
 
 @app.route('/generar-qr')
 def generarqr():
     id_reserva = request.args.get('id_reserva')
-
-    if not id_reserva:
-        return "Falta id_reserva", 400
-
-    response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
+    if not id_reserva:  
+        return "Falta id_reserva", 400  
+    
+    response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}/token")
+    if response.status_code != 200:  
+        return "Reserva no encontrada", 404  
+    
     data = response.json()
-
     token = data["token_qr"]
-
     qr_confirmacion = generar_qr(id_reserva, token)
-
-    return render_template("qr.html", qr_path=qr_confirmacion)
+    return render_template("qr.html", qr_path=qr_confirmacion)  
 
 if __name__ == '__main__':
     app.run("localhost", port= 5000, debug=True)

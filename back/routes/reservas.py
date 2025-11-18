@@ -313,8 +313,8 @@ def confirmar_servicio(id_reserva, token):
         return jsonify({'error': str(e)}), 500
     
 
-@reservas_bp.route('/<string:id_reserva>')
-def get_reserva(id_reserva):
+@reservas_bp.route('/<string:id_reserva>/token')
+def get_reserva_token(id_reserva):
     try:
         if not id_reserva:
             return jsonify({"error": "Falta id_reserva"}), 400
@@ -336,5 +336,4 @@ def get_reserva(id_reserva):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
     
