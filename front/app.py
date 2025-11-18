@@ -18,30 +18,11 @@ CORS(app)
 # manejamos que hacer cuando el token no existe
 @jwt.unauthorized_loader
 def unauthorized_callback(error):
-    return redirect(url_for('reg'))
+    return redirect(url_for('home'))
 # o cuando el token es invalido
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
-    return redirect(url_for('reg'))
-
-@app.route('/auth')
-def auth():
-  try:
-    verify_jwt_in_request(locations=['cookies'])
-
     return redirect(url_for('home'))
-  except:
-    return render_template('auth.html')
-
-@app.route('/base')
-@jwt_required(locations=['cookies'])
-def base():
-    data = get_jwt_identity()
-    role = get_jwt()
-    provider = role['provider']
-    print(data)
-    print(f'User {data} logged with valid token. Is provider? ${provider}')
-    return render_template('base/base.html', data={'userId':data, 'provider':provider})
 
 icons = {
     # iconos hardcodeados
@@ -55,68 +36,9 @@ icons = {
     "Jardinería": "🌿"
 }
 
-RESERVAS_MOCK = [
-    {
-        'id': 1,
-        'usuario_id': 1,
-        'servicio_id': 1,
-        'fecha_reserva': '2025-11-10 14:30:00',
-        'fecha_servicio': '2025-11-20 10:00:00',
-        'estado': 'pendiente',
-        'comentarios_cliente': 'Necesito ayuda urgente con una cañería rota',
-        'servicio_nombre': 'Reparación de cañerías',
-        'servicio_precio': 5000.00,
-        'proveedor_nombre': 'Juan Pérez',
-        'proveedor_descripcion': 'Plomero con 15 años de experiencia',
-        'categoria': 'Plomería'
-    },
-    {
-        'id': 2,
-        'usuario_id': 1,
-        'servicio_id': 2,
-        'fecha_reserva': '2025-11-08 09:15:00',
-        'fecha_servicio': '2025-11-15 14:00:00',
-        'estado': 'realizado',
-        'comentarios_cliente': 'Instalación de lámpara en el living',
-        'servicio_nombre': 'Instalación eléctrica',
-        'servicio_precio': 3500.00,
-        'proveedor_nombre': 'María López',
-        'proveedor_descripcion': 'Electricista matriculada',
-        'categoria': 'Electricidad'
-    },
-    {
-        'id': 3,
-        'usuario_id': 1,
-        'servicio_id': 3,
-        'fecha_reserva': '2025-11-05 16:45:00',
-        'fecha_servicio': '2025-11-10 09:00:00',
-        'estado': 'cancelado',
-        'comentarios_cliente': 'Corte de césped y limpieza de jardín',
-        'servicio_nombre': 'Mantenimiento de jardín',
-        'servicio_precio': 4200.00,
-        'proveedor_nombre': 'Carlos Gómez',
-        'proveedor_descripcion': 'Jardinero profesional',
-        'categoria': 'Jardinería'
-    },
-    {
-        'id': 4,
-        'usuario_id': 1,
-        'servicio_id': 4,
-        'fecha_reserva': '2025-11-12 11:20:00',
-        'fecha_servicio': '2025-11-25 16:30:00',
-        'estado': 'pendiente',
-        'comentarios_cliente': 'Revisión de instalación de gas',
-        'servicio_nombre': 'Inspección de gas',
-        'servicio_precio': 6500.00,
-        'proveedor_nombre': 'Roberto Díaz',
-        'proveedor_descripcion': 'Gasista matriculado',
-        'categoria': 'Gasista'
-    }
-]
-
-@app.route("/reservas")
-def mis_reservas():
-    return render_template("reservas.html", reservas=RESERVAS_MOCK)
+# @app.route("/reservas")
+# def mis_reservas():
+#     return render_template("reservas.html", reservas=RESERVAS_MOCK)
 
 @app.errorhandler(404)
 def error(e):
@@ -167,7 +89,6 @@ def obtener_servicios_destacados():
         print(f" Error al obtener servicios: {e}")
         return []
 
-
 def obtener_proveedores(filtro_servicio=None):
     """Obtiene proveedores desde el backend"""
     try:
@@ -184,7 +105,6 @@ def obtener_proveedores(filtro_servicio=None):
     except requests.exceptions.RequestException as e:  
         print(f"Error al obtener proveedores: {e}")
         return []
-
 
 def obtener_proveedor_detalle(proveedor_id):
     """Obtiene detalles de un proveedor específico"""
@@ -238,6 +158,85 @@ def home():
             })
 
     return render_template('home.html', servicios=servicios, categorias=categorias_completas, data=user_data)
+
+@app.route('/auth')
+def auth():
+  try:
+    verify_jwt_in_request(locations=['cookies'])
+
+    return redirect(url_for('home'))
+  except:
+    return render_template('auth.html')
+
+@app.route('/categoria/<nombre>')
+@jwt_required(optional=True, locations=['cookies'])
+def categoria(nombre):
+    """Muestra servicios filtrados por categoría con opciones de filtrado"""
+    data = get_jwt()    
+    user_data = data if data else None
+
+    # Obtener parámetros de filtro
+    ubicacion_seleccionada = request.args.get('ubicacion', '')
+    ordenar = request.args.get('ordenar', 'relevancia')
+
+    try:
+        # Construir URL con parámetros
+        params = {}
+        if ubicacion_seleccionada:
+            params['ubicacion'] = ubicacion_seleccionada
+        if ordenar != 'relevancia':
+            params['ordenar'] = ordenar
+
+        # Llamar al backend para obtener servicios
+        response = requests.get(
+            f'{BACKEND_URL}/servicios/categoria/{nombre}',
+            params=params,
+            timeout=3
+        )
+
+        if response.status_code == 200:
+            servicios = response.json()
+        else:
+            servicios = []
+
+        # Obtener ubicaciones únicas para el filtro
+        ubicaciones_response = requests.get(
+            f'{BACKEND_URL}/proveedores/ubicaciones',
+            timeout=2
+        )
+        ubicaciones = ubicaciones_response.json() if ubicaciones_response.status_code == 200 else []
+
+        # Contar total de servicios sin filtros
+        total_response = requests.get(
+            f'{BACKEND_URL}/servicios/categoria/{nombre}',
+            timeout=2
+        )
+        total_servicios = len(total_response.json()) if total_response.status_code == 200 else 0
+
+        return render_template(
+            'categoria.html',
+            categoria_nombre=nombre,
+            servicios=servicios,
+            total_servicios=total_servicios,
+            ubicaciones=ubicaciones,
+            ubicacion_seleccionada=ubicacion_seleccionada,
+            ordenar=ordenar,
+            data=user_data
+        )
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener servicios: {e}")
+        return render_template(
+            'categoria.html',
+            categoria_nombre=nombre,
+            servicios=[],
+            total_servicios=0,
+            ubicaciones=[],
+            ubicacion_seleccionada='',
+            ordenar='relevancia',
+            data=user_data
+        )    
+
 
 if __name__ == '__main__':
     app.run("localhost", port= 5000, debug=True)

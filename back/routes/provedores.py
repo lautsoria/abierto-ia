@@ -200,3 +200,29 @@ def update_proveedor(id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Obtener ubicaciones únicas de proveedores
+@proveedores_bp.route('/ubicaciones')
+def get_ubicaciones():
+    try:
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+            SELECT DISTINCT ubicacion 
+            FROM proveedores 
+            WHERE ubicacion IS NOT NULL AND ubicacion != ''
+            ORDER BY ubicacion
+        """
+        
+        cursor.execute(query)
+        result = cursor.fetchall()
+        ubicaciones = [row['ubicacion'] for row in result]
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(ubicaciones), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

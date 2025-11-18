@@ -42,12 +42,13 @@
     </div>
 </section>
 
-<section class="categorias">
-    <h2 class="section-title">Categorías populares</h2>
+<section class="categorias" id="categorias">
+    <h2 class="section-title">Categorías</h2>
 
     <div class="categorias-grid">
 
         {% for cat in categorias %}
+        <a href="{{ url_for('categoria', nombre=cat.nombre) }}" style="text-decoration: none; color: inherit;">
         <article class="categoria-card">
             <div class="card-icon">
                 <span>{{ cat.icono }}</span>
@@ -55,6 +56,7 @@
             <h3 class="card-title">{{ cat.nombre }}</h3>
             <p class="card-subtitle">{{ cat.total_profesionales }} profesionales</p>
         </article>
+        </a>
         {% endfor %}
 
     </div>
