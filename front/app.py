@@ -33,6 +33,79 @@ def auth():
   except:
     return render_template('auth.html')
 
+@app.route('/register', methods=['POST'])
+def register():
+    user = request.form.get("newUser")
+    email = request.form.get("email")
+    password = request.form.get("newPassword")
+    repeatPassword = request.form.get("newPassword2")
+    provider = request.form.get("isProveedor") == 'true'
+
+    if password != repeatPassword:
+        flash('Las contraseñas no coinciden', 'error')
+        return redirect(url_for('auth'))
+
+    try:
+        # Enviar request al back
+        response = requests.post(
+            f'{BACKEND_URL}/auth/register',
+            json={
+                'user': user,
+                'email': email,
+                'password': password,
+                'provider': provider
+            },
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            flash('Usuario creado correctamente.' 'success')
+            return redirect(url_for('auth'))
+        else:
+            flash('Error al registrar el usuario', 'error')
+            return redirect(url_for('auth'))
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to backend: {e}")
+        flash('Error de conexión con el servidor', 'error')
+        return redirect(url_for('auth'))
+
+@app.route('/login', methods=['POST'])
+def login():
+    credential = request.form.get("credential")
+    password = request.form.get("password")
+
+    try:
+        # Enviar solicitud al backend
+        response = requests.post(
+            f'{BACKEND_URL}/auth/login',
+            json={
+                'credential': credential,
+                'password': password
+            },
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            # Obtener las cookies del backend y pasarlas al frontend
+            resp = make_response(redirect(url_for('home')))
+            
+            # Copiar la cookie de autenticación del backend al frontend
+            if 'Set-Cookie' in response.headers:
+                for cookie in response.headers.getlist('Set-Cookie'):
+                    resp.headers.add('Set-Cookie', cookie)
+            
+            flash('Inicio de sesión exitoso', 'success')
+            return resp
+        else:
+            flash('Credenciales inválidas', 'error')
+            return redirect(url_for('auth'))
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to backend: {e}")
+        flash('Error de conexión con el servidor', 'error')
+        return redirect(url_for('auth'))
+
 @app.route('/base')
 @jwt_required(locations=['cookies'])
 def base():
