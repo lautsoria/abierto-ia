@@ -123,6 +123,35 @@ icons = {
     "Jardinería": "🌿"
 }
 
+def obtener_mis_reservas(usuario_id=None):
+
+    try:
+        if usuario_id is None:
+            verify_jwt_in_request(locations=['cookies'])
+            data = get_jwt()
+            usuario_id = data.get("sub")
+
+        if not usuario_id:
+            print("Usuario no autenticado")
+            return []
+
+        response = requests.get(
+            f"{BACKEND_URL}/reservas/mis-reservas",
+            params={"usuario_id": usuario_id},  
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Error backend: {response.status_code} - {response.text}")
+            return []
+
+    except Exception as e:
+        print(f"Error al obtener reservas: {e}")
+        return []
+
+    
 RESERVAS_MOCK = [
     {
         'id': 1,
@@ -184,7 +213,21 @@ RESERVAS_MOCK = [
 
 @app.route("/reservas")
 def mis_reservas():
-    return render_template("reservas.html", reservas=RESERVAS_MOCK)
+    data = get_jwt()  
+    es_proveedor = False
+    
+    usuario_id = data.get("sub") if data else None  
+
+    if data and data.get("provider"):  
+            es_proveedor = True
+
+    if not usuario_id:
+        flash("Debes iniciar sesión", "error")
+        return redirect(url_for("auth"))
+
+    reservas = obtener_mis_reservas(usuario_id)
+    return render_template("reservas.html", reservas=reservas,es_proveedor=es_proveedor)
+    
 
 @app.errorhandler(404)
 def error(e):
