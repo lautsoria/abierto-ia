@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escanea el Código QR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/qr.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔵 Escanea el Código QR</h1>
+            <p class="subtitle">Acerca tu cámara al código para continuar</p>
+        </div>
+
+        <div class="qr-container">
+            <div class="qr-code">
+                <img src="{{ qr_path }}"  alt="Código QR">
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📱 ¿Cómo escanear?</h3>
+            <ol class="steps">
+                <li>Abre la cámara de tu teléfono</li>
+                <li>Apunta hacia el código QR</li>
+                <li>Toca la notificación que aparece</li>
+                <li>¡Listo! Serás redirigido automáticamente</li>
+            </ol>
+        </div>
+
+        <div class="footer">
+            <span class="badge">✓ Seguro y Verificado</span>
+        </div>
+    </div>
+</body>
+</html>

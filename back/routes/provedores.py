@@ -107,50 +107,6 @@ def get_proveedor(id):
         return jsonify({'error': str(e)}), 500
 
 
-# nuevo usuario proveedor
-@proveedores_bp.route('/', methods=['POST'])
-def create_proveedor():
-    try:
-        data = request.get_json()
-        
-        # datos requeridos
-        required_fields = ['usuario_id', 'descripcion', 'ubicacion', 'telefono']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'error': f'Campo {field} es requerido'}), 400
-        
-        # TODO: Validar certificado aquí
-        # Por ahora, comentamos esta validación
-        # if not validar_certificado(request):
-        #     return jsonify({'error': 'Certificado no válido'}), 401
-        
-        conn = db_conn()
-        cursor = conn.cursor()
-        
-        query = """
-            INSERT INTO proveedores (usuario_id, descripcion, ubicacion, telefono)
-            VALUES (%s, %s, %s, %s)
-        """
-        cursor.execute(query, (
-            data['usuario_id'],
-            data['descripcion'],
-            data['ubicacion'],
-            data['telefono']
-        ))
-        
-        conn.commit()
-        proveedor_id = cursor.lastrowid
-        
-        cursor.close()
-        conn.close()
-        
-        return jsonify({
-            'message': 'Proveedor creado exitosamente',
-            'id': proveedor_id
-        }), 201
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 
 # actualizar info de un provedor

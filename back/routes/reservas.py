@@ -236,7 +236,7 @@ def update_reserva(id):
 
 
 # reserva especifica
-@reservas_bp.route('/<int:id>')
+@reservas_bp.route('/<string:id>')
 def get_reserva(id):
     try:
         conn = db_conn()
@@ -245,15 +245,15 @@ def get_reserva(id):
         query = """
             SELECT 
                 r.*,
-                s.nombre as servicio_nombre,
-                s.descripcion as servicio_descripcion,
-                s.precio as servicio_precio,
-                uc.nombre as cliente_nombre,
-                uc.email as cliente_email,
-                up.nombre as proveedor_nombre,
-                p.telefono as proveedor_telefono,
-                p.ubicacion as proveedor_ubicacion,
-                c.nombre as categoria
+                s.nombre AS servicio_nombre,
+                s.descripcion AS servicio_descripcion,
+                s.precio AS servicio_precio,
+                uc.usuario AS cliente_usuario,
+                uc.email AS cliente_email,
+                up.usuario AS proveedor_usuario,
+                p.telefono AS proveedor_telefono,
+                p.ubicacion AS proveedor_ubicacion,
+                c.nombre AS categoria
             FROM reservas r
             INNER JOIN servicios s ON r.servicio_id = s.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
@@ -262,10 +262,10 @@ def get_reserva(id):
             INNER JOIN categorias c ON s.categoria_id = c.id
             WHERE r.id = %s
         """
+        
         cursor.execute(query, (id,))
-        
         reserva = cursor.fetchone()
-        
+
         if not reserva:
             cursor.close()
             conn.close()
@@ -275,6 +275,66 @@ def get_reserva(id):
         conn.close()
         
         return jsonify(reserva), 200
-        
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+    
+@reservas_bp.route('/confirmar-servicio/<string:id_reserva>/<string:token>', methods=['POST'])
+def confirmar_servicio(id_reserva, token):
+    try:
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+
+        query = """
+            SELECT * FROM reservas
+            WHERE id = %s AND token_qr = %s
+        """
+        cursor.execute(query, (id_reserva, token))
+        reserva = cursor.fetchone()
+
+        if reserva is None:
+            return jsonify({"error": "QR inválido o expirado"}), 400
+
+        # actualizar estado
+        update = """
+            UPDATE reservas SET estado = 'realizado'
+            WHERE id = %s
+        """
+        cursor.execute(update, (id_reserva,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Servicio confirmado correctamente"}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+@reservas_bp.route('/<string:id_reserva>')
+def get_reserva(id_reserva):
+    try:
+        if not id_reserva:
+            return jsonify({"error": "Falta id_reserva"}), 400
+
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT token_qr FROM reservas WHERE id = %s", (id_reserva,))
+        data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not data:
+            return jsonify({'error': 'Reserva no encontrada'}), 404
+
+        return jsonify({
+            "id_reserva": id_reserva,
+            "token_qr": data["token_qr"]
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+    

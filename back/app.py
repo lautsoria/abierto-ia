@@ -40,7 +40,6 @@ app.register_blueprint(reservas, url_prefix="/reservas")
 app.register_blueprint(servicios, url_prefix="/servicios")
 app.register_blueprint(categorias, url_prefix="/categorias")
 # app.register_blueprint(usuarios, url_prefix="/usuarios")
-# app.register_blueprint(proveedores, url_prefix="/proveedores")
 
 if __name__ == "__main__":
     app.run(port=5500, debug=True)
