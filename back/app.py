@@ -13,8 +13,10 @@ from routes.auth import auth_bp as auth
 from routes.provedores import proveedores_bp as proveedores
 from routes.reservas import reservas_bp as reservas
 from routes.servicios import servicios_bp as servicios
-from routes.categorias import categorias_bp as categorias
+from routes.categorias import categoria_bp as categorias
 from routes.servicios import servicios_bp as servicios
+from routes.ubicacion import ubicacion_bp as ubicacion
+
 from flask_jwt_extended import JWTManager
 import os
 from dotenv import load_dotenv
@@ -38,7 +40,8 @@ app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(proveedores, url_prefix='/proveedores')
 app.register_blueprint(reservas, url_prefix="/reservas")
 app.register_blueprint(servicios, url_prefix="/servicios")
-app.register_blueprint(categorias, url_prefix="/categorias")
+app.register_blueprint(categorias, url_prefix="/categoria")
+app.register_blueprint(ubicacion, url_prefix="/ubicacion")
 # app.register_blueprint(usuarios, url_prefix="/usuarios")
 # app.register_blueprint(proveedores, url_prefix="/proveedores")
 

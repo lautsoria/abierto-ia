@@ -37,20 +37,28 @@ def get_proveedores():
         if servicio:
             # filtro categoria
             query = """
-                SELECT DISTINCT p.*, u.usuario as nombre_usuario, u.email
+                SELECT DISTINCT p.*, u.usuario as nombre_usuario, u.email,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion
                 FROM proveedores p
                 INNER JOIN usuarios u ON p.usuario_id = u.id
                 INNER JOIN servicios s ON s.proveedor_id = p.id
                 INNER JOIN categorias c ON s.categoria_id = c.id
+                LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+                LEFT JOIN barrios b ON bu.barrio_id = b.id
                 WHERE LOWER(c.nombre) = LOWER(%s)
+                GROUP BY p.id
             """
             cursor.execute(query, (servicio,))
         else:
             # devuelve todos (no filtro)
             query = """
-                SELECT p.*, u.usuario as nombre_usuario, u.email
+                SELECT p.*, u.usuario as nombre_usuario, u.email,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion
                 FROM proveedores p
                 INNER JOIN usuarios u ON p.usuario_id = u.id
+                LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+                LEFT JOIN barrios b ON bu.barrio_id = b.id
+                GROUP BY p.id
             """
             cursor.execute(query)
         
@@ -73,10 +81,14 @@ def get_proveedor(id):
         
         # datos del provedor
         query = """
-            SELECT p.*, u.usuario as nombre_usuario, u.email
+            SELECT p.*, u.usuario as nombre_usuario, u.email,
+            GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion
             FROM proveedores p
             INNER JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE p.id = %s
+            GROUP BY p.id
         """
         cursor.execute(query, (id,))
         proveedor = cursor.fetchone()
@@ -114,7 +126,7 @@ def create_proveedor():
         data = request.get_json()
         
         # datos requeridos
-        required_fields = ['usuario_id', 'descripcion', 'ubicacion', 'telefono']
+        required_fields = ['usuario_id', 'descripcion', 'telefono']
         for field in required_fields:
             if field not in data:
                 return jsonify({'error': f'Campo {field} es requerido'}), 400
@@ -128,19 +140,29 @@ def create_proveedor():
         cursor = conn.cursor()
         
         query = """
-            INSERT INTO proveedores (usuario_id, descripcion, ubicacion, telefono)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO proveedores (id, usuario_id, descripcion, telefono)
+            VALUES (UUID(), %s, %s, %s)
         """
         cursor.execute(query, (
             data['usuario_id'],
             data['descripcion'],
-            data['ubicacion'],
             data['telefono']
         ))
         
         conn.commit()
         proveedor_id = cursor.lastrowid
         
+        # Handle ubicacion (barrio)
+        if 'ubicacion' in data and data['ubicacion']:
+            # Find barrio id
+            cursor.execute("SELECT id FROM barrios WHERE nombre = %s", (data['ubicacion'],))
+            barrio = cursor.fetchone()
+            if barrio:
+                # Insert into barrios_usuarios
+                cursor.execute("INSERT INTO barrios_usuarios (id, usuario_id, barrio_id) VALUES (UUID(), %s, %s)", 
+                               (data['usuario_id'], barrio[0])) # barrio is tuple (id,)
+                conn.commit()
+
         cursor.close()
         conn.close()
         
@@ -168,14 +190,17 @@ def update_proveedor(id):
         cursor = conn.cursor()
         
         # si es provedor existente
-        cursor.execute("SELECT id FROM proveedores WHERE id = %s", (id,))
-        if not cursor.fetchone():
+        cursor.execute("SELECT id, usuario_id FROM proveedores WHERE id = %s", (id,))
+        proveedor = cursor.fetchone()
+        if not proveedor:
             cursor.close()
             conn.close()
             return jsonify({'error': 'Proveedor no encontrado'}), 404
         
+        usuario_id = proveedor[1] # tuple index 1
+
         # actualizar campo por campo
-        campos_permitidos = ['descripcion', 'ubicacion', 'telefono']
+        campos_permitidos = ['descripcion', 'telefono']
         campos_actualizar = []
         valores = []
         
@@ -184,15 +209,25 @@ def update_proveedor(id):
                 campos_actualizar.append(f"{campo} = %s")
                 valores.append(data[campo])
         
-        if not campos_actualizar:
-            return jsonify({'error': 'No hay campos para actualizar'}), 400
+        if campos_actualizar:
+            valores.append(id)
+            query = f"UPDATE proveedores SET {', '.join(campos_actualizar)} WHERE id = %s"
+            cursor.execute(query, valores)
+            conn.commit()
         
-        valores.append(id)
-        query = f"UPDATE proveedores SET {', '.join(campos_actualizar)} WHERE id = %s"
-        
-        cursor.execute(query, valores)
-        conn.commit()
-        
+        # Handle ubicacion update
+        if 'ubicacion' in data:
+            # Remove existing barrios for this user (simplification)
+            cursor.execute("DELETE FROM barrios_usuarios WHERE usuario_id = %s", (usuario_id,))
+            
+            if data['ubicacion']:
+                cursor.execute("SELECT id FROM barrios WHERE nombre = %s", (data['ubicacion'],))
+                barrio = cursor.fetchone()
+                if barrio:
+                    cursor.execute("INSERT INTO barrios_usuarios (id, usuario_id, barrio_id) VALUES (UUID(), %s, %s)", 
+                                   (usuario_id, barrio[0]))
+            conn.commit()
+
         cursor.close()
         conn.close()
         
@@ -209,10 +244,9 @@ def get_ubicaciones():
         cursor = conn.cursor(dictionary=True)
         
         query = """
-            SELECT DISTINCT ubicacion 
-            FROM proveedores 
-            WHERE ubicacion IS NOT NULL AND ubicacion != ''
-            ORDER BY ubicacion
+            SELECT nombre as ubicacion 
+            FROM barrios
+            ORDER BY nombre
         """
         
         cursor.execute(query)

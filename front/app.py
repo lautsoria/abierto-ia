@@ -48,7 +48,7 @@ BACKEND_URL = 'http://localhost:5500'
 
 def obtener_cantidad_categoria(nombre):
     try:
-        response = requests.get(f'{BACKEND_URL}/categorias/{nombre}')
+        response = requests.get(f'{BACKEND_URL}/categoria/{nombre}')
         
         if response.status_code == 200:
             data = response.json()
@@ -125,7 +125,7 @@ def obtener_proveedor_detalle(proveedor_id):
 def obtener_categorias():
     try:
         response = requests.get(  
-            f'{BACKEND_URL}/categorias',
+            f'{BACKEND_URL}/categoria',
             timeout=5
         )
         
@@ -177,21 +177,19 @@ def categoria(nombre):
 
     # Obtener parámetros de filtro
     ubicacion_seleccionada = request.args.get('ubicacion', '')
-    ordenar = request.args.get('ordenar', 'relevancia')
+    # ordenar = request.args.get('ordenar', 'relevancia')
 
     try:
         # Construir URL con parámetros
         params = {}
         if ubicacion_seleccionada:
             params['ubicacion'] = ubicacion_seleccionada
-        if ordenar != 'relevancia':
-            params['ordenar'] = ordenar
 
         # Llamar al backend para obtener servicios
         response = requests.get(
-            f'{BACKEND_URL}/servicios/categoria/{nombre}',
+            f'{BACKEND_URL}/servicios/{nombre}',
             params=params,
-            timeout=3
+            timeout=1
         )
 
         if response.status_code == 200:
@@ -201,7 +199,7 @@ def categoria(nombre):
 
         # Obtener ubicaciones únicas para el filtro
         ubicaciones_response = requests.get(
-            f'{BACKEND_URL}/proveedores/ubicaciones',
+            f'{BACKEND_URL}/ubicacion',
             timeout=2
         )
         ubicaciones = ubicaciones_response.json() if ubicaciones_response.status_code == 200 else []
@@ -220,7 +218,6 @@ def categoria(nombre):
             total_servicios=total_servicios,
             ubicaciones=ubicaciones,
             ubicacion_seleccionada=ubicacion_seleccionada,
-            ordenar=ordenar,
             data=user_data
         )
 

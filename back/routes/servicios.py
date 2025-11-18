@@ -4,10 +4,10 @@ from db.db import db_conn
 servicios_bp = Blueprint('servicios', __name__)
 
 #filtrar servicio por categoria con filtros adicionales
-@servicios_bp.route('/categoria/<string:nombre>')
+@servicios_bp.route('/<string:nombre>')
 def servicios_por_categoria(nombre):
     ubicacion = request.args.get('ubicacion', '')
-    ordenar = request.args.get('ordenar', 'relevancia')
+    # ordenar = request.args.get('ordenar', 'relevancia')
     
     try:
         conn = db_conn()
@@ -19,17 +19,18 @@ def servicios_por_categoria(nombre):
                 s.nombre,
                 s.descripcion,
                 s.precio,
-                s.imagen_url,
                 c.nombre as categoria_nombre,
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
-                p.ubicacion,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion,
                 (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as calificacion_promedio,
                 (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE LOWER(c.nombre) = LOWER(%s)
         """
         
@@ -37,18 +38,20 @@ def servicios_por_categoria(nombre):
         
         # Agregar filtro de ubicación
         if ubicacion:
-            query += " AND p.ubicacion = %s"
+            query += " AND b.nombre = %s"
             params.append(ubicacion)
         
+        query += " GROUP BY s.id"
+
         # Agregar ordenamiento
-        if ordenar == 'precio_asc':
-            query += " ORDER BY s.precio ASC"
-        elif ordenar == 'precio_desc':
-            query += " ORDER BY s.precio DESC"
-        elif ordenar == 'rating':
-            query += " ORDER BY calificacion_promedio DESC"
-        else:  # relevancia o default
-            query += " ORDER BY calificacion_promedio DESC, s.precio ASC"
+        # if ordenar == 'precio_asc':
+        #     query += " ORDER BY s.precio ASC"
+        # elif ordenar == 'precio_desc':
+        #     query += " ORDER BY s.precio DESC"
+        # elif ordenar == 'rating':
+        #     query += " ORDER BY calificacion_promedio DESC"
+        # else:  # relevancia o default
+        query += " ORDER BY calificacion_promedio DESC, s.precio ASC"
 
         cursor.execute(query, params)
         servicios = cursor.fetchall()
@@ -81,14 +84,17 @@ def servicios_por_categoria_legacy(nombre):
                 c.nombre as categoria,
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
-                p.ubicacion as proveedor_ubicacion,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as proveedor_ubicacion,
                 (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as rating,
                 (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE LOWER(c.nombre) = LOWER(%s)
+            GROUP BY s.id
             ORDER BY s.id DESC
         """
 
@@ -124,13 +130,15 @@ def servicios_top_rating():
                 c.nombre as categoria,
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
-                p.ubicacion as proveedor_ubicacion,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as proveedor_ubicacion,
                 AVG(r.puntuacion) as rating,
                 COUNT(r.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios b ON bu.barrio_id = b.id
             LEFT JOIN reseñas r ON r.servicio_id = s.id
             GROUP BY s.id
             HAVING reviews_count > 0
@@ -171,13 +179,15 @@ def servicios_por_precio():
                 c.nombre as categoria,
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
-                p.ubicacion as proveedor_ubicacion,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as proveedor_ubicacion,
                 (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as rating,
                 (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE 1=1
         """
 
@@ -193,7 +203,7 @@ def servicios_por_precio():
             query += " AND s.precio <= %s"
             params.append(precio_max)
 
-        query += " ORDER BY s.precio ASC"
+        query += " GROUP BY s.id ORDER BY s.precio ASC"
 
         cursor.execute(query, params)
         servicios = cursor.fetchall()
