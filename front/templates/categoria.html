@@ -1,0 +1,113 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ categoria_nombre }} - Servicios{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/categoria.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="main-layout">
+    <div class="categoria-header">
+        <h1>{{ categoria_nombre }}</h1>
+        <p>{{ total_servicios }} servicios disponibles</p>
+    </div>
+
+    <!-- Sidebar con filtros -->
+    <aside class="filters-container">
+        <div class="filters-title">
+            Filtros
+        </div>
+        
+        <form method="GET" action="{{ url_for('categoria', nombre=categoria_nombre) }}">
+            <div class="filter-group">
+                <label for="ubicacion">Ubicación</label>
+                <select id="ubicacion" name="ubicacion">
+                    <option value="">Todas</option>
+                    {% for ubicacion in ubicaciones %}
+                    <option value="{{ ubicacion }}" {% if ubicacion_seleccionada == ubicacion %}selected{% endif %}>
+                        {{ ubicacion }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-filter">Aplicar</button>
+            <a href="{{ url_for('categoria', nombre=categoria_nombre) }}" class="btn-clear" style="text-decoration: none; display: block; text-align: center;">
+                Limpiar filtros
+            </a>
+        </form>
+    </aside>
+
+    <!-- Contenido principal -->
+    <!-- <main>
+        <div class="results-info">
+            <div class="sort-container">
+                <label for="ordenar">Ordenar por</label>
+                <select id="ordenar" onchange="ordenarServicios(this.value)">
+                    <option value="relevancia">Más relevantes</option>
+                    <option value="precio_asc">Menor precio</option>
+                    <option value="precio_desc">Mayor precio</option>
+                    <option value="rating">Mejor calificados</option>
+                </select>
+            </div>
+        </div> -->
+
+        {% if servicios %}
+        <div class="servicios-grid">
+            {% for servicio in servicios %}
+            <div class="servicio-card" onclick="window.location.href='/servicio/id/{{ servicio.id }}'">
+                <img 
+                    src="{{ servicio.imagen or 'https://via.placeholder.com/300x200?text=' + servicio.nombre }}" 
+                    alt="{{ servicio.nombre }}"
+                    class="servicio-image"
+                >
+                <div class="servicio-content">
+                    <div class="servicio-price">
+                        ${{ "{:,.0f}".format(servicio.precio | float) }}
+                    </div>
+                    
+                    <h3 class="servicio-title">{{ servicio.nombre }}</h3>
+                    
+                    {% if servicio.rating %}
+                    <div class="servicio-rating">
+                        <span class="stars">
+                            {% set rating_int = servicio.rating | int %}
+                            {% for i in range(rating_int) %}★{% endfor %}
+                        </span>
+                        <span class="rating-count">
+                            {{ servicio.reviews_count or 0 }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if servicio.ubicacion %}
+                    <div class="servicio-ubicacion">
+                        {{ servicio.ubicacion }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h2>No se encontraron servicios</h2>
+            <p>Intenta ajustar los filtros o buscar en otra categoría</p>
+        </div>
+        {% endif %}
+    </main>
+</div>
+
+<script>
+function ordenarServicios(criterio) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('ordenar', criterio);
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}
+
+
+

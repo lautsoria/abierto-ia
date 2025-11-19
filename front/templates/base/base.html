@@ -45,18 +45,18 @@
       <nav class="header-nav">
         {% if data %}
           {% if data.provider %}
-            <a href="#" class="nav-link">Registrar servicio</a>
+            <a href="#categorias" class="nav-link">Registrar servicio</a>
             <a href="#" class="nav-link">Calendario</a>
             <a href="#" class="nav-link end">Mi perfil</a>
             <a href="#" class="nav-link">Mis servicios</a>
           {% else %}
-            <a href="#" class="nav-link">Categorías</a>
+            <a href="#categorias" class="nav-link">Categorías</a>
             <a href="#" class="nav-link">Servicios Agendados</a>
             <a href="" class="nav-link end">Mi Perfil</a>          
             <a href="" class="nav-link end">Ver 🛒</a>   
           {% endif %}          
         {% else %}
-          <a href="#" class="nav-link">Categorías</a>
+          <a href="#categorias" class="nav-link">Categorías</a>
           <a href="#" class="nav-link">Ofertas</a>
           <a href="{{ url_for('auth') }}" class="nav-link end">Ingresá</a>
         {% endif %}

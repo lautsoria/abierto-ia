@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS proveedores (
   id UUID PRIMARY KEY,
   usuario_id UUID NULL,
   descripcion VARCHAR(500),
-  ubicacion VARCHAR(255),
   telefono VARCHAR(20),
   calificacion_promedio FLOAT DEFAULT 0,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
@@ -61,6 +60,19 @@ CREATE TABLE IF NOT EXISTS resenas (
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 );
 
+CREATE TABLE IF NOT EXISTS barrios (
+  id UUID PRIMARY KEY,
+  nombre VARCHAR(30)
+);
+
+CREATE TABLE IF NOT EXISTS barrios_usuarios (
+  id UUID PRIMARY KEY,
+  usuario_id UUID NOT NULL,
+  barrio_id UUID NOT NULL,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  FOREIGN KEY (barrio_id) REFERENCES barrios(id)
+);
+
 
 -- Insert dummy usuarios
 INSERT INTO usuarios (id, usuario, email, contrasena, fecha_registro) VALUES
@@ -82,8 +94,33 @@ INSERT INTO categorias (id, nombre, descripcion, fecha_creacion) VALUES
 (UUID(), 'Jardinería', 'Mantenimiento de jardines y áreas verdes', NOW()),
 (UUID(), 'Pintura', 'Pintura interior y exterior', NOW());
 
+-- Insert barrios CABA
+INSERT INTO barrios (id, nombre) VALUES
+(UUID(), 'Agronomía'), (UUID(), 'Almagro'), (UUID(), 'Balvanera'), (UUID(), 'Barracas'), 
+(UUID(), 'Belgrano'), (UUID(), 'Boedo'), (UUID(), 'Caballito'), (UUID(), 'Chacarita'), 
+(UUID(), 'Coghlan'), (UUID(), 'Colegiales'), (UUID(), 'Constitución'), (UUID(), 'Flores'), 
+(UUID(), 'Floresta'), (UUID(), 'La Boca'), (UUID(), 'La Paternal'), (UUID(), 'Liniers'), 
+(UUID(), 'Mataderos'), (UUID(), 'Monte Castro'), (UUID(), 'Monserrat'), (UUID(), 'Nueva Pompeya'), 
+(UUID(), 'Núñez'), (UUID(), 'Palermo'), (UUID(), 'Parque Avellaneda'), (UUID(), 'Parque Chacabuco'), 
+(UUID(), 'Parque Chas'), (UUID(), 'Parque Patricios'), (UUID(), 'Puerto Madero'), (UUID(), 'Recoleta'), 
+(UUID(), 'Retiro'), (UUID(), 'Saavedra'), (UUID(), 'San Cristóbal'), (UUID(), 'San Nicolás'), 
+(UUID(), 'San Telmo'), (UUID(), 'Vélez Sársfield'), (UUID(), 'Versalles'), (UUID(), 'Villa Crespo'), 
+(UUID(), 'Villa del Parque'), (UUID(), 'Villa Devoto'), (UUID(), 'Villa General Mitre'), (UUID(), 'Villa Lugano'), 
+(UUID(), 'Villa Luro'), (UUID(), 'Villa Ortúzar'), (UUID(), 'Villa Pueyrredón'), (UUID(), 'Villa Real'), 
+(UUID(), 'Villa Riachuelo'), (UUID(), 'Villa Santa Rita'), (UUID(), 'Villa Soldati'), (UUID(), 'Villa Urquiza');
+
+-- Insert barrios_usuarios for providers
+INSERT INTO barrios_usuarios (id, usuario_id, barrio_id)
+SELECT UUID(), u.id, b.id
+FROM usuarios u
+JOIN barrios b ON 
+    (u.usuario = 'juan_perez' AND b.nombre = 'Palermo') OR
+    (u.usuario = 'carlos_ruiz' AND b.nombre = 'Belgrano') OR
+    (u.usuario = 'luis_martin' AND b.nombre = 'Caballito') OR
+    (u.usuario = 'diego_torres' AND b.nombre = 'Recoleta');
+
 -- Insert dummy proveedores (using existing user IDs)
-INSERT INTO proveedores (id, usuario_id, descripcion, ubicacion, telefono, calificacion_promedio) 
+INSERT INTO proveedores (id, usuario_id, descripcion, telefono, calificacion_promedio) 
 SELECT 
   UUID(),
   id,
@@ -92,12 +129,6 @@ SELECT
     WHEN usuario = 'carlos_ruiz' THEN 'Electricista certificado, trabajos garantizados'
     WHEN usuario = 'luis_martin' THEN 'Carpintero especializado en muebles a medida'
     WHEN usuario = 'diego_torres' THEN 'Servicio de limpieza profesional'
-  END,
-  CASE 
-    WHEN usuario = 'juan_perez' THEN 'Palermo, CABA'
-    WHEN usuario = 'carlos_ruiz' THEN 'Belgrano, CABA'
-    WHEN usuario = 'luis_martin' THEN 'Caballito, CABA'
-    WHEN usuario = 'diego_torres' THEN 'Recoleta, CABA'
   END,
   CASE 
     WHEN usuario = 'juan_perez' THEN '11-5555-1234'

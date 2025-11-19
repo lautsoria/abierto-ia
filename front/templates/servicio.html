@@ -1,0 +1,107 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ servicio.nombre }} - Mercado Servicios{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/servicio.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="{{ url_for('home') }}">Inicio</a>
+        <span>></span>
+        <a href="{{ url_for('categoria', nombre=servicio.categoria_nombre) }}">{{ servicio.categoria_nombre }}</a>
+        <span>></span>
+        <span>{{ servicio.nombre }}</span>
+    </div>
+
+    <div class="product-container">
+        <!-- Left Column: Images -->
+        <div class="gallery-container">
+            <div class="thumbnail-list">
+                <!-- Placeholder thumbnails -->
+                <img src="{{ servicio.imagen if servicio.imagen else 'https://via.placeholder.com/50' }}" class="thumbnail" alt="Thumbnail">
+                <img src="https://via.placeholder.com/50" class="thumbnail" alt="Thumbnail">
+                <img src="https://via.placeholder.com/50" class="thumbnail" alt="Thumbnail">
+            </div>
+            <div class="main-image-container">
+                <img src="{{ servicio.imagen if servicio.imagen else 'https://via.placeholder.com/600x400?text=Servicio' }}" class="main-image" alt="{{ servicio.nombre }}">
+            </div>
+        </div>
+
+        <!-- Right Column: Details -->
+        <div class="details-container">
+            <div class="condition-sold">
+                Nuevo | {{ servicio.reviews_count }} contrataciones
+            </div>
+            
+            <h1 class="product-title">{{ servicio.nombre }}</h1>
+
+            <div class="rating-container">
+                <div class="stars">
+                    {% set rating = servicio.calificacion_promedio | default(0) | float %}
+                    {% for i in range(5) %}
+                        {% if i < rating %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                </div>
+                <span class="reviews-count">{{ rating }} ({{ servicio.reviews_count }} opiniones)</span>
+            </div>
+
+            <div class="price-container">
+                <span class="currency">$</span>
+                <span class="price">{{ "{:,.0f}".format(servicio.precio | float) }}</span>
+            </div>
+
+            <div class="payment-methods">
+                <div class="payment-title">Medios de pago</div>
+                <div class="payment-options">
+                    <p>A concretar con el profesional!</p>
+                </div>
+            </div>
+
+            <div class="actions-container">
+                <a href="#" class="btn-primary">Contratar ahora</a>
+                <!-- <a href="#" class="btn-secondary">Agregar al carrito</a> -->
+            </div>
+
+            <div class="seller-info">
+                <h3 class="seller-title">Información del proveedor</h3>
+                <div class="seller-location">
+                    <span>📍</span>
+                    <span>{{ servicio.proveedor_ubicacion if servicio.proveedor_ubicacion else 'Ubicación no especificada' }}</span>
+                </div>
+                <div class="seller-reputation">
+                    <span>🏅</span>
+                    <span>MercadoLíder Platinum</span>
+                </div>
+                <p style="font-size: 14px; color: #666; margin-top: 8px;">
+                    {{ servicio.proveedor_nombre }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="description-section">
+        <h2 class="section-header">Descripción</h2>
+        <div class="description-content">
+            {{ servicio.descripcion }}
+        </div>
+    </div>
+
+    <!-- Reviews (Placeholder structure) -->
+    <div class="reviews-section">
+        <h2 class="section-header">Opiniones sobre el servicio</h2>
+        <!-- Example review -->
+        <div class="review-card">
+            <div class="review-header">
+                <div class="review-stars">★★★★★</div>
+                <span class="review-date">Hace 2 días</span>
+            </div>
+            <p class="review-text">Excelente servicio, muy profesional y puntual. Lo recomiendo totalmente.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
