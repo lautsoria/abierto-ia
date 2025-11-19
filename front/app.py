@@ -171,10 +171,11 @@ def checkout(id):
     if user_data is None:
         return render_template('auth.html')
     
-    servicio = obtener_servicio_por_id(id)
+    servicio = obtener_servicio_por_id(id, horarios=True)
+    reservas = no_disponibles(id)
 
     if servicio:
-        return render_template('checkout.html', servicio=servicio, data=user_data)
+        return render_template('checkout.html', servicio=servicio, reservas=reservas, data=user_data)
     else:
         return render_template('404.html'), 404
   except Exception as e:
