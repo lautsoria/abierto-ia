@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS proveedores (
   usuario_id UUID NULL,
   descripcion VARCHAR(500),
   telefono VARCHAR(20),
-  calificacion_promedio FLOAT DEFAULT 0,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
@@ -120,7 +119,7 @@ JOIN barrios b ON
     (u.usuario = 'diego_torres' AND b.nombre = 'Recoleta');
 
 -- Insert dummy proveedores (using existing user IDs)
-INSERT INTO proveedores (id, usuario_id, descripcion, telefono, calificacion_promedio) 
+INSERT INTO proveedores (id, usuario_id, descripcion, telefono) 
 SELECT 
   UUID(),
   id,
@@ -136,7 +135,6 @@ SELECT
     WHEN usuario = 'luis_martin' THEN '11-5555-9012'
     WHEN usuario = 'diego_torres' THEN '11-5555-3456'
   END,
-  FLOOR(3.5 + (RAND() * 1.5))
 FROM usuarios 
 WHERE usuario IN ('juan_perez', 'carlos_ruiz', 'luis_martin', 'diego_torres');
 
@@ -260,23 +258,23 @@ WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
 LIMIT 10;
 
 -- Insert dummy reseñas (only for completed reservas)
-INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
-SELECT 
-  UUID(),
-  r.usuario_id,
-  r.servicio_id,
-  FLOOR(3 + (RAND() * 3)),
-  CASE FLOOR(RAND() * 5)
-    WHEN 0 THEN 'Excelente trabajo, muy profesional'
-    WHEN 1 THEN 'Buen servicio pero llegó tarde'
-    WHEN 2 THEN 'Muy satisfecho con el resultado'
-    WHEN 3 THEN 'Cumplió con lo prometido'
-    ELSE 'Recomendable, volvería a contratar'
-  END,
-  DATE_ADD(r.fecha_servicio, INTERVAL 1 DAY)
-FROM reservas r
-WHERE r.estado = 'realizado'
-LIMIT 6;
+-- INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
+-- SELECT 
+--   UUID(),
+--   r.usuario_id,
+--   r.servicio_id,
+--   FLOOR(3 + (RAND() * 3)),
+--   CASE FLOOR(RAND() * 5)
+--     WHEN 0 THEN 'Excelente trabajo, muy profesional'
+--     WHEN 1 THEN 'Buen servicio pero llegó tarde'
+--     WHEN 2 THEN 'Muy satisfecho con el resultado'
+--     WHEN 3 THEN 'Cumplió con lo prometido'
+--     ELSE 'Recomendable, volvería a contratar'
+--   END,
+--   DATE_ADD(r.fecha_servicio, INTERVAL 1 DAY)
+-- FROM reservas r
+-- WHERE r.estado = 'realizado'
+-- LIMIT 6;
 
 -- Insert reseñas for ALL services (multiple reviews per service)
 INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
