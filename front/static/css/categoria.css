@@ -230,13 +230,20 @@
     }
 
     .stars {
-        color: #3483fa; /* ML Blue stars or Green? Usually standard yellow or green */
-        color: #00a650; /* ML Green */
-        font-size: 10px;
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        color: rgba(0, 0, 0, 0.55);
+    }
+
+    .rating-value {
+        color: rgba(0, 0, 0, 0.55);
+        font-size: 12px;
+        margin-left: 2px;
     }
 
     .rating-count {
-        color: #999;
+        color: rgba(0, 0, 0, 0.45);
         font-size: 12px;
     }
 

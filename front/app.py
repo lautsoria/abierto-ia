@@ -141,13 +141,40 @@ def categoria(nombre):
     )    
 
 @app.route('/servicio/id/<string:id>')
+@jwt_required(locations=['cookies'], optional=True)
 def servicio(id):
+    data = get_jwt()    
+    user_data = data if data else None
+    
     servicio = obtener_servicio_por_id(id)
     
     if servicio:
-        return render_template('servicio.html', servicio=servicio)
+        return render_template('servicio.html', servicio=servicio, data=user_data)
     else:
         return redirect('error')
+    
+@app.route('/checkout/<string:id>')
+@jwt_required(locations=['cookies'], optional=True)
+def checkout(id):
+  try:
+
+    data = get_jwt()    
+    user_data = data if data else None
+    
+    if user_data is None:
+        return render_template('auth.html')
+    
+    servicio = obtener_servicio_por_id(id)
+
+    if servicio:
+        return render_template('checkout.html', servicio=servicio, data=user_data)
+    else:
+        return render_template('404.html'), 404
+  except Exception as e:
+    print(e)
+    return render_template('404.html'), 404
+      
+
     
 @app.errorhandler(404)
 def error(e):

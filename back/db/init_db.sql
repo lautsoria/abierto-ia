@@ -134,7 +134,7 @@ SELECT
     WHEN usuario = 'carlos_ruiz' THEN '11-5555-5678'
     WHEN usuario = 'luis_martin' THEN '11-5555-9012'
     WHEN usuario = 'diego_torres' THEN '11-5555-3456'
-  END,
+  END
 FROM usuarios 
 WHERE usuario IN ('juan_perez', 'carlos_ruiz', 'luis_martin', 'diego_torres');
 

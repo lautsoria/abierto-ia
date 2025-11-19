@@ -32,7 +32,6 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['POST'])
 def register():
   user, email, password, provider = request.json.values()
-  print(provider)
   
   try:
     # Generate salt with the specified rounds and hash the password

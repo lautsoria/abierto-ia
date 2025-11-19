@@ -1,0 +1,294 @@
+{% extends "base/base.html" %}
+
+{% block title %}Checkout - {{ servicio.nombre }}{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background-color: #f5f5f5;
+    }
+    
+    .checkout-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 2rem;
+    }
+
+    .checkout-main {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .checkout-sidebar {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+        margin-top: 0; /* Align with checkout-container top */
+    }
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    }
+
+    h1.checkout-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    h2.section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    /* Service Preview in Main Column */
+    .service-preview {
+        display: flex;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 1.5rem;
+    }
+
+    .service-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 4px;
+        background-color: #eee;
+    }
+
+    .service-info h3 {
+        font-size: 16px;
+        margin: 0 0 0.5rem 0;
+        color: #333;
+    }
+
+    .service-provider {
+        font-size: 14px;
+        color: #666;
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        border-color: #3483fa;
+        outline: none;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+    }
+
+    .validation-message {
+        color: #d32f2f;
+        font-size: 12px;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    /* Sidebar Summary */
+    .summary-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    }
+
+    .summary-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+        color: #333;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .btn-confirm {
+        background-color: #3483fa;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 1rem;
+        width: 100%;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 1.5rem;
+    }
+
+    .btn-confirm:hover {
+        background-color: #2968c8;
+    }
+
+    @media (max-width: 900px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+        }
+        .checkout-sidebar {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-main">
+        <h1 class="checkout-title">Confirmá tu reserva</h1>
+
+        <form id="bookingForm" action="" method="POST">
+            <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
+            
+            <div class="card">
+                <h2 class="section-title">Servicio seleccionado</h2>
+                <div class="service-preview">
+                    <img src="{{ servicio.imagen or 'https://via.placeholder.com/80' }}" alt="{{ servicio.nombre }}" class="service-img">
+                    <div class="service-info">
+                        <h3>{{ servicio.nombre }}</h3>
+                        <p class="service-provider">Por {{ servicio.proveedor_nombre }}</p>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 1.5rem;">¿Cuándo lo necesitás?</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="fecha">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="hora">Hora preferida</label>
+                        <input type="time" id="hora" name="hora" class="form-control" required>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 1.5rem;">Ubicación del servicio</h2>
+                <div class="form-group">
+                    <label class="form-label" for="direccion">Dirección (CABA)</label>
+                    <input type="text" id="direccion" name="direccion" class="form-control" placeholder="Ej: Av. Corrientes 1234" required>
+                    <div id="addressError" class="validation-message">Por favor ingresá una dirección válida en CABA.</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="notas_direccion">Piso / Depto / Entre calles (Opcional)</label>
+                    <input type="text" id="notas_direccion" name="notas_direccion" class="form-control" placeholder="Ej: 2B, entre Talcahuano y Libertad">
+                </div>
+
+                <h2 class="section-title" style="margin-top: 1.5rem;">Mensaje para el profesional</h2>
+                <div class="form-group">
+                    <label class="form-label" for="mensaje">Detalles adicionales</label>
+                    <textarea id="mensaje" name="mensaje" class="form-control" placeholder="Contale al profesional más detalles sobre lo que necesitás..."></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <aside class="checkout-sidebar">
+        <div class="summary-card">
+            <div class="summary-title">Resumen de contratación</div>
+            
+            <div class="summary-row">
+                <span>Servicio</span>
+                <span>$ {{ servicio.precio }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Cargo por servicio</span>
+                <span style="color: #00a650;">Gratis</span>
+            </div>
+
+            <div class="summary-total">
+                <span>Total</span>
+                <span>$ {{ servicio.precio }}</span>
+            </div>
+
+            <button type="submit" form="bookingForm" class="btn-confirm">Confirmar reserva</button>
+            
+            <div style="margin-top: 1rem; font-size: 12px; color: #999; text-align: center;">
+                Al confirmar, aceptás los términos y condiciones de Abierto IA.
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+    // usamos el dia de hoy como fecha inicial
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha').setAttribute('min', today);
+
+    // manejamos el input de la direccion
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        const addressInput = document.getElementById('direccion');
+        const addressError = document.getElementById('addressError');
+        
+        if (addressInput.value.length < 5) {
+            e.preventDefault();
+            addressInput.style.borderColor = '#d32f2f';
+            addressError.style.display = 'block';
+            addressError.textContent = 'La dirección es muy corta.';
+            return;
+        }
+
+        addressInput.style.borderColor = '#ccc';
+        addressError.style.display = 'none';
+    });
+</script>
+{% endblock %}
+
