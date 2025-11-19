@@ -31,9 +31,11 @@ def unauthorized_callback(error):
 def invalid_token_callback(error):
     return redirect(url_for('home'))
 
+
 # @app.route("/reservas")
 # def mis_reservas():
 #     return render_template("reservas.html", reservas=RESERVAS_MOCK)
+
 
 @app.route('/')
 @jwt_required( optional=True, locations=['cookies'])
@@ -56,6 +58,7 @@ def home():
 
     return render_template('home.html', servicios=servicios, categorias=categorias_completas, data=user_data)
 
+
 @app.route('/auth')
 def auth():
   try:
@@ -65,6 +68,7 @@ def auth():
   except:
     return render_template('auth.html')
   
+
 @app.route('/register', methods=['POST'])
 def register():
     user = request.form.get("newUser")
@@ -85,6 +89,7 @@ def register():
     else:
         flash('Error al registrar el usuario', 'error')
         return redirect(url_for('auth'))
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -110,6 +115,7 @@ def login():
     else:
         flash('Credenciales inválidas', 'error')
         return redirect(url_for('auth'))
+
 
 @app.route('/categoria/<nombre>')
 @jwt_required(optional=True, locations=['cookies'])
@@ -140,6 +146,7 @@ def categoria(nombre):
         data=user_data
     )    
 
+
 @app.route('/servicio/id/<string:id>')
 @jwt_required(locations=['cookies'], optional=True)
 def servicio(id):
@@ -153,11 +160,11 @@ def servicio(id):
     else:
         return redirect('error')
     
+
 @app.route('/checkout/<string:id>')
 @jwt_required(locations=['cookies'], optional=True)
 def checkout(id):
   try:
-
     data = get_jwt()    
     user_data = data if data else None
     
@@ -174,8 +181,7 @@ def checkout(id):
     print(e)
     return render_template('404.html'), 404
       
-
-    
+      
 @app.errorhandler(404)
 def error(e):
    return render_template('404.html'), 404

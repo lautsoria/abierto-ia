@@ -268,27 +268,32 @@
     </aside>
 </div>
 
-<script>
-    // usamos el dia de hoy como fecha inicial
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('fecha').setAttribute('min', today);
+  {% block scripts %}
+  <script>
 
-    // manejamos el input de la direccion
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-        const addressInput = document.getElementById('direccion');
-        const addressError = document.getElementById('addressError');
-        
-        if (addressInput.value.length < 5) {
-            e.preventDefault();
-            addressInput.style.borderColor = '#d32f2f';
-            addressError.style.display = 'block';
-            addressError.textContent = 'La dirección es muy corta.';
-            return;
-        }
+    
 
-        addressInput.style.borderColor = '#ccc';
-        addressError.style.display = 'none';
-    });
-</script>
+      // usamos el dia de hoy como fecha inicial
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('fecha').setAttribute('min', today);
+
+      // manejamos el input de la direccion
+      document.getElementById('bookingForm').addEventListener('submit', function(e) {
+          const addressInput = document.getElementById('direccion');
+          const addressError = document.getElementById('addressError');
+          
+          if (addressInput.value.length < 5) {
+              e.preventDefault();
+              addressInput.style.borderColor = '#d32f2f';
+              addressError.style.display = 'block';
+              addressError.textContent = 'La dirección es muy corta.';
+              return;
+          }
+
+          addressInput.style.borderColor = '#ccc';
+          addressError.style.display = 'none';
+      });
+  </script>
+  {% endblock %}
 {% endblock %}
 

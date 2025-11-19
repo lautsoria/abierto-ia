@@ -31,7 +31,11 @@ CREATE TABLE IF NOT EXISTS servicios (
   nombre VARCHAR(255) NOT NULL,
   descripcion TEXT,
   precio DECIMAL(10,2) NOT NULL,
+  hora_inicio INT CHECK (hora_inicio BETWEEN 1 AND 24),
+  hora_fin INT CHECK (hora_fin BETWEEN 1 AND 24),
+  duracion INT CHECK (duracion BETWEEN 1 AND 12),
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT check_horas CHECK (hora_fin > hora_inicio),
   FOREIGN KEY (proveedor_id) REFERENCES proveedores(id),
   FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 );
@@ -139,7 +143,7 @@ FROM usuarios
 WHERE usuario IN ('juan_perez', 'carlos_ruiz', 'luis_martin', 'diego_torres');
 
 -- Insert dummy servicios
-INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, fecha_creacion)
+INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, hora_inicio, hora_fin, duracion, fecha_creacion)
 SELECT 
   UUID(),
   p.id,
@@ -162,6 +166,14 @@ SELECT
     WHEN c.nombre = 'Carpintería' THEN 15000.00
     WHEN c.nombre = 'Limpieza' THEN 2500.00
   END,
+  8, -- hora_inicio (8 AM)
+  18, -- hora_fin (6 PM)
+  CASE 
+    WHEN c.nombre = 'Plomería' THEN 2
+    WHEN c.nombre = 'Electricidad' THEN 3
+    WHEN c.nombre = 'Carpintería' THEN 8
+    WHEN c.nombre = 'Limpieza' THEN 4
+  END, -- duracion en horas
   NOW()
 FROM proveedores p
 CROSS JOIN categorias c
@@ -172,7 +184,7 @@ WHERE (p.usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez') AND
 LIMIT 4;
 
 -- Insert additional services
-INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, fecha_creacion)
+INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, hora_inicio, hora_fin, duracion, fecha_creacion)
 SELECT 
   UUID(),
   (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez')),
@@ -180,59 +192,62 @@ SELECT
   'Instalación de grifería',
   'Instalación y cambio de canillas y grifos',
   2800.00,
+  9, -- hora_inicio
+  17, -- hora_fin
+  1, -- duracion
   NOW();
 
 -- Insert 10 more varied services
-INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, fecha_creacion) VALUES
+INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, hora_inicio, hora_fin, duracion, fecha_creacion) VALUES
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez')),
  (SELECT id FROM categorias WHERE nombre = 'Plomería'),
- 'Destapación de cañerías', 'Servicio de destapación con máquina profesional', 4500.00, NOW()),
+ 'Destapación de cañerías', 'Servicio de destapación con máquina profesional', 4500.00, 8, 20, 2, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz')),
  (SELECT id FROM categorias WHERE nombre = 'Electricidad'),
- 'Instalación de tomas', 'Instalación de enchufes y tomas eléctricas', 3200.00, NOW()),
+ 'Instalación de tomas', 'Instalación de enchufes y tomas eléctricas', 3200.00, 9, 18, 2, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz')),
  (SELECT id FROM categorias WHERE nombre = 'Electricidad'),
- 'Revisión de tablero eléctrico', 'Inspección y mantenimiento de tableros', 5500.00, NOW()),
+ 'Revisión de tablero eléctrico', 'Inspección y mantenimiento de tableros', 5500.00, 8, 17, 3, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'luis_martin')),
  (SELECT id FROM categorias WHERE nombre = 'Carpintería'),
- 'Reparación de puertas', 'Ajuste y reparación de puertas de madera', 3800.00, NOW()),
+ 'Reparación de puertas', 'Ajuste y reparación de puertas de madera', 3800.00, 10, 18, 4, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'luis_martin')),
  (SELECT id FROM categorias WHERE nombre = 'Carpintería'),
- 'Instalación de estanterías', 'Colocación de estantes y repisas personalizadas', 6500.00, NOW()),
+ 'Instalación de estanterías', 'Colocación de estantes y repisas personalizadas', 6500.00, 9, 19, 5, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'diego_torres')),
  (SELECT id FROM categorias WHERE nombre = 'Limpieza'),
- 'Limpieza de oficinas', 'Servicio de limpieza empresarial completo', 8000.00, NOW()),
+ 'Limpieza de oficinas', 'Servicio de limpieza empresarial completo', 8000.00, 7, 15, 6, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'diego_torres')),
  (SELECT id FROM categorias WHERE nombre = 'Limpieza'),
- 'Limpieza de vidrios', 'Lavado profesional de ventanas y cristales', 2200.00, NOW()),
+ 'Limpieza de vidrios', 'Lavado profesional de ventanas y cristales', 2200.00, 9, 17, 3, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez')),
  (SELECT id FROM categorias WHERE nombre = 'Jardinería'),
- 'Mantenimiento de jardín', 'Corte de césped y poda de plantas', 4200.00, NOW()),
+ 'Mantenimiento de jardín', 'Corte de césped y poda de plantas', 4200.00, 8, 16, 5, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz')),
  (SELECT id FROM categorias WHERE nombre = 'Pintura'),
- 'Pintura de interiores', 'Pintura profesional de ambientes', 12000.00, NOW()),
+ 'Pintura de interiores', 'Pintura profesional de ambientes', 12000.00, 9, 18, 8, NOW()),
 
 (UUID(), 
  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'luis_martin')),
  (SELECT id FROM categorias WHERE nombre = 'Pintura'),
- 'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, NOW());
+ 'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, 8, 20, 10, NOW());
 
 -- Insert dummy reservas
 INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, estado, comentarios_cliente)
