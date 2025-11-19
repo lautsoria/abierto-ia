@@ -71,50 +71,6 @@ def servicios_por_categoria(nombre):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-#filtrar servicio por categoria (ruta legacy)
-@servicios_bp.route('/<string:nombre>')
-def servicios_por_categoria_legacy(nombre):
-    try:
-        conn = db_conn()
-        cursor = conn.cursor(dictionary=True)
-
-        query = """
-            SELECT 
-                s.*,
-                c.nombre as categoria,
-                p.id as proveedor_id,
-                u.usuario as proveedor_nombre,
-                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as proveedor_ubicacion,
-                (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as rating,
-                (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
-            FROM servicios s
-            INNER JOIN categorias c ON s.categoria_id = c.id
-            INNER JOIN proveedores p ON s.proveedor_id = p.id
-            INNER JOIN usuarios u ON p.usuario_id = u.id
-            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
-            LEFT JOIN barrios b ON bu.barrio_id = b.id
-            WHERE LOWER(c.nombre) = LOWER(%s)
-            GROUP BY s.id
-            ORDER BY s.id DESC
-        """
-
-        cursor.execute(query, (nombre,))
-        servicios = cursor.fetchall()
-        
-        # Convert Decimal to float for JSON serialization
-        for servicio in servicios:
-            if servicio.get('rating'):
-                servicio['rating'] = float(servicio['rating'])
-
-        cursor.close()
-        conn.close()
-
-        return jsonify(servicios), 200
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
 # buscar servicio con mejor rating, se le pone poner limite o default es 8
 @servicios_bp.route('/top-rating')
 def servicios_top_rating():
@@ -222,3 +178,44 @@ def servicios_por_precio():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@servicios_bp.route('/id/<string:id>', methods=['GET'])
+def servicio(id):
+    try:
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+
+        query = """
+                SELECT 
+                    s.id,
+                    s.nombre,
+                    s.descripcion,
+                    s.precio,
+                    c.nombre as categoria_nombre,
+                    p.id as proveedor_id,
+                    u.usuario as proveedor_nombre,
+                    GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion,
+                    (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as calificacion_promedio,
+                    (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
+                FROM servicios s
+                INNER JOIN categorias c ON s.categoria_id = c.id
+                INNER JOIN proveedores p ON s.proveedor_id = p.id
+                INNER JOIN usuarios u ON p.usuario_id = u.id
+                LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+                LEFT JOIN barrios b ON bu.barrio_id = b.id
+                WHERE s.id = %s
+                GROUP BY s.id
+                """
+        cursor.execute(query, (id,))
+        servicio = cursor.fetchone()
+        print(servicio)
+
+        cursor.close()
+        conn.close()
+
+        if servicio is None:
+            servicio = []
+
+        return jsonify(servicio), 200
+    except Exception as e:
+        return jsonify({'error': e}), 400

@@ -25,7 +25,7 @@ env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5000"], supports_credentials=True, methods=['GET', 'POST', 'UPDATE'])
+CORS(app, origins=["http://localhost:5000"], supports_credentials=True, methods=['POST', 'GET', 'UPDATE', 'DELETE'])
 
 # configuracion de JWT en nuestra app
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')

@@ -4,6 +4,10 @@ from flask_cors import CORS
 import os
 import requests
 import logging
+from dotenv import load_dotenv
+
+env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
@@ -24,83 +28,6 @@ def unauthorized_callback(error):
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
     return redirect(url_for('home'))
-
-@app.route('/register', methods=['POST'])
-def register():
-    user = request.form.get("newUser")
-    email = request.form.get("email")
-    password = request.form.get("newPassword")
-    repeatPassword = request.form.get("newPassword2")
-    provider = request.form.get("isProveedor") == 'true'
-
-    if password != repeatPassword:
-        flash('Las contraseñas no coinciden', 'error')
-        return redirect(url_for('auth'))
-
-    try:
-        # Enviar request al back
-        response = requests.post(
-            f'{BACKEND_URL}/auth/register',
-            json={
-                'user': user,
-                'email': email,
-                'password': password,
-                'provider': provider
-            },
-            timeout=5
-        )
-
-        if response.status_code == 200:
-            flash('Usuario creado correctamente.' 'success')
-            return redirect(url_for('auth'))
-        else:
-            flash('Error al registrar el usuario', 'error')
-            return redirect(url_for('auth'))
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to backend: {e}")
-        flash('Error de conexión con el servidor', 'error')
-        return redirect(url_for('auth'))
-
-@app.route('/login', methods=['POST'])
-def login():
-    credential = request.form.get("credential")
-    password = request.form.get("password")
-
-    try:
-        # Enviar solicitud al backend
-        response = requests.post(
-            f'{BACKEND_URL}/auth/login',
-            json={
-                'credential': credential,
-                'password': password
-            },
-            timeout=5
-        )
-
-        if response.status_code == 200:
-            # Obtener las cookies del backend y pasarlas al frontend
-            resp = make_response(redirect(url_for('home')))
-            
-            # Copiar todas las cookies del backend al frontend
-            for cookie_name, cookie_value in response.cookies.items():
-                resp.set_cookie(
-                    cookie_name,
-                    cookie_value,
-                    httponly=True,
-                    samesite='Lax'
-                )
-            
-            flash('Inicio de sesión exitoso', 'success')
-            return resp
-        else:
-            flash('Credenciales inválidas', 'error')
-            return redirect(url_for('auth'))
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to backend: {e}")
-        flash('Error de conexión con el servidor', 'error')
-        return redirect(url_for('auth'))
 
 icons = {
     # iconos hardcodeados
@@ -245,6 +172,83 @@ def auth():
     return redirect(url_for('home'))
   except:
     return render_template('auth.html')
+  
+@app.route('/register', methods=['POST'])
+def register():
+    user = request.form.get("newUser")
+    email = request.form.get("email")
+    password = request.form.get("newPassword")
+    repeatPassword = request.form.get("newPassword2")
+    provider = request.form.get("isProveedor") == 'true'
+
+    if password != repeatPassword:
+        flash('Las contraseñas no coinciden', 'error')
+        return redirect(url_for('auth'))
+
+    try:
+        # Enviar request al back
+        response = requests.post(
+            f'{BACKEND_URL}/auth/register',
+            json={
+                'user': user,
+                'email': email,
+                'password': password,
+                'provider': provider
+            },
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            flash('Usuario creado correctamente.' 'success')
+            return redirect(url_for('auth'))
+        else:
+            flash('Error al registrar el usuario', 'error')
+            return redirect(url_for('auth'))
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to backend: {e}")
+        flash('Error de conexión con el servidor', 'error')
+        return redirect(url_for('auth'))
+
+@app.route('/login', methods=['POST'])
+def login():
+    credential = request.form.get("credential")
+    password = request.form.get("password")
+
+    try:
+        # Enviar solicitud al backend
+        response = requests.post(
+            f'{BACKEND_URL}/auth/login',
+            json={
+                'credential': credential,
+                'password': password
+            },
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            # Obtener las cookies del backend y pasarlas al frontend
+            resp = make_response(redirect(url_for('home')))
+            
+            # Copiar todas las cookies del backend al frontend
+            for cookie_name, cookie_value in response.cookies.items():
+                resp.set_cookie(
+                    cookie_name,
+                    cookie_value,
+                    httponly=True,
+                    samesite='Lax'
+                )
+            
+            flash('Inicio de sesión exitoso', 'success')
+            return resp
+        else:
+            flash('Credenciales inválidas', 'error')
+            return redirect(url_for('auth'))
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to backend: {e}")
+        flash('Error de conexión con el servidor', 'error')
+        return redirect(url_for('auth'))
 
 @app.route('/categoria/<nombre>')
 @jwt_required(optional=True, locations=['cookies'])
@@ -255,7 +259,6 @@ def categoria(nombre):
 
     # Obtener parámetros de filtro
     ubicacion_seleccionada = request.args.get('ubicacion', '')
-    # ordenar = request.args.get('ordenar', 'relevancia')
 
     try:
         # Construir URL con parámetros
@@ -311,6 +314,25 @@ def categoria(nombre):
             ordenar='relevancia',
             data=user_data
         )    
+
+@app.route('/servicio/id/<string:id>')
+def servicio(id):
+
+    try:
+        servicio = requests.get(
+            f'{BACKEND_URL}/servicios/id/{id}',
+            timeout=2
+        )
+
+        servicio = servicio.json() if servicio.status_code == 200 else None
+    
+        return render_template('servicio.html', servicio=servicio)
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener servicios: {e}")
+        return render_template('404.html')
+    
+
 
 
 if __name__ == '__main__':

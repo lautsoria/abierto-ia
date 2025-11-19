@@ -56,7 +56,7 @@
         {% if servicios %}
         <div class="servicios-grid">
             {% for servicio in servicios %}
-            <div class="servicio-card" onclick="window.location.href='/servicio/{{ servicio.id }}'">
+            <div class="servicio-card" onclick="window.location.href='/servicio/id/{{ servicio.id }}'">
                 <img 
                     src="{{ servicio.imagen or 'https://via.placeholder.com/300x200?text=' + servicio.nombre }}" 
                     alt="{{ servicio.nombre }}"

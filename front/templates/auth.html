@@ -31,10 +31,10 @@
             <div class="flip-card-back">
                 <form id="registerForm" method="POST" action="{{ url_for('register') }}">
                 <h1>Registrate</h1>
-                <input type="text" id="newUser" name="fnewUsername" placeholder="Nombre de usuario" required>
-                <input type="email" id="email" name="femail" placeholder="Correo electrónico" required>
-                <input type="password" id="newPassword" name="fnewpassword" placeholder="Contraseña" required>
-                <input type="password" id="newPassword2" name="fnewpassword2" placeholder="Repetir Contraseña" required>
+                <input type="text" id="newUser" name="newUser" placeholder="Nombre de usuario" required>
+                <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+                <input type="password" id="newPassword" name="newPassword" placeholder="Contraseña" required>
+                <input type="password" id="newPassword2" name="newPassword2" placeholder="Repetir Contraseña" required>
                 <div class="proveedor-checkbox">
                     <input type="checkbox" id="isProveedor" name="isProveedor" value="true">
                     <label for="isProveedor">Soy proveedor</label>
