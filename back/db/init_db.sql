@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS reservas (
   servicio_id UUID NOT NULL,
   fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
   fecha_servicio DATETIME NOT NULL,
+  hora_servicio INT NOT NULL,
   estado ENUM('pendiente', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
@@ -75,7 +76,6 @@ CREATE TABLE IF NOT EXISTS barrios_usuarios (
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   FOREIGN KEY (barrio_id) REFERENCES barrios(id)
 );
-
 
 -- Insert dummy usuarios
 INSERT INTO usuarios (id, usuario, email, contrasena, fecha_registro) VALUES

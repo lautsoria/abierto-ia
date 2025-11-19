@@ -24,7 +24,6 @@ from db.db import db_conn
 
 proveedores_bp = Blueprint('proveedores', __name__)
 
-# listar provee
 @proveedores_bp.route('/')
 def get_proveedores():
     try:

@@ -187,10 +187,7 @@ def servicio(id):
 
         query = """
                 SELECT 
-                    s.id,
-                    s.nombre,
-                    s.descripcion,
-                    s.precio,
+                    s.*,
                     c.nombre as categoria_nombre,
                     p.id as proveedor_id,
                     u.usuario as proveedor_nombre,
