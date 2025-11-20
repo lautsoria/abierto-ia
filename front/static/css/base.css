@@ -9,13 +9,11 @@ body {
   color: #333;
 }
 
-/* Header */
 header.header {
   background-color: #FFF44F;
   padding: 20px 220px;
 }
 
-/* Top section */
 .header-top {
   display: flex;
   align-items: center;
@@ -25,7 +23,6 @@ header.header {
   min-height: 60px;
 }
 
-/* Left side - Logo and Location */
 .header-left {
   display: flex;
   align-items: center;
@@ -72,7 +69,6 @@ header.header {
   font-size: 12px;
 }
 
-/* Center - Search */
 .header-center {
   flex: 1;
   display: flex;
@@ -116,7 +112,6 @@ header.header {
   color: #333;
 }
 
-/* Right side - Promo */
 .header-right {
   display: flex;
   align-items: center;
@@ -141,14 +136,12 @@ header.header {
   background-color: #162a6a;
 }
 
-/* Navigation */
 .header-nav {
   display: flex;
   align-items: center;
   gap: 0;
   max-width: 1200px;
   margin: 0 auto;
-  /* border-top: 1px solid rgba(0, 0, 0, 0.1); */
   padding-top: 8px;
   padding-bottom: 8px;
   flex-wrap: wrap;
@@ -172,7 +165,6 @@ header.header {
   color: #1F3A93;
 }
 
-/* Footer */
 .footer {
   background-color: #fff;
   border-top: 1px solid #e6e6e6;

@@ -212,4 +212,37 @@ def no_disponibles(id):
         return []
     except requests.exceptions.RequestException as e:
         print(f"Error al obtener servicios por categoría: {e}")
-        return []    
+        return []
+    
+
+def reservar(user_id, servicio_id, fecha, horario, direccion, mensaje):
+    try:
+        response = requests.post(
+            f'{BACKEND_URL}/reservas',
+            timeout=2,
+            json={
+                'usuario_id': user_id,
+                'servicio_id': servicio_id,
+                'fecha_servicio': fecha,
+                'hora_servicio': horario,
+                'direccion': direccion,
+                'comentarios_cliente': mensaje
+            }
+        )
+        return response
+    except Exception as e:
+        print(e)
+        return None
+
+def obtener_reserva_por_id(id):
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/reservas/{id}',
+            timeout=2
+        )
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except Exception as e:
+        print(e)
+        return None            

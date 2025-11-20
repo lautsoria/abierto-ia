@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS reservas (
   fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
   fecha_servicio DATETIME NOT NULL,
   hora_servicio INT NOT NULL,
+  direccion VARCHAR(100),
   estado ENUM('pendiente', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
@@ -252,7 +253,7 @@ INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, prec
  'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, 8, 20, 10, NOW());
 
 -- Insert dummy reservas
-INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, hora_servicio, estado, comentarios_cliente)
+INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, hora_servicio, direccion, estado, comentarios_cliente)
 SELECT 
   UUID(),
   u.id,
@@ -260,6 +261,18 @@ SELECT
   DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 30) DAY), '%Y-%m-%dT%H:%i'),
   DATE_FORMAT(DATE_ADD(NOW(), INTERVAL FLOOR(RAND() * 14) DAY), '%Y-%m-%d'),
   s.hora_inicio + (FLOOR(RAND() * (FLOOR((s.hora_fin - s.duracion - s.hora_inicio) / s.duracion) + 1)) * s.duracion),
+  CASE FLOOR(RAND() * 10)
+    WHEN 0 THEN 'Av. Santa Fe 1234, Palermo'
+    WHEN 1 THEN 'Av. Corrientes 2500, Balvanera'
+    WHEN 2 THEN 'Av. Cabildo 3400, Belgrano'
+    WHEN 3 THEN 'Av. Rivadavia 5678, Caballito'
+    WHEN 4 THEN 'Av. del Libertador 1800, Recoleta'
+    WHEN 5 THEN 'Av. Córdoba 900, San Nicolás'
+    WHEN 6 THEN 'Av. Callao 600, Balvanera'
+    WHEN 7 THEN 'Av. Las Heras 2300, Recoleta'
+    WHEN 8 THEN 'Av. Scalabrini Ortiz 1500, Palermo'
+    ELSE 'Av. 9 de Julio 1000, San Nicolás'
+  END,
   CASE FLOOR(RAND() * 3)
     WHEN 0 THEN 'pendiente'
     WHEN 1 THEN 'realizado'

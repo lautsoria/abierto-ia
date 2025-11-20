@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
-from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt
+from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt, get_jwt_identity
 from flask_cors import CORS
 import os
 import time
@@ -53,10 +53,12 @@ def home():
 def auth():
   try:
     verify_jwt_in_request(locations=['cookies'])
-
     return redirect(url_for('home'))
   except:
-    return render_template('auth.html')
+    # Si el token es inválido o no existe, limpiar la cookie
+    resp = make_response(render_template('auth.html'))
+    resp.set_cookie('access_token_cookie', '', max_age=0)
+    return resp
   
 
 @app.route('/register', methods=['POST'])
@@ -136,7 +138,7 @@ def categoria(nombre):
         data=user_data
     )    
 
-
+# vista tipo producto de un servicio 
 @app.route('/servicio/id/<string:id>')
 @jwt_required(locations=['cookies'], optional=True)
 def servicio(id):
@@ -144,6 +146,8 @@ def servicio(id):
     user_data = data if data else None
     
     servicio = obtener_servicio_por_id(id)
+
+    # TODO: mandar consultar las resenas del back y pasarlas al render_template
     
     if servicio:
         return render_template('servicio.html', servicio=servicio, data=user_data)
@@ -152,16 +156,17 @@ def servicio(id):
     
 
 @app.route('/checkout/<string:id>')
-@jwt_required(locations=['cookies'], optional=True)
+@jwt_required(locations=['cookies'])
 def checkout(id):
   try:
     data = get_jwt()    
     user_data = data if data else None
     
     if user_data is None:
-        return render_template('auth.html')
+        return render_template('auth.html'), 401
     
     servicio = obtener_servicio_por_id(id, horarios=True)
+    print(servicio)
     reservas = no_disponibles(id)
 
     if servicio:
@@ -171,15 +176,60 @@ def checkout(id):
   except Exception as e:
     print(e)
     return render_template('404.html'), 404
-      
+
+@app.route('/reserva/<string:servicio>', methods=['POST'])
+@jwt_required(locations=['cookies'])
+def crear_reserva(servicio):
+    data = get_jwt()
+    user_data = data if data else None
+    print(user_data)
+
+    if user_data is None:
+        return redirect(url_for('auth'))
+
+    user_id = get_jwt_identity()
+    servicio_id = servicio
+    fecha = request.form.get('fecha')
+    horario = request.form.get('hora')
+    direccion = request.form.get('direccion')
+    notas = request.form.get('notas_direccion', '')
+    mensaje = request.form.get('mensaje', '')
+    comentarios = f"{notas} {mensaje}".strip()
+
+    response = reservar(user_id, servicio_id, fecha, horario, direccion, comentarios)
+    
+    if response and response.status_code == 201:
+        reserva_data = response.json()
+        print(reserva_data)
+        reserva_id = reserva_data.get('id')
+        flash('Reserva confirmada exitosamente', 'success')
+        return redirect(f'/reserva/{reserva_id}')
+    else:
+        flash('Error al registrar la reserva', 'error')
+        return redirect(url_for('checkout', id=servicio_id))
+    
+@app.route('/reserva/<string:reserva_id>')
+@jwt_required(locations=['cookies'], optional=True)
+def detalle_reserva(reserva_id):
+    data = get_jwt()
+    user_data = data if data else None
+    
+    # TODO: Fetch reserva details from backend
+    reserva = obtener_reserva_por_id(reserva_id)
+    print(reserva)
+    
+    return render_template('reserva.html', reserva=reserva, data=user_data)
+
+
 # manejamos que hacer cuando el token no existe
 @jwt.unauthorized_loader
 def unauthorized_callback(error):
-    return redirect(url_for('/'))
+    return redirect(url_for('auth'))
+
 # o cuando el token es invalido
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
-    return redirect(url_for('/'))
+    return redirect(url_for('auth'))
 
 @app.errorhandler(404)
 def error(e):

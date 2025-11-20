@@ -13,7 +13,6 @@
         <p>{{ total_servicios }} servicios disponibles</p>
     </div>
 
-    <!-- Sidebar con filtros -->
     <aside class="filters-container">
         <div class="filters-title">
             Filtros
@@ -38,20 +37,6 @@
             </a>
         </form>
     </aside>
-
-    <!-- Contenido principal -->
-    <!-- <main>
-        <div class="results-info">
-            <div class="sort-container">
-                <label for="ordenar">Ordenar por</label>
-                <select id="ordenar" onchange="ordenarServicios(this.value)">
-                    <option value="relevancia">Más relevantes</option>
-                    <option value="precio_asc">Menor precio</option>
-                    <option value="precio_desc">Mayor precio</option>
-                    <option value="rating">Mejor calificados</option>
-                </select>
-            </div>
-        </div> -->
 
         {% if servicios %}
         <div class="servicios-grid">

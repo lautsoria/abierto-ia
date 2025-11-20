@@ -11,8 +11,7 @@
     <div class="checkout-main">
         <h1 class="checkout-title">Confirmá tu reserva</h1>
 
-        <form id="bookingForm" action="" method="POST">
-            <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
+        <form id="bookingForm" action="{{ url_for('crear_reserva', servicio=servicio.id) }}" method="POST">
             
             <div class="card">
                 <h2 class="section-title">Servicio seleccionado</h2>
@@ -92,31 +91,35 @@
 
   {% block scripts %}
   <script>
-      // usamos el dia de hoy como fecha inicial
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('fecha').setAttribute('min', today);
+    // usamos el dia de hoy como fecha inicial
+    let min = new Date()
+    let max = new Date(min) 
+    max.setDate(min.getDate() + 15)
+    min = min.toISOString().split('T')[0]
+    max = max.toISOString().split('T')[0]
+    document.getElementById('fecha').setAttribute('min', min)
+    document.getElementById('fecha').setAttribute('max', max)
 
-      const bookings = {{ reservas | tojson }}
-      
-      /* 
-      cuando el usuario selecciona una fecha en el calendario, esta variable cambia
-      a esa fecha para poder verificar si tiene reservas
-      */
-     const options = document.getElementById('hora').options 
-     const validOptions = Array(...options).filter((op) => op.value.length > 0)
-     console.log(validOptions)
+    const bookings = {{ reservas | tojson }}
 
-      let datePicker = document.getElementById('fecha').addEventListener('change', () => {
-        
+    /* 
+    cuando el usuario selecciona una fecha en el calendario, esta variable cambia
+    a esa fecha para poder verificar si tiene reservas
+    */
+    const options = document.getElementById('hora').options
+    const validOptions = Array(...options).filter((op) => op.value.length > 0)
+    console.log(validOptions)
+
+    let datePicker = document.getElementById('fecha').addEventListener('change', () => {
+
         validOptions.forEach(op => {
             op.disabled = false;
             if (op.value) op.textContent = op.value; // Reset text
         });
-        
+
         let selectedDate = document.getElementById('fecha').value
 
         bookings.forEach(booking => {
-            console.log('viendo reservas del', booking.fecha_servicio)
             if (booking.fecha_servicio.split('T')[0] === selectedDate) {
                 console.log('Reserva encontrada! Deshabilitando horarios reservados')
                 validOptions.forEach((op) => {
@@ -127,32 +130,33 @@
                 })
             }
         });
-      })
 
-      const allDisabled = validOptions.every((op) => op.disabled)
+        const allDisabled = validOptions.every((op) => op.disabled)
+        console.log(allDisabled)
       
-      if (allDisabled) {
-        alert('El día seleccionado no tiene horarios disponibles')
-        document.getElementById('fecha').value = ''; // Reset date
-        document.getElementById('hora').value = ''; // Reset time selection
-      }
+        if (allDisabled) {
+            alert('El día seleccionado no tiene horarios disponibles')
+            document.getElementById('fecha').value = ''; // Reset date
+            document.getElementById('hora').value = ''; // Reset time selection
+        }
+    })
 
-      // manejamos el input de la direccion
-      document.getElementById('bookingForm').addEventListener('submit', function(e) {
-          const addressInput = document.getElementById('direccion');
-          const addressError = document.getElementById('addressError');
-          
-          if (addressInput.value.length < 5) {
-              e.preventDefault();
-              addressInput.style.borderColor = '#d32f2f';
-              addressError.style.display = 'block';
-              addressError.textContent = 'La dirección es muy corta.';
-              return;
-          }
+    // manejamos el input de la direccion
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        const addressInput = document.getElementById('direccion');
+        const addressError = document.getElementById('addressError');
+        
+        if (addressInput.value.length < 5) {
+            e.preventDefault();
+            addressInput.style.borderColor = '#d32f2f';
+            addressError.style.display = 'block';
+            addressError.textContent = 'La dirección es muy corta.';
+            return;
+        }
 
-          addressInput.style.borderColor = '#ccc';
-          addressError.style.display = 'none';
-      });
+        addressInput.style.borderColor = '#ccc';
+        addressError.style.display = 'none';
+    });
   </script>
   {% endblock %}
 {% endblock %}

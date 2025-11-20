@@ -5,6 +5,7 @@ from flask_jwt_extended import (
     set_access_cookies
 )
 import uuid
+from flask import make_response
 # from dotenv import load_dotenv
 # import bcrypt as b
 
@@ -72,7 +73,6 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-  from flask import make_response
   credential, password = request.json.values()
   
   try:

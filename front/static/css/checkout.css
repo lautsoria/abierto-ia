@@ -23,7 +23,7 @@ body {
     position: sticky;
     top: 2rem;
     height: fit-content;
-    margin-top: 0; /* Align with checkout-container top */
+    margin-top: 0; 
 }
 
 .card {
@@ -47,7 +47,6 @@ h2.section-title {
     margin-bottom: 1rem;
 }
 
-/* Service Preview in Main Column */
 .service-preview {
     display: flex;
     gap: 1rem;
@@ -75,7 +74,6 @@ h2.section-title {
     color: #666;
 }
 
-/* Form Styles */
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -133,7 +131,6 @@ textarea.form-control {
     display: none;
 }
 
-/* Sidebar Summary */
 .summary-card {
     background: white;
     border-radius: 4px;
