@@ -36,7 +36,7 @@
                             <option value="">Seleccioná un horario</option>
                             {% if servicio.horarios %}
                                 {% for horario in servicio.horarios %}
-                                    <option value="{{ horario }}">{{ horario }}</option>
+                                    <option id="{{ horario }}" value="{{ horario }}">{{ horario }}</option>
                                 {% endfor %}
                             {% endif %}
                         </select>
@@ -96,7 +96,46 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('fecha').setAttribute('min', today);
 
+      const bookings = {{ reservas | tojson }}
       
+      /* 
+      cuando el usuario selecciona una fecha en el calendario, esta variable cambia
+      a esa fecha para poder verificar si tiene reservas
+      */
+     const options = document.getElementById('hora').options 
+     const validOptions = Array(...options).filter((op) => op.value.length > 0)
+     console.log(validOptions)
+
+      let datePicker = document.getElementById('fecha').addEventListener('change', () => {
+        
+        validOptions.forEach(op => {
+            op.disabled = false;
+            if (op.value) op.textContent = op.value; // Reset text
+        });
+        
+        let selectedDate = document.getElementById('fecha').value
+
+        bookings.forEach(booking => {
+            console.log('viendo reservas del', booking.fecha_servicio)
+            if (booking.fecha_servicio.split('T')[0] === selectedDate) {
+                console.log('Reserva encontrada! Deshabilitando horarios reservados')
+                validOptions.forEach((op) => {
+                    console.log(op.value, '==', booking.hora_servicio)
+                    if (op.value.length > 0 && op.value === booking.hora_servicio) {
+                        op.disabled = true;
+                    }
+                })
+            }
+        });
+      })
+
+      const allDisabled = validOptions.every((op) => op.disabled)
+      
+      if (allDisabled) {
+        alert('El día seleccionado no tiene horarios disponibles')
+        document.getElementById('fecha').value = ''; // Reset date
+        document.getElementById('hora').value = ''; // Reset time selection
+      }
 
       // manejamos el input de la direccion
       document.getElementById('bookingForm').addEventListener('submit', function(e) {

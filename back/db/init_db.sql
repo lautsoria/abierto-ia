@@ -1,3 +1,5 @@
+DROP SCHEMA ids;
+
 CREATE DATABASE IF NOT EXISTS ids;
 use ids;
 
@@ -250,13 +252,14 @@ INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, prec
  'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, 8, 20, 10, NOW());
 
 -- Insert dummy reservas
-INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, estado, comentarios_cliente)
+INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, hora_servicio, estado, comentarios_cliente)
 SELECT 
   UUID(),
   u.id,
   s.id,
-  DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 30) DAY),
-  DATE_ADD(NOW(), INTERVAL FLOOR(RAND() * 14) DAY),
+  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 30) DAY), '%Y-%m-%dT%H:%i'),
+  DATE_FORMAT(DATE_ADD(NOW(), INTERVAL FLOOR(RAND() * 14) DAY), '%Y-%m-%d'),
+  s.hora_inicio + (FLOOR(RAND() * (FLOOR((s.hora_fin - s.duracion - s.hora_inicio) / s.duracion) + 1)) * s.duracion),
   CASE FLOOR(RAND() * 3)
     WHEN 0 THEN 'pendiente'
     WHEN 1 THEN 'realizado'
@@ -326,7 +329,7 @@ SELECT
     WHEN 13 THEN 'Trabajo impecable, totalmente recomendable'
     ELSE 'Servicio correcto, sin sorpresas'
   END,
-  DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) DAY)
+  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) DAY), '%Y-%m-%dT%H:%i')
 FROM servicios s
 CROSS JOIN usuarios u
 WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')

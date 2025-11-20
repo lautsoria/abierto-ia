@@ -280,3 +280,32 @@ def get_reserva(id):
         return jsonify({'error': str(e)}), 500
     
 
+@reservas_bp.route('/servicio/<string:id>')
+def servicio_reservas(id):
+    try:        
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+            SELECT 
+                r.*
+            FROM reservas r
+            WHERE r.servicio_id = (%s) AND r.estado = 'pendiente' 
+            ORDER BY r.fecha_reserva DESC
+        """
+        cursor.execute(query, (id,))
+        
+        reservas = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        for reserva in reservas:
+            reserva['fecha_reserva'] = reserva['fecha_reserva'].isoformat()
+            reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat()
+            reserva['hora_servicio'] = f"{int(reserva['hora_servicio']):02d}:00"
+
+        return jsonify(reservas), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

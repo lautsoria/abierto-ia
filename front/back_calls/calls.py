@@ -199,14 +199,14 @@ def obtener_servicio_por_id(id, horarios=False):
         print(f"Error al obtener servicio por ID: {e}")
         return None
     
+
 def no_disponibles(id):
     """Obtiene las fechas no disponibles para un servicio"""
     try:
         response = requests.get(
-            f'{BACKEND_URL}/reservas/{id}',
+            f'{BACKEND_URL}/reservas/servicio/{id}',
             timeout=2
         )
-
         if response.status_code == 200:
             return response.json()
         return []

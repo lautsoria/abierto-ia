@@ -22,16 +22,6 @@ app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 jwt = JWTManager(app)
 CORS(app)
 
-# manejamos que hacer cuando el token no existe
-@jwt.unauthorized_loader
-def unauthorized_callback(error):
-    return redirect(url_for('home'))
-# o cuando el token es invalido
-@jwt.invalid_token_loader
-def invalid_token_callback(error):
-    return redirect(url_for('home'))
-
-
 # @app.route("/reservas")
 # def mis_reservas():
 #     return render_template("reservas.html", reservas=RESERVAS_MOCK)
@@ -182,10 +172,18 @@ def checkout(id):
     print(e)
     return render_template('404.html'), 404
       
-      
+# manejamos que hacer cuando el token no existe
+@jwt.unauthorized_loader
+def unauthorized_callback(error):
+    return redirect(url_for('/'))
+# o cuando el token es invalido
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return redirect(url_for('/'))
+
 @app.errorhandler(404)
 def error(e):
    return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run("localhost", port= 5000, debug=True)
+    app.run("localhost", port=1234, debug=True)

@@ -20,7 +20,7 @@ def cantidad_por_categoria(categoria_nombre):
             WHERE LOWER(c.nombre) = LOWER(%s)
             GROUP BY c.id, c.nombre
             LIMIT 1
-        """
+            """
 
         cursor.execute(query, (categoria_nombre,))
         categoria = cursor.fetchone()
@@ -37,6 +37,7 @@ def cantidad_por_categoria(categoria_nombre):
         return jsonify(categoria), 200
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 @categoria_bp.route('')
