@@ -5,7 +5,7 @@ usuarios_bp = Blueprint('usuarios', __name__)
 
 # encontrar usuario por id
 @usuarios_bp.route('/<string:id>')
-def get_proveedores(id):
+def get_usuarios(id):
     try:
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)

@@ -115,11 +115,7 @@ def update_proveedor(id):
     try:
         data = request.get_json()
         
-        # TODO: Validar que el usuario sea proveedor
-        # Por ahora, comentamos esta validación
-        # if not es_proveedor(request):
-        #     return jsonify({'error': 'No autorizado'}), 403
-        
+    
         conn = db_conn()
         cursor = conn.cursor()
         

@@ -26,7 +26,7 @@
                             data-bs-target="#modal-{{ reserva.id }}">
                         Ver Detalle
                     </button>
-                    {% if es_proveedor %}
+                    {% if es_proveedor %}   
                         <a href="{{ url_for('generar-qr') }}?id_reserva={{ reserva.id }}" 
                         class="btn btn-success btn-sm ms-2">
                         Generar QR

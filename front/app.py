@@ -382,5 +382,40 @@ def generarqr():
     qr_confirmacion = generar_qr(id_reserva, token)
     return render_template("qr.html", qr_path=qr_confirmacion)  
 
+
+@app.route('/mi-perfil')
+def perfil():
+    data = get_jwt()
+    es_proveedor = False
+
+    usuario_id = data.get("sub") if data else None
+
+    if data and data.get("isProveedor"):
+        es_proveedor = True
+        response = requests.get(f"{BACKEND_URL}/proveedores/{usuario_id}")
+        
+        if response.status_code != 200:
+            return "Proveedor no encontrado", 404
+        
+        datos_proveedor = response.json()
+        
+        return render_template(
+            "editar_perfil.html",          
+            es_proveedor=es_proveedor,
+            usuario=datos_proveedor
+        )
+    
+    response = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
+
+    if response.status_code != 200:
+        return "Usuario no encontrado", 404
+
+    datos_user = response.json()
+    return render_template(
+        "editar_perfil.html",
+        usuario=datos_user,
+        es_proveedor=es_proveedor
+    )
+
 if __name__ == '__main__':
     app.run("localhost", port= 5000, debug=True)

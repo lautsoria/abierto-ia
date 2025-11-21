@@ -12,7 +12,7 @@
         <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h4>✏️ Editar Perfil ({{ usuario.rol|capitalize }})</h4>
+                    <h4>✏️ Editar Perfil ({{ 'proveedor' if isproveedor else 'usuario' }})</h4>
                 </div>
                 <div class="card-body">
                     
@@ -36,7 +36,7 @@
                             </div>
                         </div>
 
-                        {% if usuario.rol == 'proveedor' %}
+                        {% if es_proveedor %}
                             <hr>
                             <h5 class="mb-3 text-muted">Datos Profesionales</h5>
                             <div class="alert alert-info py-2">
@@ -45,7 +45,7 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Profesión / Oficio</label>
-                                <input type="text" name="profesion" class="form-control" value="{{ usuario.profesion }}">
+                                <input type="text" name="profesion" class="form-control" value="{{ usuario.categoria }}">
                             </div>
 
                             <div class="mb-3">
