@@ -246,3 +246,16 @@ def obtener_reserva_por_id(id):
     except Exception as e:
         print(e)
         return None            
+    
+def obtener_resenas_servicio(id):
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/resenas/{id}',
+            timeout=2
+        )
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except Exception as e:
+        print(e)
+        return None  

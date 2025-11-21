@@ -1,3 +1,38 @@
+## 21 de Noviembre, 2025
+
+### Sistema de Redirección Post-Login
+
+**Implementación de Next URL:**
+- Implementado flujo completo de redirección usando query parameter `?next=`
+- Cuando usuario no autenticado intenta acceder a ruta protegida:
+  1. `@jwt.unauthorized_loader` captura la URL solicitada
+  2. Redirige a `/auth?next=/ruta/original`
+  3. Template `auth.html` incluye `next` en forms de login/register
+  4. Después de login exitoso, redirige a URL original
+- Validación de seguridad: solo permite redirecciones internas
+
+### Sistema de Reseñas en Páginas de Servicio
+
+**Backend - Endpoint de Reseñas:**
+- Corregido query SQL en `obtener_resenas_servicio()`:
+  - Fixed typo: `i.id` → `u.id` en JOIN de usuarios
+  - Agregada coma faltante entre columnas SELECT
+  - Agregado `dictionary=True` al cursor para retornar dicts en lugar de tuplas
+  - Implementada conversión de datetime a ISO string con `.isoformat()`
+- Query ahora retorna: `usuario`, `puntuacion`, `comentarios_cliente`, `fecha`
+
+**Frontend - Display de Reseñas:**
+- Implementado loop Jinja2 en `servicio.html` para mostrar reseñas dinámicamente
+- Sistema de estrellas: genera `★` por cada punto de puntuación
+- Formateo de fecha: muestra solo fecha (sin hora) con string slicing `[:10]`
+- Manejo de estado vacío: mensaje "Aún no hay reseñas" cuando `resenas` está vacío
+- Agregado nombre de usuario y fecha en cada reseña
+
+**Corrección de Rating:**
+- Fixed `calificacion_promedio` display: ahora muestra 1 decimal con `round(servicio.calificacion_promedio, 1)`
+- Ejemplo: `4.666667` → `4.7`
+
+
 ## 20 de Noviembre, 2025
 
 ### Sistema de Reservas Completo

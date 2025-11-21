@@ -22,6 +22,15 @@ app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 jwt = JWTManager(app)
 CORS(app)
 
+# manejamos que hacer cuando el token no existe o cuando el token es invalido
+@jwt.unauthorized_loader
+@jwt.invalid_token_loader
+def unauthorized_callback(error):
+    next = request.url
+    print(next)
+    return redirect(url_for('auth', next=next))
+
+
 # @app.route("/reservas")
 # def mis_reservas():
 #     return render_template("reservas.html", reservas=RESERVAS_MOCK)
@@ -56,7 +65,8 @@ def auth():
     return redirect(url_for('home'))
   except:
     # Si el token es inválido o no existe, limpiar la cookie
-    resp = make_response(render_template('auth.html'))
+    next = request.args.get('next', url_for('home'))
+    resp = make_response(render_template('auth.html', next=next))
     resp.set_cookie('access_token_cookie', '', max_age=0)
     return resp
   
@@ -68,6 +78,7 @@ def register():
     password = request.form.get("newPassword")
     repeatPassword = request.form.get("newPassword2")
     provider = request.form.get("isProveedor") == 'true'
+    next_url = request.args.get('next', url_for('home'))
 
     if password != repeatPassword:
         flash('Las contraseñas no coinciden', 'error')
@@ -76,8 +87,20 @@ def register():
     response = registrar_usuario(user, email, password, provider)
     
     if response and response.status_code == 200:
+        # Obtener las cookies del backend y pasarlas al frontend
+        print(next_url)        
+        resp = make_response(redirect(next_url))
+        
+        # Copiar todas las cookies del backend al frontend
+        for cookie_name, cookie_value in response.cookies.items():
+            resp.set_cookie(
+                cookie_name,
+                cookie_value,
+                httponly=True,
+                samesite='Lax'
+            )
         flash('Usuario creado correctamente.', 'success')
-        return redirect(url_for('auth'))
+        return resp
     else:
         flash('Error al registrar el usuario', 'error')
         return redirect(url_for('auth'))
@@ -87,12 +110,14 @@ def register():
 def login():
     credential = request.form.get("credential")
     password = request.form.get("password")
+    next_url = request.args.get('next', url_for('home'))
 
     response = login_usuario(credential, password)
     
     if response and response.status_code == 200:
         # Obtener las cookies del backend y pasarlas al frontend
-        resp = make_response(redirect(url_for('home')))
+        print(next_url)      
+        resp = make_response(redirect(next_url))
         
         # Copiar todas las cookies del backend al frontend
         for cookie_name, cookie_value in response.cookies.items():
@@ -145,12 +170,12 @@ def servicio(id):
     data = get_jwt()    
     user_data = data if data else None
     
+    url = request.url
     servicio = obtener_servicio_por_id(id)
-
-    # TODO: mandar consultar las resenas del back y pasarlas al render_template
+    resenas = obtener_resenas_servicio(id)
     
     if servicio:
-        return render_template('servicio.html', servicio=servicio, data=user_data)
+        return render_template('servicio.html', servicio=servicio, resenas=resenas, data=user_data, url=url)
     else:
         return redirect('error')
     
@@ -162,8 +187,8 @@ def checkout(id):
     data = get_jwt()    
     user_data = data if data else None
     
-    if user_data is None:
-        return render_template('auth.html'), 401
+    # if user_data is None:
+    #     return render_template('auth.html'), 401
     
     servicio = obtener_servicio_por_id(id, horarios=True)
     print(servicio)
@@ -220,16 +245,6 @@ def detalle_reserva(reserva_id):
     
     return render_template('reserva.html', reserva=reserva, data=user_data)
 
-
-# manejamos que hacer cuando el token no existe
-@jwt.unauthorized_loader
-def unauthorized_callback(error):
-    return redirect(url_for('auth'))
-
-# o cuando el token es invalido
-@jwt.invalid_token_loader
-def invalid_token_callback(error):
-    return redirect(url_for('auth'))
 
 @app.errorhandler(404)
 def error(e):

@@ -42,7 +42,7 @@
                         {% if i < rating %}★{% else %}☆{% endif %}
                     {% endfor %}
                 </div>
-                <span class="reviews-count">{{ rating }} ({{ servicio.reviews_count }} opiniones)</span>
+                <span class="reviews-count">{{ "%.1f" | format(rating) }} ({{ servicio.reviews_count }} opiniones)</span>
             </div>
 
             <div class="price-container">
@@ -53,7 +53,7 @@
             <div class="payment-methods">
                 <div class="payment-title">Medios de pago</div>
                 <div class="payment-options">
-                    <p>A concretar con el profesional!</p>
+                    <p>A concretar con el profesional</p>
                 </div>
             </div>
 
@@ -89,7 +89,7 @@
     <div class="reviews-section">
         <h2 class="section-header">Opiniones sobre el servicio</h2>
 
-        {% if resenas and resenas|length > 0 %}
+        {% if resenas and resenas|length > 0 %} 
             {% for resena in resenas %}
                 <div class="review-card">
                     <div class="review-header">
@@ -97,7 +97,7 @@
                             {% for i in range(resena.puntuacion) %}★{% endfor %}
                             {% for i in range(5 - resena.puntuacion) %}☆{% endfor %}
                         </div>
-                        <span class="review-date">{{ resena.fecha.strftime('%d/%m/%Y') if resena.fecha else 'Fecha no disponible' }}</span>
+                        <span class="review-date">{{ resena.fecha[:10] if resena.fecha else 'Fecha no disponible' }}</span>
                     </div>
                     <p class="review-text">{{ resena.comentarios_cliente }}</p>
                     <p class="review-author">Por {{ resena.usuario }}</p>

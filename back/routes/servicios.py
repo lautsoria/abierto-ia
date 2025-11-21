@@ -179,6 +179,7 @@ def servicios_por_precio():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+# busca servicio por id
 @servicios_bp.route('/id/<string:id>', methods=['GET'])
 def servicio(id):
     try:
