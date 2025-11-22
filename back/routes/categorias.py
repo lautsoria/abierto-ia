@@ -1,10 +1,9 @@
-
 from flask import Blueprint, jsonify, request
 from db.db import db_conn
 
-categorias_bp = Blueprint('categorias', __name__)
+categoria_bp = Blueprint('categoria', __name__)
 
-@categorias_bp.route('/<string:categoria_nombre>')
+@categoria_bp.route('/<string:categoria_nombre>')
 def cantidad_por_categoria(categoria_nombre):
     """cantidad de profesionales de una categoria"""
     try:
@@ -21,7 +20,7 @@ def cantidad_por_categoria(categoria_nombre):
             WHERE LOWER(c.nombre) = LOWER(%s)
             GROUP BY c.id, c.nombre
             LIMIT 1
-        """
+            """
 
         cursor.execute(query, (categoria_nombre,))
         categoria = cursor.fetchone()
@@ -38,9 +37,10 @@ def cantidad_por_categoria(categoria_nombre):
         return jsonify(categoria), 200
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
-@categorias_bp.route('')
+@categoria_bp.route('')
 def categorias():
     """categorias existentes"""
     try:

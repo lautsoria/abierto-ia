@@ -1,3 +1,113 @@
+## 21 de Noviembre, 2025
+
+### Sistema de Redirección Post-Login
+
+**Implementación de Next URL:**
+- Implementado flujo completo de redirección usando query parameter `?next=`
+- Cuando usuario no autenticado intenta acceder a ruta protegida:
+  1. `@jwt.unauthorized_loader` captura la URL solicitada
+  2. Redirige a `/auth?next=/ruta/original`
+  3. Template `auth.html` incluye `next` en forms de login/register
+  4. Después de login exitoso, redirige a URL original
+- Validación de seguridad: solo permite redirecciones internas
+
+### Sistema de Reseñas en Páginas de Servicio
+
+**Backend - Endpoint de Reseñas:**
+- Corregido query SQL en `obtener_resenas_servicio()`:
+  - Fixed typo: `i.id` → `u.id` en JOIN de usuarios
+  - Agregada coma faltante entre columnas SELECT
+  - Agregado `dictionary=True` al cursor para retornar dicts en lugar de tuplas
+  - Implementada conversión de datetime a ISO string con `.isoformat()`
+- Query ahora retorna: `usuario`, `puntuacion`, `comentarios_cliente`, `fecha`
+
+**Frontend - Display de Reseñas:**
+- Implementado loop Jinja2 en `servicio.html` para mostrar reseñas dinámicamente
+- Sistema de estrellas: genera `★` por cada punto de puntuación
+- Formateo de fecha: muestra solo fecha (sin hora) con string slicing `[:10]`
+- Manejo de estado vacío: mensaje "Aún no hay reseñas" cuando `resenas` está vacío
+- Agregado nombre de usuario y fecha en cada reseña
+
+**Corrección de Rating:**
+- Fixed `calificacion_promedio` display: ahora muestra 1 decimal con `round(servicio.calificacion_promedio, 1)`
+- Ejemplo: `4.666667` → `4.7`
+
+
+## 20 de Noviembre, 2025
+
+### Sistema de Reservas Completo
+
+**Backend - Endpoints de Reservas:**
+- Implementado endpoint `POST /reservas` para crear reservas
+  - Validación de servicio existente antes de crear reserva
+  - Genera UUID automático para cada reserva
+  - Guarda: usuario_id, servicio_id, fecha_servicio, hora_servicio, direccion, comentarios_cliente
+  - Estado por defecto: 'pendiente'
+- Implementado endpoint `GET /reservas/<id>` para obtener detalles de una reserva específica
+  - Retorna información completa: servicio, proveedor, cliente, categoría
+  - Incluye datos del proveedor: nombre, teléfono, ubicaciones (barrios)
+  - Convierte Decimal a float para serialización JSON
+  - Formatea fechas a ISO string
+- Implementado endpoint `PUT /reservas/<id>` para actualizar estado de reserva
+  - Permite modificar: estado, comentarios_cliente, fecha_servicio
+  - Validación de estados permitidos: 'pendiente', 'realizado', 'cancelado'
+- Implementado endpoint `GET /reservas/servicio/<id>` para obtener reservas de un servicio
+  - Filtra solo reservas pendientes
+  - Formatea hora_servicio de INT a string "HH:00"
+  - Usado para mostrar horarios NO disponibles en el checkout
+
+**Frontend - Flujo de Reserva:**
+- Creado `checkout.html`: página de confirmación de reserva
+  - Muestra preview del servicio con imagen y proveedor
+  - Formulario con: fecha, hora (dropdown dinámico), dirección, notas, mensaje
+  - Date picker con rango de 15 días desde hoy
+  - Validación de dirección (mínimo 5 caracteres)
+- Implementado sistema de horarios dinámicos:
+  - Los horarios disponibles se calculan en `obtener_servicio_por_id()` usando hora_inicio, hora_fin, duracion
+  - JavaScript deshabilita horarios ya reservados al seleccionar fecha
+  - Alert si todos los horarios están ocupados
+- Creado `reserva.html`: página de confirmación post-reserva
+  - Banner de éxito con animación
+  - Card con todos los detalles: servicio, fecha/hora, dirección, proveedor, precio
+  - Badge de estado (pendiente/realizado/cancelado)
+  - Info card con próximos pasos
+  - Botones: "Volver al inicio", "Ver mis reservas"
+- Creado `reserva.css`: estilos Mercado Libre inspired
+  - Green gradient para banner de éxito
+  - Cards con box-shadow sutil
+  - Responsive design para móviles
+  - Animación de entrada para el ícono de éxito
+
+**Modularización de Llamadas al Backend:**
+- Agregadas funciones en `front/back_calls/calls.py`:
+  - `reservar()`: POST request para crear reserva
+  - `obtener_reserva_por_id()`: GET request para obtener detalles
+  - `no_disponibles()`: GET request para obtener reservas existentes de un servicio
+- Parsing de hora: convierte "08:00" string a integer 8 antes de enviar al backend
+
+**Correcciones de Bugs:**
+- Fixed JWT expiration handling: cambiado de `render_template('home.html')` a `redirect(url_for('home'))` en error handlers
+- Fixed `/auth` route para limpiar cookies expiradas con `set_cookie('access_token_cookie', '', max_age=0)`
+- Fixed route conflicts: función POST renombrada de `reserva()` a `crear_reserva()`
+- Fixed GET route para reserva individual: ahora es `/reserva/<reserva_id>`
+- Fixed `url_for()` syntax en Jinja2: cambiado de `{{ url_for('reserva'), servicio=servicio.id }}` a `{{ url_for('crear_reserva', servicio=servicio.id) }}`
+- Fixed HTTP method: cambiado de `requests.get()` a `requests.post()` en función `reservar()`
+- Fixed template rendering: removido `.strftime()` para fechas (vienen como ISO strings del backend)
+- Fixed price formatting: agregado `| float` filter en Jinja2
+
+**Datos de Prueba:**
+- Agregado campo `direccion` a las 10 reservas dummy en `init_db.sql`
+- Direcciones random de CABA: Av. Santa Fe, Av. Corrientes, Av. Cabildo, etc.
+
+### Migración de Schema: Ubicaciones a Barrios
+
+**Cambios en Base de Datos:**
+- Eliminada columna `proveedores.ubicacion` (VARCHAR)
+- Creada tabla `barrios` con UUID y nombre
+- Creada tabla junction `barrios_usuarios` para relación muchos-a-muchos
+- Insertados 48 barrios de CABA
+- Updated seed data: proveedores ahora asociados a barrios específicos
+
 ## 17 de Noviembre, 2025
 
 ### Colección de Tests API con Bruno

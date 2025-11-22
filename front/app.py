@@ -1,9 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
-from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt
+from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt, get_jwt_identity
 from flask_cors import CORS
 import os
-import requests
-import logging
+import time
+from dotenv import load_dotenv
+
+from static.icons import icons
+from back_calls.calls import *
+
+env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
@@ -16,207 +22,21 @@ app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 jwt = JWTManager(app)
 CORS(app)
 
-# manejamos que hacer cuando el token no existe
+# manejamos que hacer cuando el token no existe o cuando el token es invalido
 @jwt.unauthorized_loader
-def unauthorized_callback(error):
-    return redirect(url_for('reg'))
-# o cuando el token es invalido
 @jwt.invalid_token_loader
-def invalid_token_callback(error):
-    return redirect(url_for('reg'))
+def invalid_token(error):
+    next = request.url
+    print(next)
+    return redirect(url_for('auth', next=next))
 
-@app.route('/auth')
-def auth():
-  try:
-    verify_jwt_in_request(locations=['cookies'])
-
-    return redirect(url_for('home'))
-  except:
-    return render_template('auth.html')
-
-@app.route('/register', methods=['POST'])
-def register():
-    user = request.form.get("newUser")
-    email = request.form.get("email")
-    password = request.form.get("newPassword")
-    repeatPassword = request.form.get("newPassword2")
-    provider = request.form.get("isProveedor") == 'true'
-
-    if password != repeatPassword:
-        flash('Las contraseñas no coinciden', 'error')
-        return redirect(url_for('auth'))
-
-    try:
-        # Enviar request al back
-        response = requests.post(
-            f'{BACKEND_URL}/auth/register',
-            json={
-                'user': user,
-                'email': email,
-                'password': password,
-                'provider': provider
-            },
-            timeout=5
-        )
-
-        if response.status_code == 200:
-            flash('Usuario creado correctamente.' 'success')
-            return redirect(url_for('auth'))
-        else:
-            flash('Error al registrar el usuario', 'error')
-            return redirect(url_for('auth'))
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to backend: {e}")
-        flash('Error de conexión con el servidor', 'error')
-        return redirect(url_for('auth'))
-
-@app.route('/login', methods=['POST'])
-def login():
-    credential = request.form.get("credential")
-    password = request.form.get("password")
-
-    try:
-        # Enviar solicitud al backend
-        response = requests.post(
-            f'{BACKEND_URL}/auth/login',
-            json={
-                'credential': credential,
-                'password': password
-            },
-            timeout=5
-        )
-
-        if response.status_code == 200:
-            # Obtener las cookies del backend y pasarlas al frontend
-            resp = make_response(redirect(url_for('home')))
-            
-            # Copiar todas las cookies del backend al frontend
-            for cookie_name, cookie_value in response.cookies.items():
-                resp.set_cookie(
-                    cookie_name,
-                    cookie_value,
-                    httponly=True,
-                    samesite='Lax'
-                )
-            
-            flash('Inicio de sesión exitoso', 'success')
-            return resp
-        else:
-            flash('Credenciales inválidas', 'error')
-            return redirect(url_for('auth'))
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error connecting to backend: {e}")
-        flash('Error de conexión con el servidor', 'error')
-        return redirect(url_for('auth'))
-
-icons = {
-    # iconos hardcodeados
-    "Electricista": "⚡",
-    "Plomería": "💧",
-    "Pintura": "📌",
-    "Carpintería": "🔨",
-    "Cerrajería": "🔑",
-    "Limpieza": "✨",
-    "Aire Acondicionado": "💨",
-    "Jardinería": "🌿"
-}
-
-def obtener_mis_reservas(usuario_id=None):
-
-    try:
-        if usuario_id is None:
-            verify_jwt_in_request(locations=['cookies'])
-            data = get_jwt()
-            usuario_id = data.get("sub")
-
-        if not usuario_id:
-            print("Usuario no autenticado")
-            return []
-
-        response = requests.get(
-            f"{BACKEND_URL}/reservas/mis-reservas",
-            params={"usuario_id": usuario_id},  
-            timeout=5
-        )
-
-        if response.status_code == 200:
-            return response.json()
-        else:
-            print(f"Error backend: {response.status_code} - {response.text}")
-            return []
-
-    except Exception as e:
-        print(f"Error al obtener reservas: {e}")
-        return []
-
-    
-RESERVAS_MOCK = [
-    {
-        'id': 1,
-        'usuario_id': 1,
-        'servicio_id': 1,
-        'fecha_reserva': '2025-11-10 14:30:00',
-        'fecha_servicio': '2025-11-20 10:00:00',
-        'estado': 'pendiente',
-        'comentarios_cliente': 'Necesito ayuda urgente con una cañería rota',
-        'servicio_nombre': 'Reparación de cañerías',
-        'servicio_precio': 5000.00,
-        'proveedor_nombre': 'Juan Pérez',
-        'proveedor_descripcion': 'Plomero con 15 años de experiencia',
-        'categoria': 'Plomería'
-    },
-    {
-        'id': 2,
-        'usuario_id': 1,
-        'servicio_id': 2,
-        'fecha_reserva': '2025-11-08 09:15:00',
-        'fecha_servicio': '2025-11-15 14:00:00',
-        'estado': 'realizado',
-        'comentarios_cliente': 'Instalación de lámpara en el living',
-        'servicio_nombre': 'Instalación eléctrica',
-        'servicio_precio': 3500.00,
-        'proveedor_nombre': 'María López',
-        'proveedor_descripcion': 'Electricista matriculada',
-        'categoria': 'Electricidad'
-    },
-    {
-        'id': 3,
-        'usuario_id': 1,
-        'servicio_id': 3,
-        'fecha_reserva': '2025-11-05 16:45:00',
-        'fecha_servicio': '2025-11-10 09:00:00',
-        'estado': 'cancelado',
-        'comentarios_cliente': 'Corte de césped y limpieza de jardín',
-        'servicio_nombre': 'Mantenimiento de jardín',
-        'servicio_precio': 4200.00,
-        'proveedor_nombre': 'Carlos Gómez',
-        'proveedor_descripcion': 'Jardinero profesional',
-        'categoria': 'Jardinería'
-    },
-    {
-        'id': 4,
-        'usuario_id': 1,
-        'servicio_id': 4,
-        'fecha_reserva': '2025-11-12 11:20:00',
-        'fecha_servicio': '2025-11-25 16:30:00',
-        'estado': 'pendiente',
-        'comentarios_cliente': 'Revisión de instalación de gas',
-        'servicio_nombre': 'Inspección de gas',
-        'servicio_precio': 6500.00,
-        'proveedor_nombre': 'Roberto Díaz',
-        'proveedor_descripcion': 'Gasista matriculado',
-        'categoria': 'Gasista'
-    }
-]
 
 @app.route("/reservas")
 def mis_reservas():
-    data = get_jwt()  
+    data = get_jwt_identity()
     es_proveedor = False
     
-    usuario_id = data.get("sub") if data else None  
+    usuario_id = data
 
     if data and data.get("provider"):  
             es_proveedor = True
@@ -227,106 +47,6 @@ def mis_reservas():
 
     reservas = obtener_mis_reservas(usuario_id)
     return render_template("reservas.html", reservas=reservas,es_proveedor=es_proveedor)
-    
-
-@app.errorhandler(404)
-def error(e):
-   return render_template('404.html'), 404
-
-BACKEND_URL = 'http://localhost:5500'
-
-def obtener_cantidad_categoria(nombre):
-    try:
-        response = requests.get(f'{BACKEND_URL}/categorias/{nombre}')
-        
-        if response.status_code == 200:
-            data = response.json()
-            # la API retorna: { "categoria": "...", "total_profesionales": N }
-            return data.get("total_profesionales", 0)
-        return 0
-
-    except Exception as e:
-        print("Error al obtener cantidad categoria:", e)
-        return 0
-
-def obtener_servicios_destacados():
-    """Obtiene servicios destacados desde el backend"""
-    logging.info('Obteniendo servicios destacados')
-    try:
-        response = requests.get(  
-            f'{BACKEND_URL}/servicios/top-rating',
-            timeout=1
-        )
-        
-        if response.status_code == 200:
-            servicios = response.json()
-            return servicios
-        else:
-            print(f" Error del backend: {response.status_code}")
-            return []
-            
-    except requests.exceptions.Timeout:  
-        print("Timeout: El backend tardó más de 5 segundos")
-        return []
-        
-    except requests.exceptions.ConnectionError:  
-        print(" Error: No se pudo conectar al backend en puerto 5500")
-        print("¿Está corriendo el backend? Ejecuta: python backend/app.py")
-        return []
-        
-    except requests.exceptions.RequestException as e:  
-        print(f" Error al obtener servicios: {e}")
-        return []
-
-
-def obtener_proveedores(filtro_servicio=None):
-    """Obtiene proveedores desde el backend"""
-    try:
-        url = f'{BACKEND_URL}/proveedores'
-        if filtro_servicio:
-            url += f'?servicio={filtro_servicio}'
-        
-        response = requests.get(url, timeout=5)  
-        
-        if response.status_code == 200:
-            return response.json()
-        return []
-        
-    except requests.exceptions.RequestException as e:  
-        print(f"Error al obtener proveedores: {e}")
-        return []
-
-
-def obtener_proveedor_detalle(proveedor_id):
-    """Obtiene detalles de un proveedor específico"""
-    try:
-        response = requests.get(  
-            f'{BACKEND_URL}/proveedores/{proveedor_id}',
-            timeout=1
-        )
-        
-        if response.status_code == 200:
-            return response.json()
-        return None
-        
-    except requests.exceptions.RequestException as e:  
-        print(f"Error al obtener proveedor: {e}")
-        return None
-
-def obtener_categorias():
-    try:
-        response = requests.get(  
-            f'{BACKEND_URL}/categorias',
-            timeout=1
-        )
-        
-        if response.status_code == 200:
-            return response.json()
-        return None
-        
-    except requests.exceptions.RequestException as e:  
-        print(f"Error al obtener categorias: {e}")
-        return None
 
 
 @app.route('/')
@@ -349,15 +69,6 @@ def home():
             })
 
     return render_template('home.html', servicios=servicios, categorias=categorias_completas, data=user_data)
-
-import qrcode
-
-
-def generar_qr(id_reserva, token):
-    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}/{token}"
-    qr = qrcode.make(url)
-    qr.save(f"static/qr_reserva_{id_reserva}.png")
-    return f"static/qr_reserva_{id_reserva}.png" 
 
 
 @app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
@@ -417,5 +128,200 @@ def perfil():
         es_proveedor=es_proveedor
     )
 
+
+@app.route('/auth')
+def auth():
+  try:
+    verify_jwt_in_request(locations=['cookies'])
+    return redirect(url_for('home'))
+  except:
+    # Si el token es inválido o no existe, limpiar la cookie
+    next = request.args.get('next', url_for('home'))
+    resp = make_response(render_template('auth.html', next=next))
+    resp.set_cookie('access_token_cookie', '', max_age=0)
+    return resp
+  
+
+@app.route('/register', methods=['POST'])
+def register():
+    user = request.form.get("newUser")
+    email = request.form.get("email")
+    password = request.form.get("newPassword")
+    repeatPassword = request.form.get("newPassword2")
+    provider = request.form.get("isProveedor") == 'true'
+    next_url = request.args.get('next', url_for('home'))
+
+    if password != repeatPassword:
+        flash('Las contraseñas no coinciden', 'error')
+        return redirect(url_for('auth'))
+
+    response = registrar_usuario(user, email, password, provider)
+    
+    if response and response.status_code == 200:
+        # Obtener las cookies del backend y pasarlas al frontend
+        print(next_url)        
+        resp = make_response(redirect(next_url))
+        
+        # Copiar todas las cookies del backend al frontend
+        for cookie_name, cookie_value in response.cookies.items():
+            resp.set_cookie(
+                cookie_name,
+                cookie_value,
+                httponly=True,
+                samesite='Lax'
+            )
+        flash('Usuario creado correctamente.', 'success')
+        return resp
+    else:
+        flash('Error al registrar el usuario', 'error')
+        return redirect(url_for('auth'))
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    credential = request.form.get("credential")
+    password = request.form.get("password")
+    next_url = request.args.get('next', url_for('home'))
+
+    response = login_usuario(credential, password)
+    
+    if response and response.status_code == 200:
+        # Obtener las cookies del backend y pasarlas al frontend
+        print(next_url)      
+        resp = make_response(redirect(next_url))
+        
+        # Copiar todas las cookies del backend al frontend
+        for cookie_name, cookie_value in response.cookies.items():
+            resp.set_cookie(
+                cookie_name,
+                cookie_value,
+                httponly=True,
+                samesite='Lax'
+            )
+        flash('Inicio de sesión exitoso', 'success')
+        return resp
+    else:
+        flash('Credenciales inválidas', 'error')
+        return redirect(url_for('auth'))
+
+
+@app.route('/categoria/<nombre>')
+@jwt_required(optional=True, locations=['cookies'])
+def categoria(nombre):
+    """Muestra servicios filtrados por categoría con opciones de filtrado"""
+    data = get_jwt()    
+    user_data = data if data else None
+
+    # Obtener parámetros de filtro
+    ubicacion_seleccionada = request.args.get('ubicacion', '')
+
+    # Obtener servicios filtrados
+    servicios = obtener_servicios_por_categoria(nombre, ubicacion_seleccionada if ubicacion_seleccionada else None)
+    
+    # Obtener ubicaciones para el filtro
+    ubicaciones = obtener_ubicaciones()
+    
+    # Obtener total de servicios sin filtros
+    total_servicios = len(obtener_servicios_por_categoria(nombre))
+
+    return render_template(
+        'categoria.html',
+        categoria_nombre=nombre,
+        servicios=servicios,
+        total_servicios=total_servicios,
+        ubicaciones=ubicaciones,
+        ubicacion_seleccionada=ubicacion_seleccionada,
+        data=user_data
+    )    
+
+# vista tipo producto de un servicio 
+@app.route('/servicio/id/<string:id>')
+@jwt_required(locations=['cookies'], optional=True)
+def servicio(id):
+    data = get_jwt()    
+    user_data = data if data else None
+    
+    url = request.url
+    servicio = obtener_servicio_por_id(id)
+    resenas = obtener_resenas_servicio(id)
+    
+    if servicio:
+        return render_template('servicio.html', servicio=servicio, resenas=resenas, data=user_data, url=url)
+    else:
+        return redirect('error')
+    
+
+@app.route('/checkout/<string:id>')
+@jwt_required(locations=['cookies'])
+def checkout(id):
+  try:
+    data = get_jwt()    
+    user_data = data if data else None
+    
+    # if user_data is None:
+    #     return render_template('auth.html'), 401
+    
+    servicio = obtener_servicio_por_id(id, horarios=True)
+    print(servicio)
+    reservas = no_disponibles(id)
+
+    if servicio:
+        return render_template('checkout.html', servicio=servicio, reservas=reservas, data=user_data)
+    else:
+        return render_template('404.html'), 404
+  except Exception as e:
+    print(e)
+    return render_template('404.html'), 404
+
+@app.route('/reserva/<string:servicio>', methods=['POST'])
+@jwt_required(locations=['cookies'])
+def crear_reserva(servicio):
+    data = get_jwt()
+    user_data = data if data else None
+    print(user_data)
+
+    if user_data is None:
+        return redirect(url_for('auth'))
+
+    user_id = get_jwt_identity()
+    servicio_id = servicio
+    fecha = request.form.get('fecha')
+    horario = request.form.get('hora')
+    direccion = request.form.get('direccion')
+    notas = request.form.get('notas_direccion', '')
+    mensaje = request.form.get('mensaje', '')
+    comentarios = f"{notas} {mensaje}".strip()
+
+    response = reservar(user_id, servicio_id, fecha, horario, direccion, comentarios)
+    
+    if response and response.status_code == 201:
+        reserva_data = response.json()
+        print(reserva_data)
+        reserva_id = reserva_data.get('id')
+        flash('Reserva confirmada exitosamente', 'success')
+        return redirect(f'/reserva/{reserva_id}')
+    else:
+        flash('Error al registrar la reserva', 'error')
+        return redirect(url_for('checkout', id=servicio_id))
+    
+
+@app.route('/reserva/<string:reserva_id>')
+@jwt_required(locations=['cookies'], optional=True)
+def detalle_reserva(reserva_id):
+    data = get_jwt()
+    user_data = data if data else None
+    
+    # TODO: Fetch reserva details from backend
+    reserva = obtener_reserva_por_id(reserva_id)
+    print(reserva)
+    
+    return render_template('reserva.html', reserva=reserva, data=user_data)
+
+
+@app.errorhandler(404)
+def error(e):
+   return render_template('404.html'), 404
+
+
 if __name__ == '__main__':
-    app.run("localhost", port= 5001, debug=True)
+    app.run("localhost", port=1234, debug=True)

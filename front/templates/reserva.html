@@ -1,0 +1,120 @@
+{% extends "base/base.html" %}
+
+{% block title %}Reserva Confirmada{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reserva.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="success-banner">
+        <div class="success-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#00a650" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h1 class="success-title">¡Reserva confirmada!</h1>
+        <p class="success-subtitle">Tu reserva fue procesada exitosamente</p>
+    </div>
+
+    <div class="details-card">
+        <div class="card-header">
+            <h2>Detalles de la reserva</h2>
+            <span class="reservation-id">#{{ reserva.id }}</span>
+        </div>
+
+        <div class="card-content">
+            <div class="info-section">
+                <div class="section-icon">🛠️</div>
+                <div class="section-details">
+                    <p class="label">Servicio</p>
+                    <p class="value">{{ reserva.servicio_nombre }}</p>
+                    <p class="meta">{{ reserva.categoria }}</p>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="section-icon">📅</div>
+                <div class="section-details">
+                    <p class="label">Fecha y hora</p>
+                    <p class="value">{{ reserva.fecha_servicio if reserva.fecha_servicio else reserva.fecha_servicio }}</p>
+                    <p class="meta">{{ reserva.hora_servicio if reserva.hora_servicio else 'Sin horario' }}</p>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="section-icon">📍</div>
+                <div class="section-details">
+                    <p class="label">Dirección</p>
+                    <p class="value">{{ reserva.direccion }}</p>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="section-icon">👤</div>
+                <div class="section-details">
+                    <p class="label">Proveedor</p>
+                    <p class="value">{{ reserva.proveedor_nombre }}</p>
+                    <p class="meta">{{ reserva.proveedor_telefono }}</p>
+                </div>
+            </div>
+
+            <div class="info-section price-section">
+                <div class="section-details">
+                    <p class="label">Total</p>
+                    <p class="price-value">${{ reserva.servicio_precio }}</p>
+                </div>
+            </div>
+
+            {% if reserva.comentarios_cliente %}
+            <div class="info-section full-width">
+                <div class="section-details">
+                    <p class="label">Comentarios</p>
+                    <p class="comments-text">{{ reserva.comentarios_cliente }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="status-card">
+        <div class="status-badge {{ reserva.estado }}">
+            {% if reserva.estado == 'pendiente' %}
+            ⏳ Pendiente
+            {% elif reserva.estado == 'realizado' %}
+            ✅ Realizado
+            {% else %}
+            ❌ Cancelado
+            {% endif %}
+        </div>
+        <p class="status-info">
+            {% if reserva.estado == 'pendiente' %}
+            El proveedor se pondrá en contacto contigo próximamente.
+            {% elif reserva.estado == 'realizado' %}
+            Este servicio ya fue completado.
+            {% else %}
+            Esta reserva fue cancelada.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="info-card">
+        <div class="info-icon">ℹ️</div>
+        <div class="info-text">
+            <h3>¿Qué sigue?</h3>
+            <ul>
+                <li>Recibirás un email con todos los detalles</li>
+                <li>El proveedor te contactará para confirmar</li>
+                <li>Puedes ver esta reserva en tu perfil</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('home') }}" class="btn-secondary">Volver al inicio</a>
+        <a href="/mis-reservas" class="btn-primary">Ver mis reservas</a>
+    </div>
+</div>
+{% endblock %}
+

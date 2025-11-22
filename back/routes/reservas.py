@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from db.db import db_conn
-from datetime import datetime
+import uuid
 
 reservas_bp = Blueprint('reservas', __name__)
 
@@ -31,20 +31,23 @@ def create_reserva():
             conn.close()
             return jsonify({'error': 'Servicio no encontrado'}), 404
         
+        reserva_id = str(uuid.uuid4())
         # crea la reserva
         query = """
-            INSERT INTO reservas (usuario_id, servicio_id, fecha_servicio, comentarios_cliente)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO reservas (id, usuario_id, servicio_id, fecha_servicio, hora_servicio, direccion, comentarios_cliente)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(query, (
+            reserva_id,
             data['usuario_id'],
             data['servicio_id'],
             data['fecha_servicio'],
-            data.get('comentarios_cliente', '')
+            int(data['hora_servicio'].split(':')[0]),
+            data['direccion'],
+            data['comentarios_cliente']
         ))
         
         conn.commit()
-        reserva_id = cursor.lastrowid
         
         cursor.close()
         conn.close()
@@ -55,6 +58,7 @@ def create_reserva():
         }), 201
         
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 
@@ -179,7 +183,6 @@ def get_all_reservas():
 
 
 # mod estado reserva
-@reservas_bp.route('/<int:id>', methods=['PUT'])
 def update_reserva(id):
     try:
         data = request.get_json()
@@ -240,7 +243,7 @@ def update_reserva(id):
 def get_reserva(id):
     try:
         conn = db_conn()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True)  # ✅ Added dictionary=True
         
         query = """
             SELECT 
@@ -260,19 +263,30 @@ def get_reserva(id):
             INNER JOIN usuarios uc ON r.usuario_id = uc.id
             INNER JOIN usuarios up ON p.usuario_id = up.id
             INNER JOIN categorias c ON s.categoria_id = c.id
+            LEFT JOIN barrios_usuarios bu ON up.id = bu.usuario_id
+            LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE r.id = %s
+            GROUP BY r.id
         """
         
         cursor.execute(query, (id,))
         reserva = cursor.fetchone()
-
-        if not reserva:
-            cursor.close()
-            conn.close()
-            return jsonify({'error': 'Reserva no encontrada'}), 404
         
         cursor.close()
         conn.close()
+        
+        if not reserva:
+            return jsonify({'error': 'Reserva no encontrada'}), 404
+        
+        # Convert Decimal to float for JSON serialization
+        if reserva.get('servicio_precio'):
+            reserva['servicio_precio'] = float(reserva['servicio_precio'])
+        
+        # Format datetime fields
+        if reserva.get('fecha_reserva'):
+            reserva['fecha_reserva'] = reserva['fecha_reserva'].isoformat()
+        if reserva.get('fecha_servicio'):
+            reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat()
         
         return jsonify(reserva), 200
 
@@ -337,3 +351,44 @@ def get_reserva_token(id_reserva):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+@reservas_bp.route('/<string:id>', methods=['PUT', 'GET'])
+def reserva(id):
+    if request.method == 'PUT':
+        return update_reserva(id)
+
+    if request.method == 'GET':
+        return get_reserva(id)
+    
+    return jsonify({'error': 'Método no permitido'}), 405
+
+
+
+@reservas_bp.route('/servicio/<string:id>')
+def servicio_reservas(id):
+    try:        
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+            SELECT 
+                r.*
+            FROM reservas r
+            WHERE r.servicio_id = (%s) AND r.estado = 'pendiente' 
+            ORDER BY r.fecha_reserva DESC
+        """
+        cursor.execute(query, (id,))
+        
+        reservas = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        for reserva in reservas:
+            reserva['fecha_reserva'] = reserva['fecha_reserva'].isoformat()
+            reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat()
+            reserva['hora_servicio'] = f"{int(reserva['hora_servicio']):02d}:00"
+
+        return jsonify(reservas), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

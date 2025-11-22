@@ -140,7 +140,7 @@ body {
 /*Categorias*/
 
 .categorias{
-    padding: 20px;
+    padding: 50px 0;
     background-color: rgb(202, 202, 202);
 }
 
@@ -165,6 +165,7 @@ body {
    
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .categoria-card:hover {
