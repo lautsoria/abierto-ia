@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS reservas (
   fecha_servicio DATETIME NOT NULL,
   hora_servicio INT NOT NULL,
   direccion VARCHAR(100),
-  estado ENUM('pendiente', 'realizado', 'cancelado') DEFAULT 'pendiente',
+  estado ENUM('pendiente', 'confirmado', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)

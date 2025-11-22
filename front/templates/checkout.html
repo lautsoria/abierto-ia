@@ -91,9 +91,11 @@
 
   {% block scripts %}
   <script>
-    // usamos el dia de hoy como fecha inicial
     let min = new Date()
     let max = new Date(min) 
+    // podra reservar para el dia siguiente
+    min.setDate(min.getDate() + 1)
+    // y hasta 15 dias despues
     max.setDate(min.getDate() + 15)
     min = min.toISOString().split('T')[0]
     max = max.toISOString().split('T')[0]
@@ -108,23 +110,22 @@
     */
     const options = document.getElementById('hora').options
     const validOptions = Array(...options).filter((op) => op.value.length > 0)
-    console.log(validOptions)
 
     let datePicker = document.getElementById('fecha').addEventListener('change', () => {
-
+        /* 
+        reseteamos las opciones para que todas esten disponibles antes 
+        de invalidar las no disponibles
+        */
         validOptions.forEach(op => {
             op.disabled = false;
-            if (op.value) op.textContent = op.value; // Reset text
+            if (op.value) op.textContent = op.value;
         });
 
-        let selectedDate = document.getElementById('fecha').value
-
+        const selectedDate = document.getElementById('fecha').value
         bookings.forEach(booking => {
             if (booking.fecha_servicio.split('T')[0] === selectedDate) {
-                console.log('Reserva encontrada! Deshabilitando horarios reservados')
                 validOptions.forEach((op) => {
-                    console.log(op.value, '==', booking.hora_servicio)
-                    if (op.value.length > 0 && op.value === booking.hora_servicio) {
+                    if (op.value === booking.hora_servicio) {
                         op.disabled = true;
                     }
                 })
@@ -132,12 +133,10 @@
         });
 
         const allDisabled = validOptions.every((op) => op.disabled)
-        console.log(allDisabled)
-      
         if (allDisabled) {
             alert('El día seleccionado no tiene horarios disponibles')
-            document.getElementById('fecha').value = ''; // Reset date
-            document.getElementById('hora').value = ''; // Reset time selection
+            document.getElementById('fecha').value = '';
+            document.getElementById('hora').value = '';
         }
     })
 
