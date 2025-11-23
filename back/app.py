@@ -17,6 +17,7 @@ from routes.categorias import categoria_bp as categorias
 from routes.servicios import servicios_bp as servicios
 from routes.ubicacion import ubicacion_bp as ubicacion
 from routes.resenas import resenas_bp as resenas
+from routes.usuarios import usuarios_bp as usuarios
 
 from flask_jwt_extended import JWTManager
 import os
@@ -44,7 +45,7 @@ app.register_blueprint(servicios, url_prefix="/servicios")
 app.register_blueprint(categorias, url_prefix="/categoria")
 app.register_blueprint(ubicacion, url_prefix="/ubicacion")
 app.register_blueprint(resenas, url_prefix="/resenas")
-# app.register_blueprint(usuarios, url_prefix="/usuarios")
+app.register_blueprint(usuarios, url_prefix="/usuarios")
 
 if __name__ == "__main__":
     app.run(port=5500, debug=True)

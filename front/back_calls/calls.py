@@ -1,5 +1,7 @@
 import requests
 import logging
+import qrcode
+
 BACKEND_URL = 'http://localhost:5500'
 
 def obtener_cantidad_categoria(nombre):
@@ -199,7 +201,6 @@ def obtener_servicio_por_id(id, horarios=False):
         print(f"Error al obtener servicio por ID: {e}")
         return None
     
-
 def no_disponibles(id):
     """Obtiene las fechas no disponibles para un servicio"""
     try:
@@ -214,7 +215,6 @@ def no_disponibles(id):
         print(f"Error al obtener servicios por categoría: {e}")
         return []
     
-
 def reservar(user_id, servicio_id, fecha, horario, direccion, mensaje):
     try:
         response = requests.post(
@@ -259,3 +259,31 @@ def obtener_resenas_servicio(id):
     except Exception as e:
         print(e)
         return None  
+    
+def obtener_mis_reservas(usuario_id):
+    try:
+        if not usuario_id:
+            print("Usuario no autenticado")
+            return []
+
+        response = requests.get(
+            f"{BACKEND_URL}/reservas",
+            json={"usuario_id": usuario_id},
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Error backend: {response.status_code} - {response.text}")
+            return []
+
+    except Exception as e:
+        print(f"Error al obtener reservas: {e}")
+        return []
+
+def generar_qr(id_reserva, token):
+    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}/{token}"
+    qr = qrcode.make(url)
+    qr.save(f"static/qr_reserva_{id_reserva}.png")
+    return f"static/qr_reserva_{id_reserva}.png" 

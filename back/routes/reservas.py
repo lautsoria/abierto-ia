@@ -63,12 +63,10 @@ def create_reserva():
 
 
 # reservas de un usuario/provee
-@reservas_bp.route('/mis-reservas')
+@reservas_bp.route('', methods=['GET'])
 def get_mis_reservas():
     try:
-        # TODO: Obtener usuario_id del token JWT
-        # Por ahora, lo tomamos de query params (temporal)
-        usuario_id = request.args.get('usuario_id')
+        usuario_id = request.json.values()
         
         if not usuario_id:
             return jsonify({'error': 'usuario_id es requerido (temporal)'}), 400
@@ -137,7 +135,7 @@ def get_mis_reservas():
         return jsonify(reservas), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': e}), 500
 
 
 # ver todas las reservas,solo admins

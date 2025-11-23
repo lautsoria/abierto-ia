@@ -8,14 +8,29 @@ CREATE TABLE IF NOT EXISTS usuarios (
   usuario VARCHAR(25) NOT NULL UNIQUE,
   email VARCHAR(50) NOT NULL UNIQUE,
   contrasena VARCHAR(12) NOT NULL,
+  telefono VARCHAR(20),
   fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+  id UUID PRIMARY KEY,
+  rol VARCHAR(50) UNIQUE NOT NULL
+  -- hay que tener en cuenta que debemos tener solo 3 roles
+  -- (cliente, proveedor, admin)
+);
+
+CREATE TABLE IF NOT EXISTS roles_usuarios (
+  usuario_id UUID,
+  rol_id UUID,
+  PRIMARY KEY (usuario_id, rol_id),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  FOREIGN KEY (rol_id) REFERENCES roles(id)  
 );
 
 CREATE TABLE IF NOT EXISTS proveedores (
   id UUID PRIMARY KEY,
   usuario_id UUID NULL,
   descripcion VARCHAR(500),
-  telefono VARCHAR(20),
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
@@ -81,16 +96,39 @@ CREATE TABLE IF NOT EXISTS barrios_usuarios (
   FOREIGN KEY (barrio_id) REFERENCES barrios(id)
 );
 
+-- Insert dummy roles
+INSERT INTO roles (id, rol) VALUES
+(UUID(), 'cliente'),
+(UUID(), 'proveedor'),
+(UUID(), 'admin');
+
 -- Insert dummy usuarios
-INSERT INTO usuarios (id, usuario, email, contrasena, fecha_registro) VALUES
-(UUID(), 'juan_perez', 'juan@gmail.com', 'pass123', NOW()),
-(UUID(), 'maria_gomez', 'maria@gmail.com', 'pass456', NOW()),
-(UUID(), 'carlos_ruiz', 'carlos@hotmail.com', 'pass789', NOW()),
-(UUID(), 'ana_lopez', 'ana@yahoo.com', 'pass101', NOW()),
-(UUID(), 'luis_martin', 'luis@gmail.com', 'pass202', NOW()),
-(UUID(), 'sofia_garcia', 'sofia@outlook.com', 'pass303', NOW()),
-(UUID(), 'diego_torres', 'diego@gmail.com', 'pass404', NOW()),
-(UUID(), 'laura_vazquez', 'laura@gmail.com', 'pass505', NOW());
+INSERT INTO usuarios (id, usuario, email, contrasena, telefono, fecha_registro) VALUES
+(UUID(), 'juan_perez', 'juan@gmail.com', 'pass123', '11-5555-1234', NOW()),
+(UUID(), 'maria_gomez', 'maria@gmail.com', 'pass456', '11-5555-2345', NOW()),
+(UUID(), 'carlos_ruiz', 'carlos@hotmail.com', 'pass789', '11-5555-5678', NOW()),
+(UUID(), 'ana_lopez', 'ana@yahoo.com', 'pass101', '11-5555-3456', NOW()),
+(UUID(), 'luis_martin', 'luis@gmail.com', 'pass202', '11-5555-9012', NOW()),
+(UUID(), 'sofia_garcia', 'sofia@outlook.com', 'pass303', '11-5555-4567', NOW()),
+(UUID(), 'diego_torres', 'diego@gmail.com', 'pass404', '11-5555-3456', NOW()),
+(UUID(), 'laura_vazquez', 'laura@gmail.com', 'pass505', '11-5555-5678', NOW());
+
+-- Insert roles_usuarios (assign roles to users)
+-- Providers (juan_perez, carlos_ruiz, luis_martin, diego_torres) get proveedor role
+INSERT INTO roles_usuarios (usuario_id, rol_id)
+SELECT u.id, r.id
+FROM usuarios u
+CROSS JOIN roles r
+WHERE u.usuario IN ('juan_perez', 'carlos_ruiz', 'luis_martin', 'diego_torres')
+  AND r.rol = 'proveedor';
+
+-- Clients (maria_gomez, ana_lopez, sofia_garcia, laura_vazquez) get cliente role
+INSERT INTO roles_usuarios (usuario_id, rol_id)
+SELECT u.id, r.id
+FROM usuarios u
+CROSS JOIN roles r
+WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
+  AND r.rol = 'cliente';
 
 -- Insert dummy categorias
 INSERT INTO categorias (id, nombre, descripcion, fecha_creacion) VALUES
@@ -127,7 +165,7 @@ JOIN barrios b ON
     (u.usuario = 'diego_torres' AND b.nombre = 'Recoleta');
 
 -- Insert dummy proveedores (using existing user IDs)
-INSERT INTO proveedores (id, usuario_id, descripcion, telefono) 
+INSERT INTO proveedores (id, usuario_id, descripcion) 
 SELECT 
   UUID(),
   id,
@@ -136,12 +174,6 @@ SELECT
     WHEN usuario = 'carlos_ruiz' THEN 'Electricista certificado, trabajos garantizados'
     WHEN usuario = 'luis_martin' THEN 'Carpintero especializado en muebles a medida'
     WHEN usuario = 'diego_torres' THEN 'Servicio de limpieza profesional'
-  END,
-  CASE 
-    WHEN usuario = 'juan_perez' THEN '11-5555-1234'
-    WHEN usuario = 'carlos_ruiz' THEN '11-5555-5678'
-    WHEN usuario = 'luis_martin' THEN '11-5555-9012'
-    WHEN usuario = 'diego_torres' THEN '11-5555-3456'
   END
 FROM usuarios 
 WHERE usuario IN ('juan_perez', 'carlos_ruiz', 'luis_martin', 'diego_torres');

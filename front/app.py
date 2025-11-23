@@ -22,37 +22,22 @@ app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 jwt = JWTManager(app)
 CORS(app)
 
-# manejamos que hacer cuando el token no existe o cuando el token es invalido
+BACKEND_URL = 'http://localhost:5500'
+
+# manejamos que hacer cuando el token no existe o es invalido
 @jwt.unauthorized_loader
+@jwt.expired_token_loader
 @jwt.invalid_token_loader
-def invalid_token(error):
-    next = request.url
-    print(next)
-    return redirect(url_for('auth', next=next))
-
-
-@app.route("/reservas")
-def mis_reservas():
-    data = get_jwt_identity()
-    es_proveedor = False
-    
-    usuario_id = data
-
-    if data and data.get("provider"):  
-            es_proveedor = True
-
-    if not usuario_id:
-        flash("Debes iniciar sesión", "error")
-        return redirect(url_for("auth"))
-
-    reservas = obtener_mis_reservas(usuario_id)
-    return render_template("reservas.html", reservas=reservas,es_proveedor=es_proveedor)
+def unauthorized_token(callback):
+    next_url = request.url
+    print(f"Unauthorized access to: {next_url}")
+    return redirect(url_for('auth', next=next_url))
 
 
 @app.route('/')
-@jwt_required( optional=True, locations=['cookies'])
+@jwt_required(locations=['cookies'], optional=True)
 def home():
-    data = get_jwt()    
+    data = get_jwt()
     user_data = data if data else None
 
     servicios = obtener_servicios_destacados()
@@ -71,12 +56,27 @@ def home():
     return render_template('home.html', servicios=servicios, categorias=categorias_completas, data=user_data)
 
 
+@app.route("/reservas")
+@jwt_required(locations=['cookies'])
+def mis_reservas():
+    data = get_jwt()
+    es_proveedor = False
+    usuario_id = get_jwt_identity()
+
+    if data and data.get("provider"):  
+            es_proveedor = True
+
+    reservas = obtener_mis_reservas(usuario_id)
+    return render_template("reservas.html", reservas=reservas, es_proveedor=es_proveedor, user_data=data), 201
+
+
 @app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
 def confirmar_servicio(id_reserva, token):
     response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
     if response.status_code != 200:  
         return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido")) 
     return render_template("confirmado.html", id_reserva=id_reserva)  
+
 
 @app.route('/generar-qr')
 def generarqr():
@@ -95,11 +95,12 @@ def generarqr():
 
 
 @app.route('/mi-perfil')
+@jwt_required(locations=['cookies'])
 def perfil():
     data = get_jwt()
+    usuario_id = get_jwt_identity()
+    print(usuario_id)
     es_proveedor = False
-
-    usuario_id = data.get("sub") if data else None
 
     if data and data.get("isProveedor"):
         es_proveedor = True
@@ -113,7 +114,8 @@ def perfil():
         return render_template(
             "editar_perfil.html",          
             es_proveedor=es_proveedor,
-            usuario=datos_proveedor
+            usuario=datos_proveedor,
+            user_data=data
         )
     
     response = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
@@ -122,10 +124,12 @@ def perfil():
         return "Usuario no encontrado", 404
 
     datos_user = response.json()
+
     return render_template(
         "editar_perfil.html",
         usuario=datos_user,
-        es_proveedor=es_proveedor
+        es_proveedor=es_proveedor,
+        user_data=data
     )
 
 
@@ -234,6 +238,7 @@ def categoria(nombre):
         data=user_data
     )    
 
+
 # vista tipo producto de un servicio 
 @app.route('/servicio/id/<string:id>')
 @jwt_required(locations=['cookies'], optional=True)
@@ -272,6 +277,7 @@ def checkout(id):
   except Exception as e:
     print(e)
     return render_template('404.html'), 404
+
 
 @app.route('/reserva/<string:servicio>', methods=['POST'])
 @jwt_required(locations=['cookies'])
