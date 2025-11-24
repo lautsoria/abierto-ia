@@ -55,18 +55,29 @@ def home():
     return render_template('home.html', servicios=servicios, categorias=categorias_completas, data=user_data)
 
 
+
 @app.route("/reservas")
 @jwt_required(locations=['cookies'])
 def mis_reservas():
-    data = get_jwt()
-    es_proveedor = False
     usuario_id = get_jwt_identity()
 
-    if data and data.get("provider"):  
-            es_proveedor = True
+    response = requests.get(f"{BACKEND_URL}/reservas", json={"usuario_id": usuario_id})
 
-    reservas = obtener_mis_reservas(usuario_id)
-    return render_template("reservas.html", reservas=reservas, es_proveedor=es_proveedor, data=data), 200
+    if response.status_code != 200:
+        return "Usuario no encontrado", 404
+
+    reservas = response.json()
+
+    
+    response_user = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
+    datos_user = response_user.json()
+
+    
+    if datos_user["rol"] == "admin":
+        response_all = requests.get(f"{BACKEND_URL}/reservas/todas")  
+        reservas = response_all.json()
+
+    return render_template("reservas.html", reservas=reservas, usuario=datos_user), 201
 
 
 @app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
@@ -123,6 +134,15 @@ def perfil():
 
     datos_user = response.json()
 
+    if datos_user.get("rol") == "proveedor":
+        response = requests.get(f"{BACKEND_URL}/proveedores/{usuario_id}")
+        
+        if response.status_code != 200:
+            return "Proveedor no encontrado", 404
+        
+        datos_user = response.json()
+        
+    
     return render_template(
         "editar_perfil.html",
         usuario=datos_user,
@@ -328,4 +348,4 @@ def error(e):
 
 
 if __name__ == '__main__':
-    app.run("localhost", port=1234, debug=True)
+    app.run("localhost", port=1230, debug=True)
