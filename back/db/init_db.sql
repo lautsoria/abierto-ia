@@ -10,7 +10,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
   contrasena VARCHAR(12) NOT NULL,
   telefono VARCHAR(20),
   fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
+  rol_id CHAR(36), 
+  FOREIGN KEY (rol_id) REFERENCES roles(id)
 );
+
 
 CREATE TABLE IF NOT EXISTS roles (
   id UUID PRIMARY KEY,
@@ -19,13 +22,6 @@ CREATE TABLE IF NOT EXISTS roles (
   -- (cliente, proveedor, admin)
 );
 
-CREATE TABLE IF NOT EXISTS roles_usuarios (
-  usuario_id UUID,
-  rol_id UUID,
-  PRIMARY KEY (usuario_id, rol_id),
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (rol_id) REFERENCES roles(id)  
-);
 
 CREATE TABLE IF NOT EXISTS proveedores (
   id UUID PRIMARY KEY,

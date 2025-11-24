@@ -5,15 +5,16 @@ usuarios_bp = Blueprint('usuarios', __name__)
 
 # encontrar usuario por id
 @usuarios_bp.route('/<string:id>')
-def get_usuarios(id):
+def get_usuario(id):
     try:
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
 
         query = """
-            SELECT *
-            FROM usuarios
-            WHERE id = %s
+            SELECT u.*, r.rol
+            FROM usuarios u
+            LEFT JOIN roles r ON u.rol_id = r.id
+            WHERE u.id = %s
         """
         
         cursor.execute(query, (id,))
@@ -28,9 +29,5 @@ def get_usuarios(id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-
-
-    
 
 

@@ -139,13 +139,9 @@ def get_mis_reservas():
 
 
 # ver todas las reservas,solo admins
-@reservas_bp.route('/')
+@reservas_bp.route('/todas')
 def get_all_reservas():
     try:
-        # TODO: Validar que el usuario sea admin desde el token JWT
-        # Por ahora, comentamos esta validación
-        # if not es_admin(request):
-        #     return jsonify({'error': 'No autorizado'}), 403
         
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
@@ -241,7 +237,7 @@ def update_reserva(id):
 def get_reserva(id):
     try:
         conn = db_conn()
-        cursor = conn.cursor(dictionary=True)  # ✅ Added dictionary=True
+        cursor = conn.cursor(dictionary=True)  
         
         query = """
             SELECT 

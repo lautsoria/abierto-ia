@@ -12,7 +12,7 @@
         <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h4>✏️ Editar Perfil ({{ 'proveedor' if es_proveedor else 'usuario' }})</h4>
+                    <h4>✏️ Editar Perfil ({{ usuario.rol }})</h4>
                 </div>
                 <div class="card-body">
                     
@@ -36,7 +36,7 @@
                             </div>
                         </div>
 
-                        {% if es_proveedor %}
+                        {% if usuario.rol=='proveedor' %}
                             <hr>
                             <h5 class="mb-3 text-muted">Datos Profesionales</h5>
                             <div class="alert alert-info py-2">
@@ -45,12 +45,12 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Profesión / Oficio</label>
-                                <input type="text" name="profesion" class="form-control" value="{{ usuario.categoria }}">
+                                <input type="text" name="profesion" class="form-control" value="{{ usuario.get('categoria', 'no hay categoria') }}">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Descripción / Presentación</label>
-                                <textarea name="descripcion" class="form-control" rows="3">{{ usuario.descripcion }}</textarea>
+                                <textarea name="descripcion" class="form-control" rows="3">{{ usuario.get('descripcion''no hay descripcion') }}</textarea>
                             </div>
                         {% endif %}
                         <div class="d-grid gap-2 mt-4">
