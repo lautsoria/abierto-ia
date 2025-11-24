@@ -87,6 +87,16 @@ def mis_reservas():
 
 @app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
 def confirmar_servicio(id_reserva, token):
+    #chequear q el usuario que reservo sea el q confirma
+    usuario_id = get_jwt_identity()
+    response_reserva=requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
+    datos_reserva = response_reserva.json()
+    usuario_reserva= datos_reserva.get("usuario_id")
+
+    if not usuario_id == usuario_reserva:
+        return "usuario incorrecto", 404
+    
+    
     response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
     if response.status_code != 200:  
         return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido")) 
