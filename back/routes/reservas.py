@@ -79,10 +79,8 @@ def get_mis_reservas():
         cursor.execute("""
                        SELECT r.rol 
                        FROM roles r
-                       JOIN roles_usuarios ru
-                       ON r.id = ru.rol_id
                        JOIN usuarios u
-                       ON ru.usuario_id = u.id
+                       ON u.rol_id = r.id
                        WHERE u.id = %s
                        """, (usuario_id,))
         usuario = cursor.fetchone()
