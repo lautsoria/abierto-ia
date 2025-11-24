@@ -19,8 +19,8 @@
         <div class="location">
           <span class="location-icon">📍</span>
           <div>
-            <span class="location-label">Enviar a</span>
-            <span class="location-text">Capital Federal</span>
+            <span class="location-label">Servicios De</span>
+            <span class="location-text">Todo Argentina</span>
           </div>
         </div>
       </div>
@@ -30,7 +30,7 @@
           <input 
             type="text" 
             class="search-input" 
-            placeholder="Buscar productos, marcas y más…" 
+            placeholder="Buscar servicios" 
             maxlength="120"
           >
           <button type="submit" class="search-btn">🔍</button>
@@ -44,6 +44,7 @@
             <a href="{{ url_for('mis_reservas') }}" class="nav-link">Calendario</a>
             <a href="#" class="nav-link end">Mi perfil</a>
             <a href="#" class="nav-link">Mis servicios</a>
+            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Reservas Agendadas</a>
           {% else %}
             <a href="#categorias" class="nav-link">Categorías</a>
             <a href="{{ url_for('mis_reservas') }}" class="nav-link">Servicios Agendados</a>
@@ -52,8 +53,8 @@
           {% endif %}          
         {% else %}
           <a href="#categorias" class="nav-link">Categorías</a>
-          <a href="#" class="nav-link">Ofertas</a>
-          <a href="{{ url_for('auth') }}" class="nav-link end">Ingresá</a>
+          <a href="{{ url_for('mis_reservas') }}" class="nav-link">Mis Reservas</a>
+          <a href="{{ url_for('auth') }}" class="nav-link end">Inicia Sesion</a>
         {% endif %}
       </nav>
     </div>

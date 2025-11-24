@@ -347,5 +347,27 @@ def error(e):
    return render_template('404.html'), 404
 
 
+
+
+
+@app.route('/usuarios/<int:id>/eliminar', methods=['POST'])
+def eliminar_usuario(id):
+    response = requests.delete(f"{BACKEND_URL}/usuarios/{id}")
+
+    if response.status_code != 200:
+        return "Usuario no encontrado", 404
+    
+    
+    return redirect(url_for('listar_usuarios'))
+@app.route('/usuarios')
+def ver_usuarios():
+    response = requests.get(f'{BACKEND_URL}/usuarios/todos')
+    
+    if response.status_code != 200:
+        return "Usuarios no encontrados", 404
+    
+    usuarios = response.json()
+
+    return render_template('usuarios.html',usuarios=usuarios)
 if __name__ == '__main__':
     app.run("localhost", port=1230, debug=True)

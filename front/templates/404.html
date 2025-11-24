@@ -2,24 +2,21 @@
 <html>
 
 <head>
-	<title>Bootstrap error page</title>
+	<title>Pagina No Encontrada</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="https://fonts.googleapis.com/css2?family=Cardo&family=Lemonada:wght@300&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/notfound.css') }}">
 </head>
 
 <body>
-	<div class="row">
-		<div class="col-md-12 d-flex flex-column justify-content-center align-items-center text-white vh-100">
-			<h1>404</h1>
-			<h4>Page not found</h4>
-      <img src="{{ url_for('static', filename='images/foto1.webp') }}" alt="Error 404" class="error-image">
-			<p>Oops! The page you are looking for does not exist. It might have been moved or deleted.</p>
-			<a href="{{ url_for('home') }}" >Volver Al Inicio</a>
-		</div>
-	</div>
+	<div class="full-center">
+    <h1>404</h1>
+    <h4>Pagina No Encontrada</h4>
+    <img src="{{ url_for('static', filename='images/foto1.webp') }}" alt="Error 404" class="error-image">
+    <p>¡Oops! La página que buscas no existe. Podría haber sido movido o eliminado.</p>
+    <a href="{{ url_for('home') }}">Volver Al Inicio</a>
+</div>
 </body>
 
 </html>
