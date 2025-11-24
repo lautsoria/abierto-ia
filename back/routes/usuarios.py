@@ -29,5 +29,56 @@ def get_usuario(id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+# eliminar usuario por ID
+@usuarios_bp.route('/<string:id>', methods=['DELETE'])
+def eliminar_usuario(id):
+    try:
+        conn = db_conn()
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT id FROM usuarios WHERE id = %s', (id,))
+        usuario = cursor.fetchone()
+        
+        if usuario is None:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+        
+        
+        cursor.execute('DELETE FROM proveedores WHERE usuario_id = %s', (id,))
+        
+        cursor.execute('DELETE FROM usuarios WHERE id = %s', (id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': 'Usuario eliminado correctamente'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': 'Error al eliminar el usuario'}), 500
 
 
+@usuarios_bp.route('/todos', methods=['GET'])
+def get_usuarios():
+    try:
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+
+        query = """
+            SELECT u.*, r.rol
+            FROM usuarios u
+            LEFT JOIN roles r ON u.rol_id = r.id
+        """
+        
+        cursor.execute(query)
+        usuarios = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+        
+        return jsonify(usuarios), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
