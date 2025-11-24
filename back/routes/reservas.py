@@ -66,16 +66,25 @@ def create_reserva():
 @reservas_bp.route('', methods=['GET'])
 def get_mis_reservas():
     try:
-        usuario_id = request.json.values()
+        data = request.json
+        usuario_id = data['usuario_id']
         
         if not usuario_id:
             return jsonify({'error': 'usuario_id es requerido (temporal)'}), 400
-        
+
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
         
         # segun rol del usuario
-        cursor.execute("SELECT rol FROM usuarios WHERE id = %s", (usuario_id,))
+        cursor.execute("""
+                       SELECT r.rol 
+                       FROM roles r
+                       JOIN roles_usuarios ru
+                       ON r.id = ru.rol_id
+                       JOIN usuarios u
+                       ON ru.usuario_id = u.id
+                       WHERE u.id = %s
+                       """, (usuario_id,))
         usuario = cursor.fetchone()
         
         if not usuario:
@@ -91,7 +100,7 @@ def get_mis_reservas():
                     s.nombre as servicio_nombre,
                     s.precio as servicio_precio,
                     p.descripcion as proveedor_descripcion,
-                    u.nombre as proveedor_nombre,
+                    u.usuario as proveedor_nombre,
                     c.nombre as categoria
                 FROM reservas r
                 INNER JOIN servicios s ON r.servicio_id = s.id
@@ -110,7 +119,7 @@ def get_mis_reservas():
                     r.*,
                     s.nombre as servicio_nombre,
                     s.precio as servicio_precio,
-                    uc.nombre as cliente_nombre,
+                    uc.usuario as cliente_nombre,
                     uc.email as cliente_email,
                     c.nombre as categoria
                 FROM reservas r
@@ -142,13 +151,26 @@ def get_mis_reservas():
 @reservas_bp.route('/')
 def get_all_reservas():
     try:
-        # TODO: Validar que el usuario sea admin desde el token JWT
-        # Por ahora, comentamos esta validación
-        # if not es_admin(request):
-        #     return jsonify({'error': 'No autorizado'}), 403
+        usuario_id = request.json.values()
         
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+                       SELECT r.rol 
+                       FROM roles r
+                       JOIN roles_usuarios ru
+                       ON r.id = ru.rol_id
+                       JOIN usuarios u
+                       ON ru.usuario_id = u.id
+                       WHERE u.id = %s
+                       """, (usuario_id,))
+        usuario = cursor.fetchone()
+        
+        if not usuario:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Usuario no encontrado'}), 401
         
         query = """
             SELECT 

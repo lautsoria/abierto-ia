@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash, mak
 from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt, get_jwt_identity
 from flask_cors import CORS
 import os
-import time
 from dotenv import load_dotenv
 
 from static.icons import icons
@@ -28,7 +27,7 @@ BACKEND_URL = 'http://localhost:5500'
 @jwt.unauthorized_loader
 @jwt.expired_token_loader
 @jwt.invalid_token_loader
-def unauthorized_token(callback):
+def unauthorized_token(callback=None, error=None):
     next_url = request.url
     print(f"Unauthorized access to: {next_url}")
     return redirect(url_for('auth', next=next_url))
@@ -67,7 +66,7 @@ def mis_reservas():
             es_proveedor = True
 
     reservas = obtener_mis_reservas(usuario_id)
-    return render_template("reservas.html", reservas=reservas, es_proveedor=es_proveedor, user_data=data), 201
+    return render_template("reservas.html", reservas=reservas, es_proveedor=es_proveedor, data=data), 200
 
 
 @app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
@@ -99,7 +98,6 @@ def generarqr():
 def perfil():
     data = get_jwt()
     usuario_id = get_jwt_identity()
-    print(usuario_id)
     es_proveedor = False
 
     if data and data.get("isProveedor"):
@@ -115,7 +113,7 @@ def perfil():
             "editar_perfil.html",          
             es_proveedor=es_proveedor,
             usuario=datos_proveedor,
-            user_data=data
+            data=data
         )
     
     response = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
@@ -129,7 +127,7 @@ def perfil():
         "editar_perfil.html",
         usuario=datos_user,
         es_proveedor=es_proveedor,
-        user_data=data
+        data=data
     )
 
 

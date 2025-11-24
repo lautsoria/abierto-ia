@@ -35,23 +35,18 @@
           >
           <button type="submit" class="search-btn">🔍</button>
         </form>
-      </div>
-
-      <!-- <div class="header-right">
-        <button class="promo-btn">ENVÍO GRATIS<br><strong>EN TU PRIMERA COMPRA</strong></button>
-      </div> -->
-    
+      </div>    
 
       <nav class="header-nav">
         {% if data %}
           {% if data.provider %}
             <a href="#categorias" class="nav-link">Registrar servicio</a>
-            <a href="#" class="nav-link">Calendario</a>
+            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Calendario</a>
             <a href="#" class="nav-link end">Mi perfil</a>
             <a href="#" class="nav-link">Mis servicios</a>
           {% else %}
             <a href="#categorias" class="nav-link">Categorías</a>
-            <a href="#" class="nav-link">Servicios Agendados</a>
+            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Servicios Agendados</a>
             <a href="{{ url_for('perfil') }}" class="nav-link end">Mi Perfil</a>          
             <a href="" class="nav-link end">Ver 🛒</a>   
           {% endif %}          
