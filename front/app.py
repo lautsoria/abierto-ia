@@ -7,6 +7,11 @@ from dotenv import load_dotenv
 from static.icons import icons
 from back_calls.calls import *
 
+
+
+import qrcode
+
+
 env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(dotenv_path=env_path)
 
@@ -86,6 +91,13 @@ def confirmar_servicio(id_reserva, token):
     if response.status_code != 200:  
         return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido")) 
     return render_template("confirmado.html", id_reserva=id_reserva)  
+
+def generar_qr(id_reserva, token):
+    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}/{token}"
+    qr = qrcode.make(url)
+    qr.save(f"static/qr_reserva_{id_reserva}.png")
+    return f"static/qr_reserva_{id_reserva}.png"
+
 
 
 @app.route('/generar-qr')

@@ -426,4 +426,3 @@ WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
   AND RAND() < 0.6
 ORDER BY RAND()
 LIMIT 40;
-
