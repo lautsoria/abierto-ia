@@ -3,7 +3,7 @@ from db.db import db_conn
 
 servicios_bp = Blueprint('servicios', __name__)
 
-#filtrar servicio por categoria con filtros adicionales
+#servicios por categoria
 @servicios_bp.route('/<string:nombre>')
 def servicios_por_categoria(nombre):
     ubicacion = request.args.get('ubicacion', '')
@@ -23,8 +23,8 @@ def servicios_por_categoria(nombre):
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
                 GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion,
-                (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as calificacion_promedio,
-                (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
+                (SELECT AVG(puntuacion) FROM resenas WHERE servicio_id = s.id) as calificacion_promedio,
+                (SELECT COUNT(*) FROM resenas WHERE servicio_id = s.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
@@ -95,7 +95,7 @@ def servicios_top_rating():
             INNER JOIN usuarios u ON p.usuario_id = u.id
             LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
-            LEFT JOIN reseñas r ON r.servicio_id = s.id
+            LEFT JOIN resenas r ON r.servicio_id = s.id
             GROUP BY s.id
             HAVING reviews_count > 0
             ORDER BY rating DESC, reviews_count DESC
@@ -136,8 +136,8 @@ def servicios_por_precio():
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
                 GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as proveedor_ubicacion,
-                (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as rating,
-                (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
+                (SELECT AVG(puntuacion) FROM resenas WHERE servicio_id = s.id) as rating,
+                (SELECT COUNT(*) FROM resenas WHERE servicio_id = s.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
@@ -179,6 +179,7 @@ def servicios_por_precio():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+# busca servicio por id
 @servicios_bp.route('/id/<string:id>', methods=['GET'])
 def servicio(id):
     try:
@@ -187,16 +188,13 @@ def servicio(id):
 
         query = """
                 SELECT 
-                    s.id,
-                    s.nombre,
-                    s.descripcion,
-                    s.precio,
+                    s.*,
                     c.nombre as categoria_nombre,
                     p.id as proveedor_id,
                     u.usuario as proveedor_nombre,
                     GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion,
-                    (SELECT AVG(puntuacion) FROM reseñas WHERE servicio_id = s.id) as calificacion_promedio,
-                    (SELECT COUNT(*) FROM reseñas WHERE servicio_id = s.id) as reviews_count
+                    (SELECT AVG(puntuacion) FROM resenas WHERE servicio_id = s.id) as calificacion_promedio,
+                    (SELECT COUNT(*) FROM resenas WHERE servicio_id = s.id) as reviews_count
                 FROM servicios s
                 INNER JOIN categorias c ON s.categoria_id = c.id
                 INNER JOIN proveedores p ON s.proveedor_id = p.id
@@ -208,7 +206,6 @@ def servicio(id):
                 """
         cursor.execute(query, (id,))
         servicio = cursor.fetchone()
-        print(servicio)
 
         cursor.close()
         conn.close()

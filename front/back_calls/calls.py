@@ -1,5 +1,7 @@
 import requests
 import logging
+import qrcode
+
 BACKEND_URL = 'http://localhost:5500'
 
 def obtener_cantidad_categoria(nombre):
@@ -162,7 +164,7 @@ def obtener_ubicaciones():
         print(f"Error al obtener ubicaciones: {e}")
         return []
 
-def obtener_servicio_por_id(id):
+def obtener_servicio_por_id(id, horarios=False):
     """Obtiene los detalles de un servicio específico por ID"""
     try:
         response = requests.get(
@@ -171,8 +173,117 @@ def obtener_servicio_por_id(id):
         )
         
         if response.status_code == 200:
-            return response.json()
+            servicio = response.json()
+            
+            if horarios:
+                horarios_list = []
+                hora_inicio = servicio.get('hora_inicio')
+                hora_fin = servicio.get('hora_fin')
+                duracion = servicio.get('duracion')
+
+                if hora_inicio and hora_fin and duracion:
+                    # no tiene en cuenta la hora de inicio, pero sera agregada a horarios
+                    cant_turnos = ((hora_fin - duracion) - hora_inicio) / duracion + 1
+                    # esta formula agrega 1h de transporte y descanso a la duracion del servicio, y calcula el ultimo
+                    # turno para que el trabajador pueda terminar a tiempo su jornada laboral
+                    # claramente esto funciona en un mundo utopico 
+                    i = hora_inicio
+                    while i <= (hora_fin - duracion):
+                        horarios_list.append(f"{int(i):02d}:00")
+                        i = i + duracion
+                    
+                    servicio['horarios'] = horarios_list
+            
+            return servicio
+
         return None
     except requests.exceptions.RequestException as e:
         print(f"Error al obtener servicio por ID: {e}")
         return None
+    
+def no_disponibles(id):
+    """Obtiene las fechas no disponibles para un servicio"""
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/reservas/servicio/{id}',
+            timeout=2
+        )
+        if response.status_code == 200:
+            return response.json()
+        return []
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener servicios por categoría: {e}")
+        return []
+    
+def reservar(user_id, servicio_id, fecha, horario, direccion, mensaje):
+    try:
+        response = requests.post(
+            f'{BACKEND_URL}/reservas',
+            timeout=2,
+            json={
+                'usuario_id': user_id,
+                'servicio_id': servicio_id,
+                'fecha_servicio': fecha,
+                'hora_servicio': horario,
+                'direccion': direccion,
+                'comentarios_cliente': mensaje
+            }
+        )
+        return response
+    except Exception as e:
+        print(e)
+        return None
+
+def obtener_reserva_por_id(id):
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/reservas/{id}',
+            timeout=2
+        )
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except Exception as e:
+        print(e)
+        return None            
+    
+def obtener_resenas_servicio(id):
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/resenas/{id}',
+            timeout=2
+        )
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except Exception as e:
+        print(e)
+        return None  
+    
+def obtener_mis_reservas(usuario_id):
+    try:
+        if not usuario_id:
+            print("Usuario no autenticado")
+            return []
+
+        response = requests.get(
+            f"{BACKEND_URL}/reservas",
+            json={"usuario_id": usuario_id},
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Error backend: {response.status_code} - {response.text}")
+            return []
+
+    except Exception as e:
+        print(f"Error al obtener reservas: {e}")
+        return []
+
+def generar_qr(id_reserva, token):
+    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}/{token}"
+    qr = qrcode.make(url)
+    qr.save(f"static/qr_reserva_{id_reserva}.png")
+    return f"static/qr_reserva_{id_reserva}.png" 

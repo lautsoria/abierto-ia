@@ -24,7 +24,6 @@ from db.db import db_conn
 
 proveedores_bp = Blueprint('proveedores', __name__)
 
-# listar provee
 @proveedores_bp.route('/')
 def get_proveedores():
     try:
@@ -181,11 +180,7 @@ def update_proveedor(id):
     try:
         data = request.get_json()
         
-        # TODO: Validar que el usuario sea proveedor
-        # Por ahora, comentamos esta validación
-        # if not es_proveedor(request):
-        #     return jsonify({'error': 'No autorizado'}), 403
-        
+    
         conn = db_conn()
         cursor = conn.cursor()
         

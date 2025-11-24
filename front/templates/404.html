@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page Not Found</title>
+	<title>Pagina No Encontrada</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css2?family=Cardo&family=Lemonada:wght@300&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/notfound.css') }}">
 </head>
+
 <body>
-  <h1>Error 404! Page not found</h1>
+	<div class="full-center">
+    <h1>404</h1>
+    <h4>Pagina No Encontrada</h4>
+    <img src="{{ url_for('static', filename='images/foto1.webp') }}" alt="Error 404" class="error-image">
+    <p>¡Oops! La página que buscas no existe. Podría haber sido movido o eliminado.</p>
+    <a href="{{ url_for('home') }}">Volver Al Inicio</a>
+</div>
 </body>
+
 </html>

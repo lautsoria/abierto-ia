@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
-from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt
+from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt, get_jwt_identity
 from flask_cors import CORS
 import os
-import time
 from dotenv import load_dotenv
 
 from static.icons import icons
@@ -22,23 +21,22 @@ app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 jwt = JWTManager(app)
 CORS(app)
 
-# manejamos que hacer cuando el token no existe
-@jwt.unauthorized_loader
-def unauthorized_callback(error):
-    return redirect(url_for('home'))
-# o cuando el token es invalido
-@jwt.invalid_token_loader
-def invalid_token_callback(error):
-    return redirect(url_for('home'))
+BACKEND_URL = 'http://localhost:5500'
 
-# @app.route("/reservas")
-# def mis_reservas():
-#     return render_template("reservas.html", reservas=RESERVAS_MOCK)
+# manejamos que hacer cuando el token no existe o es invalido
+@jwt.unauthorized_loader
+@jwt.expired_token_loader
+@jwt.invalid_token_loader
+def unauthorized_token(callback=None, error=None):
+    next_url = request.url
+    print(f"Unauthorized access to: {next_url}")
+    return redirect(url_for('auth', next=next_url))
+
 
 @app.route('/')
-@jwt_required( optional=True, locations=['cookies'])
+@jwt_required(locations=['cookies'], optional=True)
 def home():
-    data = get_jwt()    
+    data = get_jwt()
     user_data = data if data else None
 
     servicios = obtener_servicios_destacados()
@@ -56,15 +54,116 @@ def home():
 
     return render_template('home.html', servicios=servicios, categorias=categorias_completas, data=user_data)
 
+
+
+@app.route("/reservas")
+@jwt_required(locations=['cookies'])
+def mis_reservas():
+    usuario_id = get_jwt_identity()
+
+    response = requests.get(f"{BACKEND_URL}/reservas", json={"usuario_id": usuario_id})
+
+    if response.status_code != 200:
+        return "Usuario no encontrado", 404
+
+    reservas = response.json()
+
+    
+    response_user = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
+    datos_user = response_user.json()
+
+    
+    if datos_user["rol"] == "admin":
+        response_all = requests.get(f"{BACKEND_URL}/reservas/todas")  
+        reservas = response_all.json()
+
+    return render_template("reservas.html", reservas=reservas, usuario=datos_user), 201
+
+
+@app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
+def confirmar_servicio(id_reserva, token):
+    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
+    if response.status_code != 200:  
+        return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido")) 
+    return render_template("confirmado.html", id_reserva=id_reserva)  
+
+
+@app.route('/generar-qr')
+def generarqr():
+    id_reserva = request.args.get('id_reserva')
+    if not id_reserva:  
+        return "Falta id_reserva", 400  
+    
+    response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}/token")
+    if response.status_code != 200:  
+        return "Reserva no encontrada", 404  
+    
+    data = response.json()
+    token = data["token_qr"]
+    qr_confirmacion = generar_qr(id_reserva, token)
+    return render_template("qr.html", qr_path=qr_confirmacion)  
+
+
+@app.route('/mi-perfil')
+@jwt_required(locations=['cookies'])
+def perfil():
+    data = get_jwt()
+    usuario_id = get_jwt_identity()
+    es_proveedor = False
+
+    if data and data.get("isProveedor"):
+        es_proveedor = True
+        response = requests.get(f"{BACKEND_URL}/proveedores/{usuario_id}")
+        
+        if response.status_code != 200:
+            return "Proveedor no encontrado", 404
+        
+        datos_proveedor = response.json()
+        
+        return render_template(
+            "editar_perfil.html",          
+            es_proveedor=es_proveedor,
+            usuario=datos_proveedor,
+            data=data
+        )
+    
+    response = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
+
+    if response.status_code != 200:
+        return "Usuario no encontrado", 404
+
+    datos_user = response.json()
+
+    if datos_user.get("rol") == "proveedor":
+        response = requests.get(f"{BACKEND_URL}/proveedores/{usuario_id}")
+        
+        if response.status_code != 200:
+            return "Proveedor no encontrado", 404
+        
+        datos_user = response.json()
+        
+    
+    return render_template(
+        "editar_perfil.html",
+        usuario=datos_user,
+        es_proveedor=es_proveedor,
+        data=data
+    )
+
+
 @app.route('/auth')
 def auth():
   try:
     verify_jwt_in_request(locations=['cookies'])
-
     return redirect(url_for('home'))
   except:
-    return render_template('auth.html')
+    # Si el token es inválido o no existe, limpiar la cookie
+    next = request.args.get('next', url_for('home'))
+    resp = make_response(render_template('auth.html', next=next))
+    resp.set_cookie('access_token_cookie', '', max_age=0)
+    return resp
   
+
 @app.route('/register', methods=['POST'])
 def register():
     user = request.form.get("newUser")
@@ -72,6 +171,7 @@ def register():
     password = request.form.get("newPassword")
     repeatPassword = request.form.get("newPassword2")
     provider = request.form.get("isProveedor") == 'true'
+    next_url = request.args.get('next', url_for('home'))
 
     if password != repeatPassword:
         flash('Las contraseñas no coinciden', 'error')
@@ -80,22 +180,37 @@ def register():
     response = registrar_usuario(user, email, password, provider)
     
     if response and response.status_code == 200:
+        # Obtener las cookies del backend y pasarlas al frontend
+        print(next_url)        
+        resp = make_response(redirect(next_url))
+        
+        # Copiar todas las cookies del backend al frontend
+        for cookie_name, cookie_value in response.cookies.items():
+            resp.set_cookie(
+                cookie_name,
+                cookie_value,
+                httponly=True,
+                samesite='Lax'
+            )
         flash('Usuario creado correctamente.', 'success')
-        return redirect(url_for('auth'))
+        return resp
     else:
         flash('Error al registrar el usuario', 'error')
         return redirect(url_for('auth'))
+
 
 @app.route('/login', methods=['POST'])
 def login():
     credential = request.form.get("credential")
     password = request.form.get("password")
+    next_url = request.args.get('next', url_for('home'))
 
     response = login_usuario(credential, password)
     
     if response and response.status_code == 200:
         # Obtener las cookies del backend y pasarlas al frontend
-        resp = make_response(redirect(url_for('home')))
+        print(next_url)      
+        resp = make_response(redirect(next_url))
         
         # Copiar todas las cookies del backend al frontend
         for cookie_name, cookie_value in response.cookies.items():
@@ -110,6 +225,7 @@ def login():
     else:
         flash('Credenciales inválidas', 'error')
         return redirect(url_for('auth'))
+
 
 @app.route('/categoria/<nombre>')
 @jwt_required(optional=True, locations=['cookies'])
@@ -140,18 +256,118 @@ def categoria(nombre):
         data=user_data
     )    
 
+
+# vista tipo producto de un servicio 
 @app.route('/servicio/id/<string:id>')
+@jwt_required(locations=['cookies'], optional=True)
 def servicio(id):
+    data = get_jwt()    
+    user_data = data if data else None
+    
+    url = request.url
     servicio = obtener_servicio_por_id(id)
+    resenas = obtener_resenas_servicio(id)
     
     if servicio:
-        return render_template('servicio.html', servicio=servicio)
+        return render_template('servicio.html', servicio=servicio, resenas=resenas, data=user_data, url=url)
     else:
         return redirect('error')
     
+
+@app.route('/checkout/<string:id>')
+@jwt_required(locations=['cookies'])
+def checkout(id):
+  try:
+    data = get_jwt()    
+    user_data = data if data else None
+    
+    # if user_data is None:
+    #     return render_template('auth.html'), 401
+    
+    servicio = obtener_servicio_por_id(id, horarios=True)
+    print(servicio)
+    reservas = no_disponibles(id)
+
+    if servicio:
+        return render_template('checkout.html', servicio=servicio, reservas=reservas, data=user_data)
+    else:
+        return render_template('404.html'), 404
+  except Exception as e:
+    print(e)
+    return render_template('404.html'), 404
+
+
+@app.route('/reserva/<string:servicio>', methods=['POST'])
+@jwt_required(locations=['cookies'])
+def crear_reserva(servicio):
+    data = get_jwt()
+    user_data = data if data else None
+    print(user_data)
+
+    if user_data is None:
+        return redirect(url_for('auth'))
+
+    user_id = get_jwt_identity()
+    servicio_id = servicio
+    fecha = request.form.get('fecha')
+    horario = request.form.get('hora')
+    direccion = request.form.get('direccion')
+    notas = request.form.get('notas_direccion', '')
+    mensaje = request.form.get('mensaje', '')
+    comentarios = f"{notas} {mensaje}".strip()
+
+    response = reservar(user_id, servicio_id, fecha, horario, direccion, comentarios)
+    
+    if response and response.status_code == 201:
+        reserva_data = response.json()
+        print(reserva_data)
+        reserva_id = reserva_data.get('id')
+        flash('Reserva confirmada exitosamente', 'success')
+        return redirect(f'/reserva/{reserva_id}')
+    else:
+        flash('Error al registrar la reserva', 'error')
+        return redirect(url_for('checkout', id=servicio_id))
+    
+
+@app.route('/reserva/<string:reserva_id>')
+@jwt_required(locations=['cookies'], optional=True)
+def detalle_reserva(reserva_id):
+    data = get_jwt()
+    user_data = data if data else None
+    
+    # TODO: Fetch reserva details from backend
+    reserva = obtener_reserva_por_id(reserva_id)
+    print(reserva)
+    
+    return render_template('reserva.html', reserva=reserva, data=user_data)
+
+
 @app.errorhandler(404)
 def error(e):
    return render_template('404.html'), 404
 
+
+
+
+
+@app.route('/usuarios/<int:id>/eliminar', methods=['POST'])
+def eliminar_usuario(id):
+    response = requests.delete(f"{BACKEND_URL}/usuarios/{id}")
+
+    if response.status_code != 200:
+        return "Usuario no encontrado", 404
+    
+    
+    return redirect(url_for('listar_usuarios'))
+@app.route('/usuarios')
+def ver_usuarios():
+    response = requests.get(f'{BACKEND_URL}/usuarios/todos')
+    
+    if response.status_code != 200:
+        return "Usuarios no encontrados", 404
+    
+    usuarios = response.json()
+
+    return render_template('usuarios.html',usuarios=usuarios)
 if __name__ == '__main__':
-    app.run("localhost", port= 5000, debug=True)
+    app.run("localhost", port=1230, debug=True)

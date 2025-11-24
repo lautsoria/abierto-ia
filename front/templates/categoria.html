@@ -13,7 +13,6 @@
         <p>{{ total_servicios }} servicios disponibles</p>
     </div>
 
-    <!-- Sidebar con filtros -->
     <aside class="filters-container">
         <div class="filters-title">
             Filtros
@@ -39,20 +38,6 @@
         </form>
     </aside>
 
-    <!-- Contenido principal -->
-    <!-- <main>
-        <div class="results-info">
-            <div class="sort-container">
-                <label for="ordenar">Ordenar por</label>
-                <select id="ordenar" onchange="ordenarServicios(this.value)">
-                    <option value="relevancia">Más relevantes</option>
-                    <option value="precio_asc">Menor precio</option>
-                    <option value="precio_desc">Mayor precio</option>
-                    <option value="rating">Mejor calificados</option>
-                </select>
-            </div>
-        </div> -->
-
         {% if servicios %}
         <div class="servicios-grid">
             {% for servicio in servicios %}
@@ -69,15 +54,26 @@
                     
                     <h3 class="servicio-title">{{ servicio.nombre }}</h3>
                     
-                    {% if servicio.rating %}
+                    {% if servicio.calificacion_promedio %}
                     <div class="servicio-rating">
+                        {% set rating = servicio.calificacion_promedio | float %}
+                        {% set full_stars = rating | int %}
+                        {% set has_half = (rating - full_stars) >= 0.5 %}
+                        
                         <span class="stars">
-                            {% set rating_int = servicio.rating | int %}
-                            {% for i in range(rating_int) %}★{% endfor %}
+                            {% for i in range(full_stars) %}
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                <path d="M6 0l1.545 4.13L12 4.635 8.182 7.765l1.273 4.235L6 9.28 2.545 12l1.273-4.235L0 4.635l4.455-.505z"/>
+                            </svg>
+                            {% endfor %}
+                            {% if has_half %}
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style="opacity: 0.5">
+                                <path d="M6 0l1.545 4.13L12 4.635 8.182 7.765l1.273 4.235L6 9.28 2.545 12l1.273-4.235L0 4.635l4.455-.505z"/>
+                            </svg>
+                            {% endif %}
                         </span>
-                        <span class="rating-count">
-                            {{ servicio.reviews_count or 0 }}
-                        </span>
+                        <span class="rating-value">{{ "%.1f" | format(rating) }}</span>
+                        <span class="rating-count">({{ servicio.reviews_count or 0 }})</span>
                     </div>
                     {% endif %}
 
