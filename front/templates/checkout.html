@@ -111,6 +111,41 @@
     const options = document.getElementById('hora').options
     const validOptions = Array(...options).filter((op) => op.value.length > 0)
 
+    function pickedTimes(date) {
+        // devuelve los horarios no disponibles segun el dia
+        return bookings
+            .filter(b => b.fecha_servicio.split('T')[0] === date)
+            .map(b => b.hora_servicio);
+    }
+
+    function isDateFull(date) {
+        // vemos si todos los horarios del dia estan ocupados
+        const bookedHours = pickedTimes(date);
+        return validOptions.every(op => bookedHours.includes(op.value));
+    }
+
+    function nextAvailableDate(fromDate) {
+
+        const maxDate = new Date(document.getElementById('fecha').getAttribute('max'));
+        let checkDate = new Date(fromDate);
+        checkDate.setDate(checkDate.getDate() + 1);
+
+        while (checkDate <= maxDate) {
+            const dateStr = checkDate.toISOString().split('T')[0];
+            if (!isDateFull(dateStr)) {
+                return dateStr;
+            }
+            checkDate.setDate(checkDate.getDate() + 1);
+        }
+        return null;
+    }
+
+    function display(dateStr) {
+        const date = new Date(dateStr + 'T00:00:00');
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        return date.toLocaleDateString('es-AR', options);
+    }
+
     let datePicker = document.getElementById('fecha').addEventListener('change', () => {
         /* 
         reseteamos las opciones para que todas esten disponibles antes 
@@ -134,7 +169,13 @@
 
         const allDisabled = validOptions.every((op) => op.disabled)
         if (allDisabled) {
-            alert('El día seleccionado no tiene horarios disponibles')
+            const nextAvailable = nextAvailableDate(selectedDate);
+            if (nextAvailable) {
+                const formattedDate = display(nextAvailable);
+                alert(`El día seleccionado no tiene horarios disponibles.\n\nPróxima fecha disponible: ${formattedDate}`);
+            } else {
+                alert('El día seleccionado no tiene horarios disponibles.\n\nNo hay fechas disponibles en los próximos 15 días.');
+            }
             document.getElementById('fecha').value = '';
             document.getElementById('hora').value = '';
         }

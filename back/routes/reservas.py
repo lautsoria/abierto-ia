@@ -5,6 +5,7 @@ import uuid
 reservas_bp = Blueprint('reservas', __name__)
 
 # crear reserva
+# TODO: verificar que la fecha elegida no este reservada ya
 @reservas_bp.route('/', methods=['POST'])
 def create_reserva():
     try:
@@ -271,8 +272,8 @@ def get_reserva(id):
                 uc.usuario AS cliente_usuario,
                 uc.email AS cliente_email,
                 up.usuario AS proveedor_usuario,
-                p.telefono AS proveedor_telefono,
-                p.ubicacion AS proveedor_ubicacion,
+                uc.telefono AS proveedor_telefono,
+                b.nombre AS proveedor_ubicacion,
                 c.nombre AS categoria
             FROM reservas r
             INNER JOIN servicios s ON r.servicio_id = s.id
@@ -387,12 +388,12 @@ def servicio_reservas(id):
         cursor = conn.cursor(dictionary=True)
         
         query = """
-            SELECT 
+                SELECT
                 r.*
-            FROM reservas r
-            WHERE r.servicio_id = (%s) AND r.estado = 'pendiente' 
-            ORDER BY r.fecha_reserva DESC
-        """
+                FROM reservas r
+                WHERE r.servicio_id = (%s) AND r.estado = 'pendiente' 
+                ORDER BY r.fecha_reserva DESC
+                """
         cursor.execute(query, (id,))
         
         reservas = cursor.fetchall()
