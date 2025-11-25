@@ -5,8 +5,6 @@ import uuid
 reservas_bp = Blueprint('reservas', __name__)
 
 # crear reserva
-# TODO: verificar que la fecha elegida no este reservada ya
-# TODO: verificar que al crear una reserva no se pise con otra
 @reservas_bp.route('/', methods=['POST'])
 def create_reserva():
     try:
@@ -32,6 +30,24 @@ def create_reserva():
             cursor.close()
             conn.close()
             return jsonify({'error': 'Servicio no encontrado'}), 404
+        
+        # verificar que no exista una reserva en la misma fecha y hora
+        cursor.execute("""
+            SELECT id FROM reservas 
+            WHERE servicio_id = %s 
+            AND fecha_servicio = %s 
+            AND hora_servicio = %s
+            AND estado != 'cancelado'
+        """, (
+            data['servicio_id'],
+            data['fecha_servicio'],
+            int(data['hora_servicio'].split(':')[0])
+        ))
+        
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Ya existe una reserva para esta fecha y horario'}), 409
         
         reserva_id = str(uuid.uuid4())
         # crea la reserva
@@ -140,6 +156,11 @@ def get_mis_reservas():
         
         cursor.close()
         conn.close()
+
+        for reserva in reservas:
+            reserva['fecha_reserva'] = reserva['fecha_reserva'].isoformat().split('T')[0]
+            reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat().split('T')[0]
+            reserva['hora_servicio'] = f"{int(reserva['hora_servicio']):02d}:00"
         
         return jsonify(reservas), 200
         
@@ -299,12 +320,9 @@ def get_reserva(id):
         # Convert Decimal to float for JSON serialization
         if reserva.get('servicio_precio'):
             reserva['servicio_precio'] = float(reserva['servicio_precio'])
-        
-        # Format datetime fields
-        if reserva.get('fecha_reserva'):
-            reserva['fecha_reserva'] = reserva['fecha_reserva'].isoformat()
-        if reserva.get('fecha_servicio'):
-            reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat()
+
+        reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat().split('T')[0]
+        reserva['hora_servicio'] = f"{int(reserva['hora_servicio']):02d}:00"
         
         return jsonify(reserva), 200
 
@@ -403,7 +421,7 @@ def servicio_reservas(id):
         
         for reserva in reservas:
             reserva['fecha_reserva'] = reserva['fecha_reserva'].isoformat()
-            reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat()
+            reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat().split('T')[0]
             reserva['hora_servicio'] = f"{int(reserva['hora_servicio']):02d}:00"
 
         return jsonify(reservas), 200
