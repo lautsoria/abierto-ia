@@ -2,69 +2,68 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href='{{ url_for('static', filename='css/editar_perfil.css', external='true') }}'>
+
     <title>Editar Perfil</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4>✏️ Editar Perfil ({{ usuario.rol|capitalize }})</h4>
+    <div class="profile-card">
+        <div class="card-header">
+            <h4>✏️ Editar Perfil ({{ usuario.rol|capitalize }})</h4>
+        </div>
+        
+        <div class="card-body">
+            
+            <form action="/perfil/editar" method="POST">
+                
+                <h5 class="form-section-title">Datos Personales</h5>
+                
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" name="nombre" value="{{ usuario.nombre }}" required>
                 </div>
-                <div class="card-body">
+
+                <div class="form-row form-group">
+                    <div>
+                        <label>Email</label>
+                        <input type="email" name="email" value="{{ usuario.email }}" required>
+                    </div>
+                    <div>
+                        <label>Teléfono</label>
+                        <input type="text" name="telefono" value="{{ usuario.telefono }}">
+                    </div>
+                </div>
+
+                {% if usuario.rol == 'proveedor' %}
+                    <hr>
+                    <h5 class="form-section-title">Datos Profesionales</h5>
                     
-                    <form action="/perfil/editar" method="POST">
-                        
-                        <h5 class="mb-3 text-muted">Datos Personales</h5>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Nombre Completo</label>
-                            <input type="text" name="nombre" class="form-control" value="{{ usuario.nombre }}" required>
-                        </div>
+                    <div class="alert-info">
+                        <small>ℹ️ Estos datos son públicos para tus clientes.</small>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" value="{{ usuario.email }}" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Teléfono</label>
-                                <input type="text" name="telefono" class="form-control" value="{{ usuario.telefono }}">
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>Profesión / Oficio</label>
+                        <input type="text" name="profesion" value="{{ usuario.profesion }}">
+                    </div>
 
-                        {% if usuario.rol == 'proveedor' %}
-                            <hr>
-                            <h5 class="mb-3 text-muted">Datos Profesionales</h5>
-                            <div class="alert alert-info py-2">
-                                <small>ℹ️ Estos datos son públicos para tus clientes.</small>
-                            </div>
+                    <div class="form-group">
+                        <label>Descripción / Presentación</label>
+                        <textarea name="descripcion" rows="3">{{ usuario.descripcion }}</textarea>
+                    </div>
+                {% endif %}
 
-                            <div class="mb-3">
-                                <label class="form-label">Profesión / Oficio</label>
-                                <input type="text" name="profesion" class="form-control" value="{{ usuario.profesion }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Descripción / Presentación</label>
-                                <textarea name="descripcion" class="form-control" rows="3">{{ usuario.descripcion }}</textarea>
-                            </div>
-                        {% endif %}
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-success btn-lg">Guardar Cambios</button>
-                            <a href="#" class="btn btn-secondary">Cancelar</a>
-                        </div>
-
-                    </form>
-
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    <a href="#" class="btn btn-secondary">Cancelar</a>
                 </div>
-            </div>
+
+            </form>
+
         </div>
     </div>
-</div>
 
 </body>
 </html>
