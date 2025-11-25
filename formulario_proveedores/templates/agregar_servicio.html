@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Agregar Servicio</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+
+<div class="container">
+  <h2>Publicar Servicio</h2>
+
+  <form method="POST">
+
+    <label>Nombre completo</label>
+    <input type="text" name="nombre" required>
+
+    <label>Teléfono</label>
+    <input type="text" name="telefono" required>
+
+    <label>Zona de trabajo</label>
+    <input type="text" name="zona" required>
+
+    <label>Tipo de servicio</label>
+    <select name="tipoServicio" required>
+      <option value="">Seleccionar...</option>
+      <option>Electricidad</option>
+      <option>Plomería</option>
+      <option>Gas</option>
+      <option>Instalación de aire acondicionado</option>
+      <option>Carpintería</option>
+      <option>Otros</option>
+    </select>
+
+    <label>Descripción</label>
+    <textarea name="descripcion"></textarea>
+
+    <label>Precio aproximado</label>
+    <input type="number" name="precio">
+
+    <button type="submit">Publicar servicio</button>
+
+  </form>
+
+  {% if mensaje %}
+    <p class="mensaje">{{ mensaje }}</p>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

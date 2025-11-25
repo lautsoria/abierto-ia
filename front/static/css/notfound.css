@@ -10,11 +10,12 @@ h1 {
   font-weight: bold;
   text-shadow: 4px 4px 8px rgba(0,0,0,0.3);
   font-family: 'Lemonada', cursive;
+  margin: 5px;
 }
 
 h4 {
   font-size: 2rem;
-  margin: 20px 0;
+  margin: 5px 0;
   text-transform: uppercase;
   letter-spacing: 3px;
 }
@@ -23,21 +24,30 @@ h4 {
   max-width: 300px;
   width: 100%;
   height: auto;
-  margin: 30px 0;
+  margin: 5px 0;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
-
+.full-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* centra verticalmente */
+    align-items: center;     /* centra horizontalmente */
+    min-height: 100vh;       /* asegura que sea al menos el alto de la ventana */
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;      
+    box-sizing: border-box;
+}
 p {
   font-size: 1.2rem;
   max-width: 600px;
-  margin: 20px auto;
   line-height: 1.6;
 }
 
 a {
   display: inline-block;
-  margin-top: 30px;
+  margin-top: 5px;
   padding: 15px 40px;
   background-color: white;
   color: #667eea;
