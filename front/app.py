@@ -427,6 +427,27 @@ def ver_usuarios():
 
     return render_template('usuarios.html',usuarios=usuarios)
 
+
+
+@app.route('/buscar')
+def buscar_servicios():
+    query = request.args.get("q", "").strip()
+
+    if not query:
+        return render_template("resultados_busqueda.html", servicios=[])
+
+    response = requests.get(f"{BACKEND_URL}/servicios/buscar", params={"q": query})
+
+    if response.status_code != 200:
+        return render_template("resultados_busqueda.html", servicios=[])
+
+    servicios = response.json()
+
+    return render_template("resultados_busqueda.html", servicios=servicios, query=query)
+
+
+
+
 if __name__ == '__main__':
     app.run("localhost", port=1230, debug=True)
 

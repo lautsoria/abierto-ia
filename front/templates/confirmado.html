@@ -9,7 +9,7 @@
     <div class="confirmado">
         <h2>Contanos qué te pareció el servicio</h2>
         <img src="{{ url_for('static', filename='images/confirmar.jpg') }}" alt="imagen_confirmado">
-        <form action="{{ url_for('confirmado') }}" method="POST">
+        <form action="{{ url_for('confirmar_servicio') }}" method="POST">
             <div class="form-group">
                 <label for="puntuacion">Puntuación del servicio:</label>
                 <select id="puntuacion" name="puntuacion" required>

@@ -26,14 +26,16 @@
       </div>
 
       <div class="header-center">
-        <form class="search-form" role="search">
-          <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Buscar servicios" 
-            maxlength="120"
-          >
-          <button type="submit" class="search-btn">🔍</button>
+          <form class="search-form" role="search" action="{{ url_for('buscar_servicios') }}" method="GET">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Buscar servicios" 
+              maxlength="120"
+              name="q"
+              required
+            >
+            <button type="submit" class="search-btn">🔍</button>
         </form>
       </div>    
 
