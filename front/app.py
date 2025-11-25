@@ -3,13 +3,10 @@ from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, 
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
+import qrcode
 
 from static.icons import icons
 from back_calls.calls import *
-
-
-
-import qrcode
 
 
 env_path = os.path.join(os.path.dirname(__file__), '..', '.env')

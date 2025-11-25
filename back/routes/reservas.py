@@ -126,7 +126,7 @@ def get_mis_reservas():
                 INNER JOIN usuarios u ON p.usuario_id = u.id
                 INNER JOIN categorias c ON s.categoria_id = c.id
                 WHERE r.usuario_id = %s
-                ORDER BY r.fecha_reserva DESC
+                ORDER BY r.fecha_servicio ASC
             """
             cursor.execute(query, (usuario_id,))
             
@@ -147,7 +147,7 @@ def get_mis_reservas():
                     INNER JOIN usuarios u ON r.usuario_id = u.id
                     INNER JOIN categorias c ON s.categoria_id = c.id
                     WHERE p.usuario_id = %s
-                    ORDER BY r.fecha_reserva DESC
+                    ORDER BY r.fecha_servicio DESC
             """
             cursor.execute(query, (usuario_id,))
 
