@@ -1,3 +1,58 @@
+## 25 de Noviembre, 2025
+
+### Sistema de Confirmación de Servicio con QR
+
+**Generación de QR:**
+- Implementado sistema de códigos QR para confirmar servicios realizados
+- Proveedores pueden generar QR desde la página de reservas
+- QR contiene URL de confirmación: `/reservas/confirmar-servicio/{id_reserva}/{token}`
+- Imagen QR guardada en `static/qr_reserva_{id}.png`
+
+**Endpoint de Confirmación:**
+- Simplificado endpoint `POST /reservas/confirmar-servicio/<id_reserva>/<token>`
+- Eliminada dependencia de columna `token_qr` - ahora usa el ID de reserva como token
+- Actualiza estado de reserva a 'realizado' al escanear QR válido
+
+### Limpieza y Refactorización de Código
+
+**Backend - Auth (`auth.py`):**
+- Eliminado código comentado de bcrypt (hashing de contraseñas no implementado aún)
+- Removido logger no utilizado
+- Simplificados imports innecesarios
+- Agregado `datetime` import para uso futuro
+- Query de login ahora incluye `fecha_registro` del usuario
+
+**Backend - Reservas (`reservas.py`):**
+- Cambiado `GET /reservas` de JSON body a query parameters (`request.args`)
+- Fixed alias incorrecto: `uc.id` → `u.id` en JOIN de usuarios para reservas de proveedor
+- Eliminada validación de rol redundante (else branch)
+- Mejorado manejo de errores: `str(e)` en lugar de `e` directamente
+- Comentado endpoint `/reservas/<id>/token` (deprecado - ya no se usa `token_qr`)
+
+**Base de Datos (`init_db.sql`):**
+- Eliminada columna `token_qr` de tabla `reservas` (simplificación del modelo)
+- Actualizado INSERT de reservas dummy para reflejar nuevo schema
+
+### Mejoras en Frontend
+
+**Página de Reservas (`reservas.html`):**
+- Botón de generar QR ahora solo visible para proveedores
+- Corregido `url_for('generarqr')` con parámetro `id_reserva`
+- Variable de rol obtenida directamente del JWT en lugar de request adicional
+
+**Flujo de Mis Reservas (`app.py`):**
+- Admins ahora ven todas las reservas automáticamente (`/reservas/todas`)
+- Eliminado request redundante a `/usuarios/{id}` para obtener rol
+- Rol se obtiene directamente de `get_jwt()['rol']`
+- Simplificada lógica de obtención de reservas según rol
+
+**Registro de Proveedores:**
+- Proveedores nuevos son redirigidos a completar perfil después del registro
+- Mensaje flash cambiado de "Inicio de sesión exitoso" a "Usuario creado con éxito"
+
+**Generación de QR (`calls.py`):**
+- URL de confirmación actualizada a `/reservas/confirmar-servicio/{id}/{token}`
+
 ## 21 de Noviembre, 2025
 
 ### Sistema de Redirección Post-Login
