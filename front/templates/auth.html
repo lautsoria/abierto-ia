@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href='{{ url_for('static', filename='css/auth.css') }}'>
+  <title>Login</title>
+</head>
+
+<body>
+<div class="Formulario" >
+    <div class="flip-card" id="flipCard">
+        <div class="flip-card-inner">
+            <div class="flip-card-front">
+                <form id="loginForm" method="POST" action="{{ url_for('login', next=next) }}">
+                <h1>Login</h1>
+                <input type="text" id="credential" name="credential" placeholder="Nombre de usuario" required>
+                <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                <div style="position: relative;">                    
+                    <input type="checkbox" id="recordarContraseña">
+                    <label for="recordarContraseña">Recordar Constraseña</label>
+                    <div class="password-toggle" onclick="togglePasswordVisibility()">
+                    </div>
+                </div>
+                <button type= "submit">Iniciar Sesion</button>
+                <span id="loginMessage"></span>
+
+            </form>
+            <span class="toggle-text" id="Registertext">Registrarse</span>
+            </div>
+            <div class="flip-card-back">
+                <form id="registerForm" method="POST" action="{{ url_for('register', next=next) }}">
+                <h1>Registrate</h1>
+                <input type="text" id="newUser" name="newUser" placeholder="Nombre de usuario" required>
+                <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+                <input type="password" id="newPassword" name="newPassword" placeholder="Contraseña" required>
+                <input type="password" id="newPassword2" name="newPassword2" placeholder="Repetir Contraseña" required>
+                <div class="proveedor-checkbox">
+                    <input type="checkbox" id="isProveedor" name="isProveedor" value="true">
+                    <label for="isProveedor">Soy proveedor</label>
+                </div>
+                <button type="submit">Registrarse</button>
+                </form>
+                <span id="registerMessage"></span>
+                <span class="toggle-text" id="loginText">volver al <strong class="resaltado">Inicio de Sesion</strong></span>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>

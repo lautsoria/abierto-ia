@@ -1,0 +1,203 @@
+{% extends "base/base.html" %}
+
+{% block title %}Checkout - {{ servicio.nombre }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-main">
+        <h1 class="checkout-title">Confirmá tu reserva</h1>
+
+        <form id="bookingForm" action="{{ url_for('crear_reserva', servicio=servicio.id) }}" method="POST">
+            
+            <div class="card">
+                <h2 class="section-title">Servicio seleccionado</h2>
+                <div class="service-preview">
+                    <img src="{{ servicio.imagen or 'https://via.placeholder.com/80' }}" alt="{{ servicio.nombre }}" class="service-img">
+                    <div class="service-info">
+                        <h3>{{ servicio.nombre }}</h3>
+                        <p class="service-provider">Por {{ servicio.proveedor_nombre }}</p>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 1.5rem;">¿Cuándo lo necesitás?</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="fecha">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="hora">Hora preferida</label>
+                        <select id="hora" name="hora" class="form-control" required>
+                            <option value="">Seleccioná un horario</option>
+                            {% if servicio.horarios %}
+                                {% for horario in servicio.horarios %}
+                                    <option id="{{ horario }}" value="{{ horario }}">{{ horario }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 1.5rem;">Ubicación del servicio</h2>
+                <div class="form-group">
+                    <label class="form-label" for="direccion">Dirección (CABA)</label>
+                    <input type="text" id="direccion" name="direccion" class="form-control" placeholder="Ej: Av. Corrientes 1234" required>
+                    <div id="addressError" class="validation-message">Por favor ingresá una dirección válida en CABA.</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="notas_direccion">Piso / Depto / Entre calles (Opcional)</label>
+                    <input type="text" id="notas_direccion" name="notas_direccion" class="form-control" placeholder="Ej: 2B, entre Talcahuano y Libertad">
+                </div>
+
+                <h2 class="section-title" style="margin-top: 1.5rem;">Mensaje para el profesional</h2>
+                <div class="form-group">
+                    <label class="form-label" for="mensaje">Detalles adicionales</label>
+                    <textarea id="mensaje" name="mensaje" class="form-control" placeholder="Contale al profesional más detalles sobre lo que necesitás..."></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <aside class="checkout-sidebar">
+        <div class="summary-card">
+            <div class="summary-title">Resumen de contratación</div>
+            
+            <div class="summary-row">
+                <span>Servicio</span>
+                <span>$ {{ servicio.precio }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Cargo por servicio</span>
+                <span style="color: #00a650;">Gratis</span>
+            </div>
+
+            <div class="summary-total">
+                <span>Total</span>
+                <span>$ {{ servicio.precio }}</span>
+            </div>
+
+            <button type="submit" form="bookingForm" class="btn-confirm">Confirmar reserva</button>
+            
+            <div style="margin-top: 1rem; font-size: 12px; color: #999; text-align: center;">
+                Al confirmar, aceptás los términos y condiciones de Abierto IA.
+            </div>
+        </div>
+    </aside>
+</div>
+
+  {% block scripts %}
+  <script>
+    let min = new Date()
+    let max = new Date(min) 
+    // podra reservar para el dia siguiente
+    min.setDate(min.getDate() + 1)
+    // y hasta 15 dias despues
+    max.setDate(min.getDate() + 15)
+    min = min.toISOString().split('T')[0]
+    max = max.toISOString().split('T')[0]
+    document.getElementById('fecha').setAttribute('min', min)
+    document.getElementById('fecha').setAttribute('max', max)
+
+    const bookings = {{ reservas | tojson }}
+
+    /* 
+    cuando el usuario selecciona una fecha en el calendario, esta variable cambia
+    a esa fecha para poder verificar si tiene reservas
+    */
+    const options = document.getElementById('hora').options
+    const validOptions = Array(...options).filter((op) => op.value.length > 0)
+
+    function pickedTimes(date) {
+        // devuelve los horarios no disponibles segun el dia
+        return bookings
+            .filter(b => b.fecha_servicio.split('T')[0] === date)
+            .map(b => b.hora_servicio);
+    }
+
+    function isDateFull(date) {
+        // vemos si todos los horarios del dia estan ocupados
+        const bookedHours = pickedTimes(date);
+        return validOptions.every(op => bookedHours.includes(op.value));
+    }
+
+    function nextAvailableDate(fromDate) {
+
+        const maxDate = new Date(document.getElementById('fecha').getAttribute('max'));
+        let checkDate = new Date(fromDate);
+        checkDate.setDate(checkDate.getDate() + 1);
+
+        while (checkDate <= maxDate) {
+            const dateStr = checkDate.toISOString().split('T')[0];
+            if (!isDateFull(dateStr)) {
+                return dateStr;
+            }
+            checkDate.setDate(checkDate.getDate() + 1);
+        }
+        return null;
+    }
+
+    function display(dateStr) {
+        const date = new Date(dateStr + 'T00:00:00');
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        return date.toLocaleDateString('es-AR', options);
+    }
+
+    let datePicker = document.getElementById('fecha').addEventListener('change', () => {
+        /* 
+        reseteamos las opciones para que todas esten disponibles antes 
+        de invalidar las no disponibles
+        */
+        validOptions.forEach(op => {
+            op.disabled = false;
+            if (op.value) op.textContent = op.value;
+        });
+
+        const selectedDate = document.getElementById('fecha').value
+        bookings.forEach(booking => {
+            if (booking.fecha_servicio.split('T')[0] === selectedDate) {
+                validOptions.forEach((op) => {
+                    if (op.value === booking.hora_servicio) {
+                        op.disabled = true;
+                    }
+                })
+            }
+        });
+
+        const allDisabled = validOptions.every((op) => op.disabled)
+        if (allDisabled) {
+            const nextAvailable = nextAvailableDate(selectedDate);
+            if (nextAvailable) {
+                const formattedDate = display(nextAvailable);
+                alert(`El día seleccionado no tiene horarios disponibles.\n\nPróxima fecha disponible: ${formattedDate}`);
+            } else {
+                alert('El día seleccionado no tiene horarios disponibles.\n\nNo hay fechas disponibles en los próximos 15 días.');
+            }
+            document.getElementById('fecha').value = '';
+            document.getElementById('hora').value = '';
+        }
+    })
+
+    // manejamos el input de la direccion
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        const addressInput = document.getElementById('direccion');
+        const addressError = document.getElementById('addressError');
+        
+        if (addressInput.value.length < 5) {
+            e.preventDefault();
+            addressInput.style.borderColor = '#d32f2f';
+            addressError.style.display = 'block';
+            addressError.textContent = 'La dirección es muy corta.';
+            return;
+        }
+
+        addressInput.style.borderColor = '#ccc';
+        addressError.style.display = 'none';
+    });
+  </script>
+  {% endblock %}
+{% endblock %}
+

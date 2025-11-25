@@ -1,0 +1,59 @@
+{% extends "base/base.html" %}
+{% block title %}Lista De Usuarios{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/usuarios.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Gestión de Usuarios</h1>
+        
+    </div>
+    {% if usuarios %}
+    <div class="table-container">
+        <table class="usuarios-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Fecha Registro</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.id }}</td>
+                    <td>{{ usuario.nombre }}</td>
+                    <td>{{ usuario.email }}</td>
+                    <td>
+                        <span class="badge badge-{{ usuario.rol }}">
+                            {{ usuario.rol }}
+                        </span>
+                    </td>
+                    <td>{{ usuario.fecha_registro }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('eliminar_usuario', id=usuario.id) }}" 
+                           class="btn-icon btn-delete" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-users fa-4x"></i>
+        <h2>No hay usuarios registrados</h2>
+        
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+

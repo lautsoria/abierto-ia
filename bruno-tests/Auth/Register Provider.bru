@@ -1,0 +1,30 @@
+meta {
+  name: Register Provider
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "user": "provider_{{$randomInt}}",
+    "email": "provider{{$randomInt}}@example.com",
+    "password": "provpass123",
+    "provider": true
+  }
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response has message", function() {
+    expect(res.body.message).to.include('creado correctamente');
+  });
+}

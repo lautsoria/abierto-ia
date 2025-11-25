@@ -1,0 +1,194 @@
+
+body {
+    background-color: #ededed;
+    font-family: "Proxima Nova", -apple-system, "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+}
+
+.checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+}
+
+.checkout-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.checkout-sidebar {
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+    margin-top: 0; 
+}
+
+.card {
+    background: white;
+    border-radius: 4px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.12);
+}
+
+h1.checkout-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+h2.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.service-preview {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+}
+
+.service-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    background-color: #eee;
+}
+
+.service-info h3 {
+    font-size: 16px;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.service-provider {
+    font-size: 14px;
+    color: #666;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+.form-control:focus {
+    border-color: #3483fa;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 131, 250, 0.1);
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+.validation-message {
+    color: #d32f2f;
+    font-size: 12px;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 4px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.12);
+}
+
+.summary-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 14px;
+    color: #666;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+}
+
+.btn-confirm {
+    background-color: #3483fa;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 1rem;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1.5rem;
+}
+
+.btn-confirm:hover {
+    background-color: #2968c8;
+}
+
+@media (max-width: 900px) {
+    .checkout-container {
+        grid-template-columns: 1fr;
+    }
+    .checkout-sidebar {
+        position: static;
+    }
+}

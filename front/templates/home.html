@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href='{{ url_for('static', filename='css/styles.css', external='true') }}'>
-</head>
-<body>
+{% extends "base/base.html" %}
+
+{% block title %}Home - Mercado Servicios{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+{% endblock %}
+
+{% block content %}
 <section class="servicios">
  <div class="banner-container">
         <div class="banner-content">
@@ -42,71 +42,25 @@
     </div>
 </section>
 
-<section class="categorias">
-    <h2 class="section-title">Categorías populares</h2>
+<section class="categorias" id="categorias">
+    <div class="container">
+        <h2 class="section-title">Categorías</h2>
 
-    <div class="categorias-grid">
-        
+        <div class="categorias-grid">
+
+        {% for cat in categorias %}
+        <a href="{{ url_for('categoria', nombre=cat.nombre) }}" style="text-decoration: none; color: inherit;">
         <article class="categoria-card">
-            <div class="card-icon icon-electricista">
-                <span>⚡</span>
+            <div class="card-icon">
+                <span>{{ cat.icono }}</span>
             </div>
-            <h3 class="card-title">Electricista</h3>
-            <p class="card-subtitle">234 profesionales</p>
+            <h3 class="card-title">{{ cat.nombre }}</h3>
+            <p class="card-subtitle">{{ cat.total_profesionales }} profesionales</p>
         </article>
+        </a>
+        {% endfor %}
 
-        <article class="categoria-card">
-            <div class="card-icon icon-plomeria">
-                <span>💧</span>
-            </div>
-            <h3 class="card-title">Plomería</h3>
-            <p class="card-subtitle">189 profesionales</p>
-        </article>
-
-        <article class="categoria-card">
-            <div class="card-icon icon-pintura">
-                <span>📌</span> </div>
-            <h3 class="card-title">Pintura</h3>
-            <p class="card-subtitle">156 profesionales</p>
-        </article>
-
-        <article class="categoria-card">
-            <div class="card-icon icon-carpinteria">
-                <span>🔨</span>
-            </div>
-            <h3 class="card-title">Carpintería</h3>
-            <p class="card-subtitle">143 profesionales</p>
-        </article>
-
-        <article class="categoria-card">
-            <div class="card-icon icon-cerrajeria">
-                <span>🔑</span> </div>
-            <h3 class="card-title">Cerrajería</h3>
-            <p class="card-subtitle">98 profesionales</p>
-        </article>
-
-        <article class="categoria-card">
-            <div class="card-icon icon-limpieza">
-                <span>✨</span> </div>
-            <h3 class="card-title">Limpieza</h3>
-            <p class="card-subtitle">267 profesionales</p>
-        </article>
-
-        <article class="categoria-card">
-            <div class="card-icon icon-aire">
-                <span>💨</span> </div>
-            <h3 class="card-title">Aire Acondicionado</h3>
-            <p class="card-subtitle">121 profesionales</p>
-        </article>
-
-        <article class="categoria-card">
-            <div class="card-icon icon-jardineria">
-                <span>🌿</span>
-            </div>
-            <h3 class="card-title">Jardinería</h3>
-            <p class="card-subtitle">178 profesionales</p>
-        </article>
-
+    </div>
     </div>
 </section>
 
@@ -116,187 +70,48 @@
 
         <div class="services-grid">
             
+            {% for servicio in servicios %}
             <div class="service-card">
                 <div class="card-image-container">
-                    <img src="t" alt="Instalación Eléctrica">
+                    <img src="{{ servicio.imagen if servicio.imagen else 'https://via.placeholder.com/300x200?text=Servicio' }}" alt="{{ servicio.nombre }}">
+                    {% if servicio.rating and servicio.rating >= 4.5 %}
                     <span class="badge">Destacado</span>
+                    {% endif %}
                 </div>
                 <div class="card-body">
-                    <h3>Instalación Eléctrica Completa</h3>
-                    <p>Instalación y reparación de sistemas eléctricos, certificado incluido.</p>
+                    <h3>{{ servicio.nombre }}</h3>
+                    <p>{{ servicio.descripcion }}</p>
                     <div class="rating">
                         <div class="stars">
-                            <span class="filled">★★★★</span><span class="empty">★</span>
+                            {% if servicio.rating %}
+                                {% set rating_entero = servicio.rating | int %}
+                                {% set tiene_media = (servicio.rating - rating_entero) >= 0.5 %}
+                                
+                                {# Estrellas llenas #}
+                                <span class="filled">
+                                    {% for i in range(rating_entero) %}★{% endfor %}
+                                </span>
+                                
+                                {# Estrellas vacías #}
+                                <span class="empty">
+                                    {% for i in range(5 - rating_entero) %}★{% endfor %}
+                                </span>
+                            {% else %}
+                                <span class="empty">★★★★★</span>
+                            {% endif %}
                         </div>
-                        <span class="review-count">(127)</span>
+                        <span class="review-count">({{ servicio.reviews_count if servicio.reviews_count else 0 }})</span>
                     </div>
                     <div class="card-footer">
                         <div class="price">
                             <span>Desde</span>
-                            <strong>$15.000</strong>
+                            <strong>${{ "{:,.0f}".format(servicio.precio | float) }}</strong>
                         </div>
-                        <a href="#" class="btn-contact">Contactar</a>
+                        <a href="{{ url_for('servicio', id=servicio.id) }}" class="btn-contact">Reservar</a>
                     </div>
                 </div>
             </div>
-
-            <div class="service-card">
-                <div class="card-image-container">
-                    <img src="" alt="Reparación de Plomería">
-                    <span class="badge">Destacado</span>
-                </div>
-                <div class="card-body">
-                    <h3>Reparación de Plomería 24/7</h3>
-                    <p>Servicio de urgencia para fugas, destapes y reparaciones.</p>
-                    <div class="rating">
-                        <div class="stars">
-                            <span class="filled">★★★★</span><span class="empty">★</span>
-                        </div>
-                        <span class="review-count">(203)</span>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <span>Desde</span>
-                            <strong>$8.000</strong>
-                        </div>
-                        <a href="#" class="btn-contact">Contactar</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="service-card">
-                <div class="card-image-container">
-                    <img src="" alt="Pintura de Interiores">
-                </div>
-                <div class="card-body">
-                    <h3>Pintura de Interiores</h3>
-                    <p>Pintura profesional para casas y departamentos, materiales incluidos.</p>
-                    <div class="rating">
-                        <div class="stars">
-                            <span class="filled">★★★★</span><span class="empty">★</span>
-                        </div>
-                        <span class="review-count">(156)</span>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <span>Desde</span>
-                            <strong>$12.000</strong>
-                        </div>
-                        <a href="#" class="btn-contact">Contactar</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="service-card">
-                <div class="card-image-container">
-                    <img src="" alt="Carpintería a Medida">
-                </div>
-                <div class="card-body">
-                    <h3>Carpintería a Medida</h3>
-                    <p>Muebles personalizados, reparación y restauración de madera.</p>
-                    <div class="rating">
-                        <div class="stars">
-                            <span class="filled">★★★★★</span><span class="empty"></span>
-                        </div>
-                        <span class="review-count">(89)</span>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <span>Desde</span>
-                            <strong>$18.000</strong>
-                        </div>
-                        <a href="#" class="btn-contact">Contactar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="service-card">
-                <div class="card-image-container">
-                    <img src="" alt="Cerrajero profesional">
-                </div>
-                <div class="card-body">
-                    <h3>Cerrajero profesional</h3>
-                    <p>Apertura de  puertas, cambio de cerraduras y duplicado de llaves</p>
-                    <div class="rating">
-                        <div class="stars">
-                            <span class="filled">★★★★</span><span class="empty">★</span>
-                        </div>
-                        <span class="review-count">(142)</span>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <span>Desde</span>
-                            <strong>$6.500</strong>
-                        </div>
-                        <a href="#" class="btn-contact">Contactar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="service-card">
-                <div class="card-image-container">
-                    <img src="" alt="Limpieza profunda del hogar">
-                </div>
-                <div class="card-body">
-                    <h3>Limpieza profunda del hogar</h3>
-                    <p>Servicio completo de limpieza residencial con productos ecologicos</p>
-                    <div class="rating">
-                        <div class="stars">
-                            <span class="filled">★★★★</span><span class="empty">★</span>
-                        </div>
-                        <span class="review-count">(234)</span>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <span>Desde</span>
-                            <strong>$12.000</strong>
-                        </div>
-                        <a href="#" class="btn-contact">Contactar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="service-card">
-                <div class="card-image-container">
-                    <img src="" alt="Instalación y reparación del A/C">
-                </div>
-                <div class="card-body">
-                    <h3>Instalación y reparación del A/C</h3>
-                    <p>Mantenimiento, instalación y reparación de aires acondicionados</p>
-                    <div class="rating">
-                        <div class="stars">
-                            <span class="filled">★★★★</span><span class="empty">★</span>
-                        </div>
-                        <span class="review-count">(98)</span>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <span>Desde</span>
-                            <strong>$14.000</strong>
-                        </div>
-                        <a href="#" class="btn-contact">Contactar</a>
-                    </div>
-                </div>
-            </div>
-            <div class="service-card">
-                <div class="card-image-container">
-                    <img src="" alt="Diseño y mantenimiento del jardin">
-                </div>
-                <div class="card-body">
-                    <h3>Diseño y mantenimiento del jardin</h3>
-                    <p>Jardinería, poda, diseño de paisajes y mantenimiento</p>
-                    <div class="rating">
-                        <div class="stars">
-                            <span class="filled">★★★★</span><span class="empty">★</span>
-                        </div>
-                        <span class="review-count">(167)</span>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <span>Desde</span>
-                            <strong>$11.000</strong>
-                        </div>
-                        <a href="#" class="btn-contact">Contactar</a>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
 
             </div>
     </div>
@@ -371,6 +186,4 @@
         </div>
     </div>
 </section>
-
-</body>
-</html>
+{% endblock %}

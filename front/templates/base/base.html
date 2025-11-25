@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href='{{ url_for('static', filename='css/styles.css', external='true') }}'>
   <title>{% block title %}Base{% endblock %}</title>
+  <link rel="stylesheet" href='{{ url_for('static', filename='css/base.css', external='true') }}'>
+  {% block styles %}{% endblock %}
 </head>
 
 <body>
@@ -13,53 +14,110 @@
       <div class="header-left">
         <div class="logo">
           <span class="logo-icon">🤝</span>
-          <span class="logo-text">mercado<br><strong>libre</strong></span>
+          <span class="logo-text">Mercado<br><strong>Servicios</strong></span>
         </div>
         <div class="location">
           <span class="location-icon">📍</span>
           <div>
-            <span class="location-label">Enviar a</span>
-            <span class="location-text">Capital Federal</span>
+            <span class="location-label">Servicios De</span>
+            <span class="location-text">Toda Argentina</span>
           </div>
         </div>
       </div>
 
       <div class="header-center">
-        <form class="search-form" role="search">
-          <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Buscar productos, marcas y más…" 
-            maxlength="120"
-          >
-          <button type="submit" class="search-btn">🔍</button>
+          <form class="search-form" role="search" action="{{ url_for('buscar_servicios') }}" method="GET">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Buscar servicios" 
+              maxlength="120"
+              name="q"
+              required
+            >
+            <button type="submit" class="search-btn">🔍</button>
         </form>
-      </div>
+      </div>    
 
-      <div class="header-right">
-        <button class="promo-btn">ENVÍO GRATIS<br><strong>EN TU PRIMERA COMPRA</strong></button>
-      </div>
+      <nav class="header-nav">
+        {% if data %}
+          {% if data.rol == 'proveedor' %}
+            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Calendario</a>
+            <a href="{{ url_for('home') }}#categorias" class="nav-link">Registrar servicio</a>
+            <a href="#" class="nav-link end">Mi perfil</a>
+            <a href="#" class="nav-link">Mis servicios</a>
+          {% endif %}
+
+          {% if data.rol == 'cliente' %}
+            <a href="{{ url_for('home') }}#categorias" class="nav-link">Categorías</a>
+            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Reservas Agendadas</a>
+            <a href="{{ url_for('perfil') }}" class="nav-link end">Mi Perfil</a>   
+          {% endif %}
+          
+          {% if data.rol == 'admin' %}
+            <a href="{{ url_for('admin-categorias') }}" class="nav-link">Categorías</a>
+            <a href="{{ url_for('admin-servicios') }}" class="nav-link">Servicios</a>
+            <a href="{{ url_for('admin-usuarios') }}" class="nav-link end">Usuarios</a>  
+          {% endif %}
+        
+        {% else %}
+          <a href="{{ url_for('home') }}#categorias" class="nav-link">Categorías</a>
+          <a href="{{ url_for('auth') }}" class="nav-link end">Inicia Sesion</a>
+        {% endif %}
+      </nav>
     </div>
-
-    <nav class="header-nav">
-      <a href="#" class="nav-link">Categorías</a>
-      <a href="#" class="nav-link">Ofertas</a>
-      <a href="#" class="nav-link">Cupones</a>
-      <a href="#" class="nav-link">Supermercado</a>
-      <a href="#" class="nav-link">Moda</a>
-      <a href="#" class="nav-link">Mercado Play</a>
-      <a href="#" class="nav-link">Vender</a>
-      <a href="#" class="nav-link">Ayuda</a>
-      <a href="#" class="nav-link">Creá tu cuenta</a>
-      <a href="#" class="nav-link">Ingresá</a>
-      <a href="#" class="nav-link">🛒</a>
-    </nav>
   </header>
   {% block content %}
   {% endblock %}
-  <footer>
+  
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3 class="footer-title">Acerca de</h3>
+        <ul class="footer-links">
+          <li><a href="#">Sobre nosotros</a></li>
+          <li><a href="#">Términos y condiciones</a></li>
+          <li><a href="#">Políticas de privacidad</a></li>
+          <li><a href="#">Trabaja con nosotros</a></li>
+        </ul>
+      </div>
 
+      <div class="footer-section">
+        <h3 class="footer-title">Ayuda</h3>
+        <ul class="footer-links">
+          <li><a href="#">Cómo comprar</a></li>
+          <li><a href="#">Cómo vender</a></li>
+          <li><a href="#">Resolución de problemas</a></li>
+          <li><a href="#">Centro de seguridad</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3 class="footer-title">Tu cuenta</h3>
+        <ul class="footer-links">
+          <!-- <li><a href="#">Ingresá</a></li> -->
+          <li><a href="#">Mis compras</a></li>
+          <li><a href="#">Favoritos</a></li>
+          <li><a href="#">Vender</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3 class="footer-title">Redes sociales</h3>
+        <ul class="footer-links">
+          <li><a href="#">Facebook</a></li>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">YouTube</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 Mercado Servicios. Todos los derechos reservados.</p>
+    </div>
   </footer>
+  
   {% block scripts %}
   {% endblock %}
 </body>

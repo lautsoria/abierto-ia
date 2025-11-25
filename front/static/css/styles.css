@@ -1,176 +1,9 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  color: #333;
-}
-
-/* Header */
-header.header {
-  background-color: #FFF44F;
-  padding: 8px 16px;
-}
-
-/* Top section */
-.header-top {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 60px;
-}
-
-/* Left side - Logo and Location */
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-shrink: 0;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #333;
-  font-size: 12px;
-  line-height: 1.2;
-}
-
-.logo-icon {
-  font-size: 24px;
-}
-
-.location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.location-icon {
-  font-size: 16px;
-}
-
-.location-label {
-  display: block;
-  font-size: 11px;
-  color: #999;
-}
-
-.location-text {
-  display: block;
-  font-weight: bold;
-  font-size: 12px;
-}
-
-/* Center - Search */
-.header-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  min-width: 200px;
-}
-
-.search-form {
-  width: 100%;
-  max-width: 550px;
-  display: flex;
-  background: white;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.search-input {
-  flex: 1;
-  border: none;
-  padding: 12px 16px;
-  font-size: 14px;
-  outline: none;
-  background: white;
-}
-
-.search-input::placeholder {
-  color: #999;
-}
-
-.search-btn {
-  background: none;
-  border: none;
-  padding: 12px 16px;
-  font-size: 16px;
-  cursor: pointer;
-  color: #999;
-  transition: color 0.2s;
-}
-
-.search-btn:hover {
-  color: #333;
-}
-
-/* Right side - Promo */
-.header-right {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.promo-btn {
-  background-color: #1F3A93;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-  line-height: 1.3;
-  transition: background-color 0.2s;
-}
-
-.promo-btn:hover {
-  background-color: #162a6a;
-}
-
-/* Navigation */
-.header-nav {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  max-width: 1200px;
-  margin: 0 auto;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding-top: 8px;
-  padding-bottom: 8px;
-  flex-wrap: wrap;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: #333;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 4px 12px;
-  transition: color 0.2s;
-  white-space: nowrap;
-}
-
-.nav-link:hover {
-  color: #1F3A93;
-}
-
 /*Home*/
 
 /*Servicios*/
+body {
+    background-color: #ebebeb;
+}
 
 .servicios {
     background-color: #0052ff;
@@ -307,7 +140,7 @@ header.header {
 /*Categorias*/
 
 .categorias{
-    padding: 20px;
+    padding: 50px 0;
     background-color: rgb(202, 202, 202);
 }
 
@@ -332,6 +165,7 @@ header.header {
    
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .categoria-card:hover {

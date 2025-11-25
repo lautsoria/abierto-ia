@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<h2>Agregar Servicio</h2>
+
+<form method="POST">
+    <input type="text" name="titulo" placeholder="Título del servicio" required>
+    <textarea name="descripcion" placeholder="Descripción"></textarea>
+    <input type="number" name="precio" placeholder="Precio">
+    <button type="submit">Agregar</button>
+</form>
+{% endblock %}

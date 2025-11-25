@@ -1,0 +1,25 @@
+meta {
+  name: Get Proveedores By Service
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/proveedores/?servicio=plomería
+  body: none
+  auth: none
+}
+
+params:query {
+  servicio: plomería
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response is an array", function() {
+    expect(res.body).to.be.an('array');
+  });
+}

@@ -1,0 +1,279 @@
+body {
+    background-color: #ededed;
+    font-family: "Proxima Nova", -apple-system, "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+    color: #333;
+}
+
+.main-container {
+    max-width: 1184px;
+    margin: 0 auto;
+    padding: 12px 0;
+}
+
+
+.breadcrumb {
+    font-size: 14px;
+    color: #3483fa;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 6px;
+}
+
+.breadcrumb a {
+    text-decoration: none;
+    color: #3483fa;
+}
+
+.breadcrumb span {
+    color: #999;
+}
+
+.product-container {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.12);
+    display: flex;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.gallery-container {
+    width: 700px;
+    display: flex;
+    gap: 16px;
+}
+
+.thumbnail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.thumbnail {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    object-fit: cover;
+}
+
+.thumbnail:hover {
+    border-color: #3483fa;
+}
+
+.main-image-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-image {
+    max-width: 100%;
+    max-height: 500px;
+    object-fit: contain;
+}
+
+.details-container {
+    width: 360px;
+    padding-left: 24px;
+    border-left: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.condition-sold {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.product-title {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.18;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.stars {
+    color: #3483fa;
+    font-size: 14px;
+}
+
+.reviews-count {
+    color: #666;
+    font-size: 14px;
+}
+
+.price-container {
+    margin-bottom: 24px;
+}
+
+.price {
+    font-size: 36px;
+    font-weight: 300;
+    color: #333;
+}
+
+.currency {
+    font-size: 36px;
+    font-weight: 300;
+    margin-right: 4px;
+}
+
+.payment-methods {
+    margin-bottom: 24px;
+}
+
+.payment-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.payment-options {
+    font-size: 14px;
+    color: #3483fa;
+}
+
+.actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: #3483fa;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background-color: #2968c8;
+}
+
+.btn-secondary {
+    background-color: rgba(65,137,230,.15);
+    color: #3483fa;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(65,137,230,.2);
+}
+
+.seller-info {
+    margin-top: 32px;
+    padding: 16px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.seller-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+}
+
+.seller-location {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #666;
+}
+
+.seller-reputation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #00a650;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.description-section {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.12);
+    padding: 32px;
+    margin-bottom: 20px;
+}
+
+.section-header {
+    font-size: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.description-content {
+    font-size: 20px;
+    color: #666;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.reviews-section {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.12);
+    padding: 32px;
+}
+
+.review-card {
+    border-bottom: 1px solid #eee;
+    padding: 16px 0;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.review-stars {
+    color: #3483fa;
+}
+
+.review-date {
+    color: #999;
+    font-size: 12px;
+}
+
+.review-text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.review-author {
+    font-size: 12px;
+    color: #999;
+    font-style: italic;
+}

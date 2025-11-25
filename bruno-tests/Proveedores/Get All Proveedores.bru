@@ -1,0 +1,31 @@
+meta {
+  name: Get All Proveedores
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/proveedores/
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response is an array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("Proveedores have required fields", function() {
+    if (res.body.length > 0) {
+      const proveedor = res.body[0];
+      expect(proveedor).to.have.property('id');
+      expect(proveedor).to.have.property('descripcion');
+      expect(proveedor).to.have.property('ubicacion');
+      expect(proveedor).to.have.property('telefono');
+    }
+  });
+}

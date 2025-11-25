@@ -1,0 +1,35 @@
+meta {
+  name: Get Top Rated Services
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/servicios/top-rating?limit=10
+  body: none
+  auth: none
+}
+
+params:query {
+  limit: 10
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response is an array", function() {
+    expect(res.body).to.be.an('array');
+  });
+  
+  test("Services have required fields", function() {
+    if (res.body.length > 0) {
+      const service = res.body[0];
+      expect(service).to.have.property('nombre');
+      expect(service).to.have.property('precio');
+      expect(service).to.have.property('categoria');
+      expect(service).to.have.property('rating');
+    }
+  });
+}
