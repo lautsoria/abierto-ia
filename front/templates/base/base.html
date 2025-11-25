@@ -39,18 +39,25 @@
 
       <nav class="header-nav">
         {% if data %}
-          {% if data.provider %}
+          {% if data.rol == 'proveedor' %}
             <a href="#categorias" class="nav-link">Registrar servicio</a>
             <a href="{{ url_for('mis_reservas') }}" class="nav-link">Calendario</a>
             <a href="#" class="nav-link end">Mi perfil</a>
             <a href="#" class="nav-link">Mis servicios</a>
-            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Reservas Agendadas</a>
-          {% else %}
+          {% endif %}
+
+          {% if data.rol == 'cliente' %}
             <a href="#categorias" class="nav-link">Categorías</a>
-            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Servicios Agendados</a>
-            <a href="{{ url_for('perfil') }}" class="nav-link end">Mi Perfil</a>          
-            <a href="" class="nav-link end">Ver 🛒</a>   
-          {% endif %}          
+            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Reservas Agendados</a>
+            <a href="{{ url_for('perfil') }}" class="nav-link end">Mi Perfil</a>   
+          {% endif %}
+          
+          {% if data.rol == 'admin' %}
+            <a href="{{ url_for('admin-categorias') }}" class="nav-link">Categorías</a>
+            <a href="{{ url_for('admin-servicios') }}" class="nav-link">Servicios</a>
+            <a href="{{ url_for('admin-usuarios') }}" class="nav-link end">Usuarios</a>  
+          {% endif %}
+        
         {% else %}
           <a href="#categorias" class="nav-link">Categorías</a>
           <a href="{{ url_for('mis_reservas') }}" class="nav-link">Mis Reservas</a>

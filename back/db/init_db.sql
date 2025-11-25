@@ -1,12 +1,14 @@
 DROP SCHEMA ids;
 CREATE DATABASE IF NOT EXISTS ids;
 use ids;
+
 CREATE TABLE IF NOT EXISTS roles (
   id UUID PRIMARY KEY,
   rol VARCHAR(50) UNIQUE NOT NULL
   -- hay que tener en cuenta que debemos tener solo 3 roles
   -- (cliente, proveedor, admin)
 );
+
 CREATE TABLE IF NOT EXISTS usuarios (
   id UUID PRIMARY KEY,
   usuario VARCHAR(25) NOT NULL UNIQUE,
@@ -58,7 +60,6 @@ CREATE TABLE IF NOT EXISTS reservas (
   direccion VARCHAR(100),
   estado ENUM('pendiente', 'confirmado', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
-  token_qr VARCHAR(64),
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 );
