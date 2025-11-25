@@ -7,7 +7,6 @@ servicios_bp = Blueprint('servicios', __name__)
 @servicios_bp.route('/<string:nombre>')
 def servicios_por_categoria(nombre):
     ubicacion = request.args.get('ubicacion', '')
-    # ordenar = request.args.get('ordenar', 'relevancia')
     
     try:
         conn = db_conn()
@@ -216,3 +215,56 @@ def servicio(id):
         return jsonify(servicio), 200
     except Exception as e:
         return jsonify({'error': e}), 400
+
+
+@servicios_bp.route('/servicios/buscar', methods=['GET'])
+def buscar_servicios():
+    q = request.args.get("q", "").strip()
+
+    if not q:
+        return jsonify([]), 200
+
+    palabras = q.split()
+
+    conditions = " OR ".join([
+        "(s.nombre LIKE %s OR s.descripcion LIKE %s)"
+        for _ in palabras
+    ])
+
+    params = []
+    for palabra in palabras:
+        like = f"%{palabra}%"
+        params.extend([like, like])
+
+    conn = db_conn()
+    cursor = conn.cursor(dictionary=True)
+
+    query = f"""
+        SELECT 
+            s.id,
+            s.nombre,
+            s.descripcion,
+            s.precio,
+
+            c.nombre AS categoria_nombre,
+
+            u.nombre AS proveedor_nombre,
+            
+
+            p.id AS proveedor_id
+
+        FROM servicios s
+        JOIN categorias c ON s.categoria_id = c.id
+        JOIN proveedores p ON s.proveedor_id = p.id
+        JOIN usuarios u ON p.usuario_id = u.id
+
+        WHERE {conditions}
+    """
+
+    cursor.execute(query, params)
+    servicios = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(servicios), 200

@@ -1,0 +1,31 @@
+{% extends "base/base.html" %}
+{% block title %}Busqueda de Servicios{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/resultados.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Resultados para "{{ query }}"</h2>
+
+    {% if servicios %}
+        <ul class="servicios-lista">
+            {% for s in servicios %}
+                <li class="servicio-item">
+                    <h3>{{ s.nombre }}</h3>
+                    <p>{{ s.descripcion }}</p>
+                    <p><strong>Categoría:</strong> {{ s.categoria }}</p>
+                    <p><strong>Proveedor:</strong> {{ s.proveedor_descripcion }}</p>
+                    <p><strong>Precio:</strong> ${{ s.precio }}</p>
+
+                    <a href="" class="btn-ver">
+                        Contratar Servicio
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron servicios.</p>
+    {% endif %}
+</div>
+{% endblock %}

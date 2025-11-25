@@ -7,6 +7,11 @@ from dotenv import load_dotenv
 from static.icons import icons
 from back_calls.calls import *
 
+
+
+import qrcode
+
+
 env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(dotenv_path=env_path)
 
@@ -75,14 +80,63 @@ def mis_reservas():
     return render_template("reservas.html", reservas=reservas, data=user_data, rol=rol), 201
 
 
-@app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
-def confirmar_servicio(id_reserva, token):
-    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
-    
+@app.route('/confirmar-servicio/<string:id_reserva>/<string:token>', methods=['GET', 'POST'])
+def confirmar_servicio(id_reserva):
+
+    # verificar que el usuario autenticado sea el dueño de la reserva
+    usuario_id = get_jwt_identity()
+
+    response_reserva = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
+    if response_reserva.status_code != 200:
+        return "Reserva no encontrada", 404
+
+    datos_reserva = response_reserva.json()
+    usuario_reserva = datos_reserva.get("usuario_id")
+
+    if usuario_id != usuario_reserva:
+        return "usuario incorrecto", 404
+
+    # confirmar el servicio con el id de reserva
+    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}")
     if response.status_code != 200:
-        return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido"))
-    
+        return "error desconocido", 404
+
+    # si es post
+    if request.method == "POST":
+        estrellas = int(request.form.get("puntuacion"))
+        descripcion = request.form.get("resena")
+
+        servicio_id = datos_reserva.get("servicio_id")
+
+
+        payload = {
+            "estrellas": estrellas,
+            "descripcion": descripcion,
+            "usuario_id":usuario_id,
+            "servicio_id":servicio_id
+        }
+
+        response = requests.post(
+            f"{BACKEND_URL}/proveedores/añadir_puntuacion/{id_reserva}",
+            json=payload
+        )
+
+        if response.status_code != 200:
+            return "Error al enviar la reseña", 400
+
+        return render_template("confirmado.html", id_reserva=id_reserva)
+
+    # si el usuario solo abrió la página (GET)
     return render_template("confirmado.html", id_reserva=id_reserva)
+ 
+
+
+def generar_qr(id_reserva):
+    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}"
+    qr = qrcode.make(url)
+    qr.save(f"static/qr_reserva_{id_reserva}.png")
+    return f"static/qr_reserva_{id_reserva}.png"
+
 
 
 @app.route('/generar-qr')
@@ -91,15 +145,13 @@ def generarqr():
     if not id_reserva:  
         return "Falta id_reserva", 400
     
-    # response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}/{token}")
-    # if response.status_code != 200:  
-    #     return "Reserva no encontrada", 404  
+    response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
+    if response.status_code != 200:  
+        return "Reserva no encontrada", 404  
     
-    # data = response.json()
-    # token = data["token_qr"]
-
-    qr_confirmacion = generar_qr(id_reserva, id_reserva)
-    return render_template("qr.html", qr_path=qr_confirmacion)
+    data = response.json()
+    qr_confirmacion = generar_qr(id_reserva)
+    return render_template("qr.html", qr_path=qr_confirmacion)  
 
 
 # TODO: cambiar como se obtiene el rol (se obtiene del JWT)
@@ -370,6 +422,27 @@ def ver_usuarios():
     usuarios = response.json()
 
     return render_template('usuarios.html',usuarios=usuarios)
+
+
+
+@app.route('/buscar')
+def buscar_servicios():
+    query = request.args.get("q", "").strip()
+
+    if not query:
+        return render_template("resultados_busqueda.html", servicios=[])
+
+    response = requests.get(f"{BACKEND_URL}/servicios/buscar", params={"q": query})
+
+    if response.status_code != 200:
+        return render_template("resultados_busqueda.html", servicios=[])
+
+    servicios = response.json()
+
+    return render_template("resultados_busqueda.html", servicios=servicios, query=query)
+
+
+
 
 if __name__ == '__main__':
     app.run("localhost", port=1230, debug=True)

@@ -48,4 +48,4 @@ app.register_blueprint(resenas, url_prefix="/resenas")
 app.register_blueprint(usuarios, url_prefix="/usuarios")
 
 if __name__ == "__main__":
-    app.run(port=5500, debug=True)
+    app.run(port=5511, debug=True)
