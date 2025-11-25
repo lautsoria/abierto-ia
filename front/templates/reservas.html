@@ -18,7 +18,7 @@
                 <li class="list-group-item">
                     <div>
                         <h5 class="mb-1">{{ reserva.servicio_nombre }}</h5>
-                        <p class="mb-1 text-muted">Para el: {{ reserva.fecha_servicio }}</p>
+                        <p class="mb-1 text-muted">Para el: {{ reserva.fecha_servicio }} a las {{ reserva.hora_servicio }}</p>
                     </div>
                     
                     <button class="btn btn-primary btn-sm" 
@@ -26,8 +26,8 @@
                             data-bs-target="#modal-{{ reserva.id }}">
                         Ver Detalle
                     </button>
-                    {% if usuario.rol=="proveedor" %}   
-                        <a href="{{ url_for('generar-qr') }}?id_reserva={{ reserva.id }}" 
+                    {% if rol == "proveedor" %}   
+                        <a href="{{ url_for('generarqr', id_reserva=reserva.id) }}" 
                         class="btn btn-success btn-sm ms-2">
                         Generar QR
                         </a>
@@ -44,7 +44,8 @@
                             <div class="modal-body">
                                 <p><strong>Trabajo:</strong> {{ reserva.servicio_nombre }}</p>
                                 <p><strong>Proveedor:</strong> {{ reserva.proveedor_nombre }}</p>
-                                <p><strong>Horario y Fecha:</strong> {{ reserva.fecha_servicio }}</p>
+                                <p><strong>Fecha:</strong> {{ reserva.fecha_servicio }}</p>
+                                <p><strong>Horario:</strong> {{ reserva.hora_servicio }}</p>
                                 <hr>
                                 <p><strong>Categoría:</strong> {{ reserva.categoria }}</p>
                                 <p><strong>Estado:</strong> <span class="badge bg-info text-dark">{{ reserva.estado }}</span></p>
