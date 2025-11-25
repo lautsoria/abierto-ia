@@ -1,12 +1,14 @@
 DROP SCHEMA ids;
 CREATE DATABASE IF NOT EXISTS ids;
 use ids;
+
 CREATE TABLE IF NOT EXISTS roles (
   id UUID PRIMARY KEY,
   rol VARCHAR(50) UNIQUE NOT NULL
   -- hay que tener en cuenta que debemos tener solo 3 roles
   -- (cliente, proveedor, admin)
 );
+
 CREATE TABLE IF NOT EXISTS usuarios (
   id UUID PRIMARY KEY,
   usuario VARCHAR(25) NOT NULL UNIQUE,
@@ -58,7 +60,6 @@ CREATE TABLE IF NOT EXISTS reservas (
   direccion VARCHAR(100),
   estado ENUM('pendiente', 'confirmado', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
-  token_qr VARCHAR(64),
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 );
@@ -330,7 +331,7 @@ INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, prec
  'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, 8, 20, 10, NOW());
 
 -- Insert dummy reservas
-INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, hora_servicio, direccion, estado, comentarios_cliente, token_qr)
+INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, hora_servicio, direccion, estado, comentarios_cliente)
 SELECT 
   UUID(),
   u.id,
@@ -359,8 +360,7 @@ SELECT
     WHEN 0 THEN 'Servicio urgente, por favor confirmar'
     WHEN 1 THEN 'Excelente servicio, muy recomendable'
     ELSE NULL
-  END,
-  UUID()
+  END
 FROM usuarios u
 CROSS JOIN servicios s
 WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')

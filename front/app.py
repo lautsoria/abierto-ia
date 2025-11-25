@@ -37,7 +37,6 @@ def unauthorized_token(callback=None, error=None):
 @jwt_required(locations=['cookies'], optional=True)
 def home():
     data = get_jwt()
-    print(data)
     user_data = data if data else None
 
     servicios = obtener_servicios_destacados()
@@ -59,32 +58,31 @@ def home():
 @app.route("/reservas")
 @jwt_required(locations=['cookies'])
 def mis_reservas():
+    user_data = get_jwt()
     usuario_id = get_jwt_identity()
-    rol = get_jwt()['rol']
+    rol = user_data['rol']
 
-    response = requests.get(f"{BACKEND_URL}/reservas", json={"usuario_id": usuario_id, 'rol':rol})
+    if rol == "admin":
+        response = requests.get(f"{BACKEND_URL}/reservas/todas")  
+    else:    
+        response = requests.get(f"{BACKEND_URL}/reservas", params={"usuario_id":usuario_id, "rol":rol})
 
     if response.status_code != 200:
         return "Usuario no encontrado", 404
 
     reservas = response.json()
+    print(reservas)
 
-    response_user = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
-    datos_user = response_user.json()
-
-    
-    if datos_user["rol"] == "admin":
-        response_all = requests.get(f"{BACKEND_URL}/reservas/todas")  
-        reservas = response_all.json()
-
-    return render_template("reservas.html", reservas=reservas, usuario=datos_user), 201
+    return render_template("reservas.html", reservas=reservas, data=user_data, rol=rol), 201
 
 
 @app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
 def confirmar_servicio(id_reserva, token):
     response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
+    
     if response.status_code != 200:
-        return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido")) 
+        return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido"))
+    
     return render_template("confirmado.html", id_reserva=id_reserva)
 
 
@@ -94,16 +92,18 @@ def generarqr():
     if not id_reserva:  
         return "Falta id_reserva", 400
     
-    response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}/{token}")
-    if response.status_code != 200:  
-        return "Reserva no encontrada", 404  
+    # response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}/{token}")
+    # if response.status_code != 200:  
+    #     return "Reserva no encontrada", 404  
     
-    data = response.json()
-    token = data["token_qr"]
-    qr_confirmacion = generar_qr(id_reserva, token)
+    # data = response.json()
+    # token = data["token_qr"]
+
+    qr_confirmacion = generar_qr(id_reserva, id_reserva)
     return render_template("qr.html", qr_path=qr_confirmacion)
 
 
+# TODO: cambiar como se obtiene el rol (se obtiene del JWT)
 @app.route('/mi-perfil')
 @jwt_required(locations=['cookies'])
 def perfil():
@@ -162,7 +162,7 @@ def auth():
     resp = make_response(render_template('auth.html', next=next))
     resp.set_cookie('access_token_cookie', '', max_age=0)
     return resp
-  
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -180,9 +180,12 @@ def register():
     response = registrar_usuario(user, email, password, provider)
     
     if response and response.status_code == 200:
-        # Obtener las cookies del backend y pasarlas al frontend
-        print(next_url)      
-        resp = make_response(redirect(next_url))
+        if provider:
+            # si el proveedor se registra
+            # debera completar los datos de su perfil
+            resp = make_response(redirect())
+        else:
+            resp = make_response(redirect(next_url))
         
         # Copiar todas las cookies del backend al frontend
         for cookie_name, cookie_value in response.cookies.items():
@@ -192,7 +195,7 @@ def register():
                 httponly=True,
                 samesite='Lax'
             )
-        flash('Inicio de sesión exitoso', 'success')
+        flash('Usuario creado con éxito', 'success')
         return resp
     else:
         flash('Error al registrar el usuario', 'error')

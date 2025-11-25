@@ -283,7 +283,7 @@ def obtener_mis_reservas(usuario_id):
         return []
 
 def generar_qr(id_reserva, token):
-    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}/{token}"
+    url = f"http://localhost:5000/reservas/confirmar-servicio/{id_reserva}/{token}"
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
     return f"static/qr_reserva_{id_reserva}.png" 
