@@ -1,0 +1,34 @@
+{% extends "base/base.html" %}
+{% block title %} Servicio Confirmado{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/confirmado.css') }}">
+{% endblock %}
+{% block content %}
+<h1>Servicio Confirmado Con Éxito</h1>
+<div class="container">
+    <div class="confirmado">
+        <h2>Contanos qué te pareció el servicio</h2>
+        <img src="{{ url_for('static', filename='images/confirmar.jpg') }}" alt="imagen_confirmado">
+        <form action="{{ url_for('confirmado') }}" method="POST">
+            <div class="form-group">
+                <label for="puntuacion">Puntuación del servicio:</label>
+                <select id="puntuacion" name="puntuacion" required>
+                    <option value="0">Seleccioná una puntuación</option>
+                    <option value="1">⭐ 1 - Muy malo</option>
+                    <option value="2">⭐⭐ 2 - Malo</option>
+                    <option value="3">⭐⭐⭐ 3 - Regular</option>
+                    <option value="4">⭐⭐⭐⭐ 4 - Bueno</option>
+                    <option value="5">⭐⭐⭐⭐⭐ 5 - Excelente</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="resena">Tu reseña:</label>
+                <textarea id="resena" name="resena" rows="5" placeholder="Contanos tu experiencia con el servicio..." required></textarea>
+            </div>
+            
+            <button type="submit" class="btn-enviar">Enviar Reseña</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

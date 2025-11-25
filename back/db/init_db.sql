@@ -58,7 +58,6 @@ CREATE TABLE IF NOT EXISTS reservas (
   direccion VARCHAR(100),
   estado ENUM('pendiente', 'confirmado', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
-  token_qr VARCHAR(64),
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
   FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 );

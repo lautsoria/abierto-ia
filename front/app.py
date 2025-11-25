@@ -85,25 +85,59 @@ def mis_reservas():
     return render_template("reservas.html", reservas=reservas, usuario=datos_user), 201
 
 
-@app.route('/confirmar-servicio/<string:id_reserva>/<string:token>')
-def confirmar_servicio(id_reserva, token):
-    #chequear q el usuario que reservo sea el q confirma
-    usuario_id = get_jwt_identity()
-    response_reserva=requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
-    datos_reserva = response_reserva.json()
-    usuario_reserva= datos_reserva.get("usuario_id")
+@app.route('/confirmar-servicio/<string:id_reserva>/<string:token>', methods=['GET', 'POST'])
+def confirmar_servicio(id_reserva):
 
-    if not usuario_id == usuario_reserva:
+    # verificar que el usuario autenticado sea el dueño de la reserva
+    usuario_id = get_jwt_identity()
+
+    response_reserva = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
+    if response_reserva.status_code != 200:
+        return "Reserva no encontrada", 404
+
+    datos_reserva = response_reserva.json()
+    usuario_reserva = datos_reserva.get("usuario_id")
+
+    if usuario_id != usuario_reserva:
         return "usuario incorrecto", 404
-    
-    
-    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}/{token}")
-    if response.status_code != 200:  
-        return render_template("error_qr.html", mensaje=response.json().get("error", "Error desconocido")) 
-    return render_template("confirmado.html", id_reserva=id_reserva)  
+
+    # confirmar el servicio con el id de reserva
+    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}")
+    if response.status_code != 200:
+        return "error desconocido", 404
+
+    # si es post
+    if request.method == "POST":
+        estrellas = int(request.form.get("puntuacion"))
+        descripcion = request.form.get("resena")
+
+        servicio_id = datos_reserva.get("servicio_id")
+
+
+        payload = {
+            "estrellas": estrellas,
+            "descripcion": descripcion,
+            "usuario_id":usuario_id,
+            "servicio_id":servicio_id
+        }
+
+        response = requests.post(
+            f"{BACKEND_URL}/proveedores/añadir_puntuacion/{id_reserva}",
+            json=payload
+        )
+
+        if response.status_code != 200:
+            return "Error al enviar la reseña", 400
+
+        return render_template("confirmado.html", id_reserva=id_reserva)
+
+    # si el usuario solo abrió la página (GET)
+    return render_template("confirmado.html", id_reserva=id_reserva)
+ 
+
 
 def generar_qr(id_reserva, token):
-    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}/{token}"
+    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}"
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
     return f"static/qr_reserva_{id_reserva}.png"
@@ -116,13 +150,12 @@ def generarqr():
     if not id_reserva:  
         return "Falta id_reserva", 400  
     
-    response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}/token")
+    response = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
     if response.status_code != 200:  
         return "Reserva no encontrada", 404  
     
     data = response.json()
-    token = data["token_qr"]
-    qr_confirmacion = generar_qr(id_reserva, token)
+    qr_confirmacion = generar_qr(id_reserva)
     return render_template("qr.html", qr_path=qr_confirmacion)  
 
 
