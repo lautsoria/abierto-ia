@@ -330,7 +330,7 @@ INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, prec
  'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, 8, 20, 10, NOW());
 
 -- Insert dummy reservas
-INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, hora_servicio, direccion, estado, comentarios_cliente)
+INSERT INTO reservas (id, usuario_id, servicio_id, fecha_reserva, fecha_servicio, hora_servicio, direccion, estado, comentarios_cliente, token_qr)
 SELECT 
   UUID(),
   u.id,
@@ -359,7 +359,8 @@ SELECT
     WHEN 0 THEN 'Servicio urgente, por favor confirmar'
     WHEN 1 THEN 'Excelente servicio, muy recomendable'
     ELSE NULL
-  END
+  END,
+  UUID()
 FROM usuarios u
 CROSS JOIN servicios s
 WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')

@@ -68,6 +68,7 @@ def get_mis_reservas():
     try:
         data = request.json
         usuario_id = data['usuario_id']
+        rol = data['rol']
         
         if not usuario_id:
             return jsonify({'error': 'usuario_id es requerido (temporal)'}), 400
@@ -90,7 +91,7 @@ def get_mis_reservas():
             conn.close()
             return jsonify({'error': 'Usuario no encontrado'}), 404
         
-        if usuario['rol'] == 'cliente':
+        if rol == 'cliente':
             # Si es cliente, mostrar sus reservas como cliente
             query = """
                 SELECT 
@@ -110,23 +111,23 @@ def get_mis_reservas():
             """
             cursor.execute(query, (usuario_id,))
             
-        elif usuario['rol'] == 'proveedor':
+        elif rol == 'proveedor':
             # Si es proveedor, mostrar reservas de sus servicios
             query = """
-                SELECT 
-                    r.*,
-                    s.nombre as servicio_nombre,
-                    s.precio as servicio_precio,
-                    uc.usuario as cliente_nombre,
-                    uc.email as cliente_email,
-                    c.nombre as categoria
-                FROM reservas r
-                INNER JOIN servicios s ON r.servicio_id = s.id
-                INNER JOIN proveedores p ON s.proveedor_id = p.id
-                INNER JOIN usuarios uc ON r.usuario_id = uc.id
-                INNER JOIN categorias c ON s.categoria_id = c.id
-                WHERE p.usuario_id = %s
-                ORDER BY r.fecha_reserva DESC
+                    SELECT 
+                        r.*,
+                        s.nombre as servicio_nombre,
+                        s.precio as servicio_precio,
+                        uc.usuario as cliente_nombre,
+                        uc.email as cliente_email,
+                        c.nombre as categoria
+                    FROM reservas r
+                    INNER JOIN servicios s ON r.servicio_id = s.id
+                    INNER JOIN proveedores p ON s.proveedor_id = p.id
+                    INNER JOIN usuarios uc ON r.usuario_id = uc.id
+                    INNER JOIN categorias c ON s.categoria_id = c.id
+                    WHERE p.usuario_id = %s
+                    ORDER BY r.fecha_reserva DESC
             """
             cursor.execute(query, (usuario_id,))
         else:
@@ -255,9 +256,7 @@ def update_reserva(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 # reserva especifica
-@reservas_bp.route('/<string:id>')
 def get_reserva(id):
     try:
         conn = db_conn()
