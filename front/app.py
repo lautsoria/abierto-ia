@@ -71,7 +71,6 @@ def mis_reservas():
         return "Usuario no encontrado", 404
 
     reservas = response.json()
-    print(reservas)
 
     return render_template("reservas.html", reservas=reservas, data=user_data, rol=rol), 201
 
@@ -304,7 +303,6 @@ def crear_reserva(servicio):
     
     if response and response.status_code == 201:
         reserva_data = response.json()
-        print(reserva_data)
         reserva_id = reserva_data.get('id')
         flash('Reserva confirmada exitosamente', 'success')
         return redirect(f'/reserva/{reserva_id}')
@@ -320,7 +318,6 @@ def detalle_reserva(reserva_id):
     user_data = data if data else None
     
     reserva = obtener_reserva_por_id(reserva_id)
-    print(reserva)
     
     return render_template('reserva.html', reserva=reserva, data=user_data)
 

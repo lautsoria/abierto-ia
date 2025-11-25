@@ -6,6 +6,7 @@ reservas_bp = Blueprint('reservas', __name__)
 
 # crear reserva
 # TODO: verificar que la fecha elegida no este reservada ya
+# TODO: verificar que al crear una reserva no se pise con otra
 @reservas_bp.route('/', methods=['POST'])
 def create_reserva():
     try:
@@ -136,7 +137,6 @@ def get_mis_reservas():
 
         
         reservas = cursor.fetchall()
-        print(reservas)
         
         cursor.close()
         conn.close()
