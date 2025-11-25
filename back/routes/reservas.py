@@ -315,9 +315,9 @@ def confirmar_servicio(id_reserva, token):
 
         query = """
             SELECT * FROM reservas
-            WHERE id = %s AND token_qr = %s
+            WHERE id = %s 
         """
-        cursor.execute(query, (id_reserva, token))
+        cursor.execute(query, (id_reserva))
         reserva = cursor.fetchone()
 
         if reserva is None:

@@ -136,7 +136,7 @@ def confirmar_servicio(id_reserva):
  
 
 
-def generar_qr(id_reserva, token):
+def generar_qr(id_reserva):
     url = f"http://localhost:5000/confirmar-servicio/{id_reserva}"
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
