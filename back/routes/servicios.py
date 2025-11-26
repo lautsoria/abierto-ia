@@ -270,6 +270,7 @@ def buscar_servicios():
 
     return jsonify(servicios), 200
 
+<<<<<<< HEAD
 @servicios_bp.route('/', methods=['POST'])
 def registrar_servicio():
     payload = request.json
@@ -395,6 +396,7 @@ def servicios_proveedor(id):
         cursor = conn.cursor(dictionary=True)
 
         query = """
+
             SELECT 
                 s.*,
                 c.nombre as categoria_nombre,
@@ -430,3 +432,52 @@ def servicios_proveedor(id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500 
+
+@servicios_bp.route('/todos', methods=['GET'])
+def todos_servicios ():
+    try:
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+
+        query = """
+            SELECT s.*, 
+            FROM servicios s
+        """
+        
+        cursor.execute(query)
+        usuarios = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+        
+        return jsonify(usuarios), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@servicios_bp.route('/<string:id>/eliminar', methods=['DELETE'])
+def eliminar_servicio(id):
+    try:
+        conn = db_conn()
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT id FROM servicios WHERE id = %s', (id,))
+        servicio = cursor.fetchone()
+        
+        if servicio is None:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Servicio no encontrado'}), 404
+        
+        
+        cursor.execute('DELETE FROM servicio WHERE id = %s', (id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': 'Servicio eliminado correctamente'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': 'Error al eliminar el servicio'}), 500
+

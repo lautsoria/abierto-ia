@@ -1,0 +1,58 @@
+{% extends "base/base.html" %}
+{% block title %}Lista De Servicios{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/usuarios.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Gestión de Servicios</h1>
+        
+    </div>
+    {% if servicios %}
+    <div class="table-container">
+        <table class="usuarios-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Proveedor</th>
+                    <th>Nombre</th>
+                    <th>Categoria</th>
+                    <th>Descripcion</th>
+                    <th>Precio </th>
+                    <th>Duracion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.id }}</td>
+                    <td>{{ servicio.proveedor_id }}</td>
+                    <td>{{ servicio.nombre }}</td>
+                    <td>{{ servicio.categoria }}</td>
+                    <td>{{ servicio.descripcion }}</td>
+                    <td>{{ servicio.precio }}</td>
+                    <td>{{ servicio.duracion }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('eliminar_servicio', id=servicio.id) }}" 
+                           class="btn-icon btn-delete" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-users fa-4x"></i>
+        <h2>No hay servicios registrados</h2>
+        
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+

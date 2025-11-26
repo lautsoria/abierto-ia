@@ -35,6 +35,7 @@
               name="q"
               required
             >
+            
             <button type="submit" class="search-btn">🔍</button>
         </form>
       </div>    
@@ -121,5 +122,6 @@
   
   {% block scripts %}
   {% endblock %}
+<script src="{{ url_for('static', filename='js/filtro.js') }}"></script>
 </body>
 </html>
