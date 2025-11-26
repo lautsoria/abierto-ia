@@ -1,5 +1,102 @@
 ## 25 de Noviembre, 2025
 
+### Sistema de Reseñas - Endpoint POST
+
+**Backend - Nuevo Endpoint:**
+- Implementado `POST /resenas` para crear nuevas reseñas
+- Recibe: `usuario_id`, `servicio_id`, `estrellas`, `descripcion`
+- Genera UUID automático para cada reseña
+- Retorna status 200 con mensaje de éxito
+
+**Corrección de Schema:**
+- Fixed `init_db.sql`: cambiado `UUID` a `UUID()` en tabla `resenas`
+
+### Flujo de Confirmación de Servicio Mejorado
+
+**Frontend - Confirmación (`app.py`):**
+- Simplificado endpoint `/confirmar-servicio/<id_reserva>` (removido token de URL)
+- Agregado `@jwt_required` para validar usuario autenticado
+- Validación de que el usuario es dueño de la reserva (401 si no coincide)
+- POST ahora envía reseña a `/resenas` en lugar de `/proveedores/añadir_puntuacion`
+- Redirige a home después de enviar reseña exitosamente
+- Confirmación de servicio (`estado = 'realizado'`) se ejecuta en GET
+
+**Generación de QR Dinámica:**
+- URL del QR ahora usa variable de entorno `PUBLIC_URL`
+- Permite configurar IP local para acceso desde móviles en la misma red
+- Default: `http://localhost:5000`
+
+### Estilos Mercado Libre - Página de Confirmación
+
+**Rediseño completo de `confirmado.css`:**
+- Header verde con gradiente (#00a650 → #008a43) estilo ML
+- Check icon con imagen personalizable (check-verified.png)
+- Card con bordes sutiles y sombra mínima
+- Info box con fondo gris claro para tips
+- Form inputs con focus state azul ML (#3483fa)
+- Botón de envío azul ML con hover states
+- Responsive design para móviles
+
+**Template `confirmado.html`:**
+- Nueva estructura: container → header → card → body
+- Info box con ícono 💡 y mensaje sobre importancia de reseñas
+- Labels más descriptivos ("¿Cómo calificarías el servicio?")
+- Placeholder mejorado en textarea
+- Fixed: `url_for('confirmar_servicio', id_reserva=reserva)` con parámetro correcto
+
+### Página de Reservas - Mejoras UI
+
+**Badges de Estado (`reservas.html`):**
+- Agregados badges visuales para mostrar estado de cada reserva
+- Colores por estado:
+  - `pendiente` → badge-warning (amarillo)
+  - `confirmado` → badge-primary (azul)
+  - `realizado` → badge-success (verde)
+  - otros → badge-danger (rojo)
+- Badge mostrado junto al botón "Ver Detalle"
+
+**Ordenamiento:**
+- Reservas ahora ordenadas ASC por `fecha_servicio` (más próximas primero)
+- Cambiado tanto para clientes como proveedores en `reservas.py`
+
+**Estilos (`reservas.css`):**
+- Variables CSS en `:root` para colores consistentes
+- Clases `.badge-*` para estados con colores específicos
+- `.btn-success` agregado con estilo igual a `.btn-primary`
+- Botón "Generar QR" cambió de `btn-sm` a tamaño regular
+- Contenedor compatible con template base
+
+### Navegación y Compatibilidad
+
+**Base Template (`base.html`):**
+- Link #categorias cambiado a `{{ url_for('home') }}#categorias`
+- Funciona correctamente desde cualquier página
+
+**Template `editar_perfil.html`:**
+- Ya compatible con base template
+- CSS sin estilos de body (usa container)
+
+### Acceso desde Red Local (QR desde móvil)
+
+**Configuración de Red:**
+- Flask debe correr con `--host=0.0.0.0` para aceptar conexiones externas
+- Puerto 5000 abierto en UFW: `sudo ufw allow 5000`
+- Acceso desde móvil: `http://<IP-local>:5000`
+- Variable `PUBLIC_URL` en .env para URL correcta en QR
+
+### Correcciones Varias
+
+**Backend:**
+- `auth.py`: Removido import no usado de `datetime`
+- `reservas.py`: Removido parámetro `token` de `confirmar_servicio()`
+
+**Frontend:**
+- `editar_perfil.html`: Ahora recibe `data` para mostrar nav correctamente
+- `app.py`: Puerto cambiado de 1230 a 1234
+- Limpieza de código: removidos comentarios TODO y líneas vacías extra
+
+---
+
 ### Sistema de Confirmación de Servicio con QR
 
 **Generación de QR:**
