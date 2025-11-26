@@ -34,11 +34,12 @@
                     <td>{{ servicio.precio }}</td>
                     <td>{{ servicio.duracion }}</td>
                     <td class="actions">
-                        <a href="{{ url_for('eliminar_servicio', id=servicio.id) }}" 
-                           class="btn-icon btn-delete" title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                        
+                        <form action="{{ url_for('eliminar_servicio', id=usuario.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn-icon btn-delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                                                
                     </td>
                 </tr>
                 {% endfor %}
