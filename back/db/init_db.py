@@ -34,6 +34,3 @@ for query in sql.split(';'):
 
 cursor.close()
 db.close()
-
-
-

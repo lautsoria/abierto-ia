@@ -326,7 +326,7 @@ def get_reserva(id):
 
     
 @reservas_bp.route('/confirmar-servicio/<string:id_reserva>', methods=['POST'])
-def confirmar_servicio(id_reserva, token):
+def confirmar_servicio(id_reserva):
     try:
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)

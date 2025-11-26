@@ -245,7 +245,7 @@ def obtener_reserva_por_id(id):
         return None
     except Exception as e:
         print(e)
-        return None            
+        return None          
     
 def obtener_resenas_servicio(id):
     try:

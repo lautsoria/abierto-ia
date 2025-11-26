@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS reservas (
 );
 
 CREATE TABLE IF NOT EXISTS resenas (
-  id UUID PRIMARY KEY,
+  id UUID() PRIMARY KEY,
   usuario_id UUID NOT NULL,
   servicio_id UUID NOT NULL,
   puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),

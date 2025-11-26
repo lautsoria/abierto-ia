@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href='{{ url_for('static', filename='css/reservas.css', external='true') }}'>
-
-    <title>Mis Reservas</title>
-</head>
-<body>
-
-    <div class="container">
+{% extends "base/base.html" %}
+{% block title %}Mis Reservas{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reservas.css') }}">
+{% endblock %}
+{% block content %}
+    <div class="reservas-container">
         <h1>📅 Mis Reservas</h1>
 
         <ul class="reservation-list">
@@ -17,12 +12,22 @@
                 <li class="reservation-item">
                     <div class="reservation-info">
                         <h5>{{ reserva.servicio_nombre }}</h5>
-                        <p class="text-muted">Para el: {{ reserva.fecha_servicio }}</p>
+                        <p class="text-muted">Para el: {{ reserva.fecha_servicio }} a las {{ reserva.hora_servicio }}</p>
                     </div>
                     
-                    <button class="btn btn-primary" onclick="openModal('modal-{{ reserva.id }}')">
-                        Ver Detalle
-                    </button>
+                    <div class="reservation-actions">
+                        <span class="badge {% if reserva.estado == 'pendiente' %}badge-warning{% elif reserva.estado == 'confirmado' %}badge-primary{% elif reserva.estado == 'realizado' %}badge-success{% else %}badge-danger{% endif %}">
+                            {{ reserva.estado }}
+                        </span>
+                        <button class="btn btn-primary" onclick="openModal('modal-{{ reserva.id }}')">
+                            Ver Detalle
+                        </button>
+                        {% if rol == "proveedor" %}   
+                            <a href="{{ url_for('generarqr', id_reserva=reserva.id) }}" class="btn btn-success">
+                                Generar QR
+                            </a>
+                        {% endif %}
+                    </div>
                 </li>
 
                 <div id="modal-{{ reserva.id }}" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'modal-{{ reserva.id }}')">
@@ -66,5 +71,4 @@
             }
         }
     </script>
-</body>
 {% endblock %}

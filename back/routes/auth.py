@@ -2,7 +2,6 @@ from flask import Blueprint, request
 from flask_jwt_extended import create_access_token, set_access_cookies
 from flask import make_response
 import uuid
-from datetime import datetime
 
 from db.db import db_conn
 

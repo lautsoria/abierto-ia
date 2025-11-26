@@ -1,195 +1,221 @@
-body {
-    background: linear-gradient(135deg, #66a4ea 0%, #395cbb 100%);
-    min-height: 100vh;
-}
-.container {
-    max-width: 800px;
+/* Confirmado page styles - Mercado Libre inspired */
+
+.confirmado-container {
+    max-width: 700px;
     margin: 40px auto;
-    padding: 20px;
-    
+    padding: 0 20px;
 }
 
-h1 {
-    text-align: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #ffffff;
-    font-size: 2.5rem;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-weight: 400;
-}
-
-
-.confirmado {
-    background: rgba(255, 255, 255, 0.938);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(157, 216, 250, 0.719);
-    padding: 40px;
+.confirmado-header {
+    background: linear-gradient(135deg, #00a650 0%, #008a43 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 8px 8px 0 0;
     text-align: center;
 }
 
-.confirmado h2 {
-    color: #327bc4;
-    font-size: 1.8rem;
-    margin-bottom: 25px;
+.confirmado-header h1 {
+    font-size: 1.5rem;
     font-weight: 500;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
 }
 
-.confirmado img {
-    max-width: 300px;
+.confirmado-header .check-icon {
+    width: 48px;
+    height: 48px;
+    background: url('/static/images/confirmar.jpg') no-repeat center center;
+    background-size: contain;
+    border-radius: 0;
+    display: inline-block;
+}
+
+.confirmado-card {
+    background: white;
+    border: 1px solid #ededed;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.confirmado-body {
+    padding: 32px;
+}
+
+.confirmado-body h2 {
+    color: #333;
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+    text-align: center;
+}
+
+.confirmado-body .subtitle {
+    color: #666;
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.confirmado-body img {
+    display: block;
+    max-width: 200px;
     width: 100%;
     height: auto;
-    margin: 20px 0 30px;
-    border-radius: 10px;
+    margin: 0 auto 32px;
+    border-radius: 8px;
 }
 
-
-form {
-    text-align: left;
-    margin-top: 30px;
+/* Form styles */
+.review-form {
+    margin-top: 24px;
 }
 
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .form-group label {
     display: block;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #8a4ed8;
-    margin-bottom: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
 }
 
-
-#puntuacion {
+.form-group select,
+.form-group textarea {
     width: 100%;
-    padding: 12px 15px;
+    padding: 12px;
     font-size: 1rem;
-    border: 2px solid #dfe6e9;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
     font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-#puntuacion:hover {
-    border-color: #74b9ff;
+.form-group select:hover,
+.form-group textarea:hover {
+    border-color: #3483fa;
 }
 
-#puntuacion:focus {
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
-    border-color: #0984e3;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.1);
+    border-color: #3483fa;
+    box-shadow: 0 0 0 3px rgba(52, 131, 250, 0.1);
 }
 
-
-#resena {
-    width: 100%;
-    padding: 15px;
-    font-size: 1rem;
-    border: 2px solid #dfe6e9;
-    border-radius: 8px;
-    background-color: #f8f9fa;
+.form-group textarea {
     resize: vertical;
-    min-height: 120px;
-    font-family: inherit;
-    transition: all 0.3s ease;
+    min-height: 100px;
 }
 
-#resena:hover {
-    border-color: #74b9ff;
+.form-group textarea::placeholder {
+    color: #999;
 }
 
-#resena:focus {
-    outline: none;
-    border-color: #0984e3;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.1);
+/* Star rating display */
+.star-rating {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
-#resena::placeholder {
-    color: #95a5a6;
+.star-rating .star {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s;
 }
 
+.star-rating .star.active,
+.star-rating .star:hover {
+    color: #ffb800;
+}
 
+/* Submit button - ML style */
 .btn-enviar {
     width: 100%;
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #ffffff;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #3483fa;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    transition: background-color 0.2s;
+    margin-top: 8px;
 }
 
 .btn-enviar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    background-color: #2968c8;
 }
 
 .btn-enviar:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+    background-color: #1f5bb5;
 }
 
+/* Info box */
+.info-box {
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
 
+.info-box .icon {
+    font-size: 1.25rem;
+}
+
+.info-box p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .container {
-        padding: 15px;
+    .confirmado-container {
         margin: 20px auto;
     }
 
-    h1 {
-        font-size: 2rem;
+    .confirmado-header h1 {
+        font-size: 1.25rem;
     }
 
-    .confirmado {
-        padding: 25px;
+    .confirmado-body {
+        padding: 24px;
     }
 
-    .confirmado h2 {
-        font-size: 1.4rem;
-    }
-
-    .confirmado img {
-        max-width: 250px;
-    }
-
-    .form-group label {
-        font-size: 1rem;
-    }
-
-    .btn-enviar {
-        font-size: 1rem;
-        padding: 12px 25px;
+    .confirmado-body h2 {
+        font-size: 1.1rem;
     }
 }
 
 @media (max-width: 480px) {
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    .confirmado {
+    .confirmado-header {
         padding: 20px;
     }
 
-    .confirmado h2 {
-        font-size: 1.2rem;
+    .confirmado-header h1 {
+        font-size: 1.1rem;
     }
 
-    .confirmado img {
-        max-width: 200px;
+    .confirmado-body {
+        padding: 20px;
+    }
+
+    .confirmado-body img {
+        max-width: 150px;
     }
 }

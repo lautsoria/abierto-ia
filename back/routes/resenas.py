@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from db.db import db_conn
+import uuid
 
 resenas_bp = Blueprint('resenas', __name__)
 
@@ -7,7 +8,7 @@ resenas_bp = Blueprint('resenas', __name__)
 def resenas_de_servicio(id):
     try:
       conn = db_conn()
-      cursor = conn.cursor(dictionary=True)  # ✅ Added dictionary=True
+      cursor = conn.cursor(dictionary=True)
 
       query = '''
               SELECT 
@@ -40,3 +41,41 @@ def resenas_de_servicio(id):
     except Exception as e:
       print(f"Error in resenas_de_servicio: {e}")
       return jsonify({'error': str(e)}), 500
+
+
+@resenas_bp.route('', methods=['POST'])
+def resena():
+  payload = request.json
+
+  try:
+     conn = db_conn()
+     cursor = conn.cursor(dictionary=True)
+
+     query = '''
+            INSERT
+            INTO resenas (
+            id,
+            usuario_id,
+            servicio_id,
+            puntuacion,
+            comentarios_cliente
+            )
+            values (%s, %s, %s, %s, %s)
+             '''
+     
+     cursor.execute(query, (
+            str(uuid.uuid4()),
+            payload["usuario_id"],
+            payload["servicio_id"],
+            payload["estrellas"],
+            payload["descripcion"]
+     ))
+
+     conn.commit()
+     cursor.close()
+     conn.close()
+
+     return {'message': 'success'}, 200
+  
+  except Exception as e:
+    return {'message': str(e)}, 400

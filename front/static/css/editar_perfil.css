@@ -1,40 +1,32 @@
 
-        :root {
-            --primary-color: #0d6efd;
-            --success-color: #198754;
-            --secondary-color: #6c757d;
-            --background-bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #212529;
-            --border-color: #dee2e6;
-            --info-bg: #cff4fc;
-            --info-text: #055160;
-            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
+        /* Editar Perfil page styles - works with base.html */
 
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background-color: var(--background-bg);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center; 
-        }
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --secondary-color: #6c757d;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --info-bg: #cff4fc;
+    --info-text: #055160;
+    --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
 
-        * {
-            box-sizing: border-box;
-        }
+.editar-perfil-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
 
-        .profile-card {
-            background-color: var(--card-bg);
-            width: 100%;
-            max-width: 700px; 
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            overflow: hidden; 
-            margin-top: 40px;
-        }
+.profile-card {
+    background-color: var(--card-bg);
+    width: 100%;
+    max-width: 700px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
 
         .card-header {
             background-color: var(--primary-color);

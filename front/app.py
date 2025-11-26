@@ -77,10 +77,12 @@ def mis_reservas():
     return render_template("reservas.html", reservas=reservas, data=user_data, rol=rol), 201
 
 
-@app.route('/confirmar-servicio/<string:id_reserva>/<string:token>', methods=['GET', 'POST'])
+@app.route('/confirmar-servicio/<string:id_reserva>', methods=['GET', 'POST'])
+@jwt_required(locations=['cookies'])
 def confirmar_servicio(id_reserva):
 
     # verificar que el usuario autenticado sea el dueño de la reserva
+    data = get_jwt()
     usuario_id = get_jwt_identity()
 
     response_reserva = requests.get(f"{BACKEND_URL}/reservas/{id_reserva}")
@@ -91,12 +93,7 @@ def confirmar_servicio(id_reserva):
     usuario_reserva = datos_reserva.get("usuario_id")
 
     if usuario_id != usuario_reserva:
-        return "usuario incorrecto", 404
-
-    # confirmar el servicio con el id de reserva
-    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}")
-    if response.status_code != 200:
-        return "error desconocido", 404
+        return "usuario incorrecto", 401
 
     # si es post
     if request.method == "POST":
@@ -104,7 +101,6 @@ def confirmar_servicio(id_reserva):
         descripcion = request.form.get("resena")
 
         servicio_id = datos_reserva.get("servicio_id")
-
 
         payload = {
             "estrellas": estrellas,
@@ -114,22 +110,28 @@ def confirmar_servicio(id_reserva):
         }
 
         response = requests.post(
-            f"{BACKEND_URL}/proveedores/añadir_puntuacion/{id_reserva}",
+            f"{BACKEND_URL}/resenas",
             json=payload
         )
 
         if response.status_code != 200:
             return "Error al enviar la reseña", 400
 
-        return render_template("confirmado.html", id_reserva=id_reserva)
+        return redirect(url_for('home'))
+    
+    # confirmar el servicio con el id de reserva
+    response = requests.post(f"{BACKEND_URL}/reservas/confirmar-servicio/{id_reserva}")
+    if response.status_code != 200:
+        return "error desconocido", 404
 
     # si el usuario solo abrió la página (GET)
-    return render_template("confirmado.html", id_reserva=id_reserva)
+    return render_template("confirmado.html", reserva=id_reserva, data=data)
  
 
 
 def generar_qr(id_reserva):
-    url = f"http://localhost:5000/confirmar-servicio/{id_reserva}"
+    base_url = os.getenv('PUBLIC_URL', 'http://localhost:5000')
+    url = f"{base_url}/confirmar-servicio/{id_reserva}"
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
     return f"static/qr_reserva_{id_reserva}.png"
@@ -151,7 +153,6 @@ def generarqr():
     return render_template("qr.html", qr_path=qr_confirmacion)  
 
 
-# TODO: cambiar como se obtiene el rol (se obtiene del JWT)
 @app.route('/mi-perfil')
 @jwt_required(locations=['cookies'])
 def perfil():
@@ -177,6 +178,7 @@ def perfil():
     return render_template(
         "editar_perfil.html",
         usuario=datos_user,
+        data=data
     )
 
 
@@ -361,7 +363,7 @@ def crear_reserva(servicio):
     
 
 @app.route('/reserva/<string:reserva_id>')
-@jwt_required(locations=['cookies'], optional=True)
+@jwt_required(locations=['cookies'])
 def detalle_reserva(reserva_id):
     data = get_jwt()
     user_data = data if data else None
@@ -374,9 +376,6 @@ def detalle_reserva(reserva_id):
 @app.errorhandler(404)
 def error(e):
    return render_template('404.html'), 404
-
-
-
 
 
 @app.route('/usuarios/<int:id>/eliminar', methods=['POST'])
@@ -442,6 +441,6 @@ def buscar_servicios():
 
 
 if __name__ == '__main__':
-    app.run("localhost", port=1230, debug=True)
+    app.run("localhost", port=1234, debug=True)
 
 

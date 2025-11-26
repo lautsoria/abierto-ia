@@ -4,31 +4,45 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/confirmado.css') }}">
 {% endblock %}
 {% block content %}
-<h1>Servicio Confirmado Con Éxito</h1>
-<div class="container">
-    <div class="confirmado">
-        <h2>Contanos qué te pareció el servicio</h2>
-        <img src="{{ url_for('static', filename='images/confirmar.jpg') }}" alt="imagen_confirmado">
-        <form action="{{ url_for('confirmar_servicio') }}" method="POST">
-            <div class="form-group">
-                <label for="puntuacion">Puntuación del servicio:</label>
-                <select id="puntuacion" name="puntuacion" required>
-                    <option value="0">Seleccioná una puntuación</option>
-                    <option value="1">⭐ 1 - Muy malo</option>
-                    <option value="2">⭐⭐ 2 - Malo</option>
-                    <option value="3">⭐⭐⭐ 3 - Regular</option>
-                    <option value="4">⭐⭐⭐⭐ 4 - Bueno</option>
-                    <option value="5">⭐⭐⭐⭐⭐ 5 - Excelente</option>
-                </select>
+<div class="confirmado-container">
+    <div class="confirmado-header">
+        <h1>
+            <span class="check-icon"></span>
+            Servicio Confirmado
+        </h1>
+    </div>
+    
+    <div class="confirmado-card">
+        <div class="confirmado-body">
+            <h2>¡Gracias por usar nuestro servicio!</h2>
+            <p class="subtitle">Contanos qué te pareció para ayudar a otros usuarios</p>
+            
+            <div class="info-box">
+                <span class="icon">💡</span>
+                <p>Tu opinión es muy importante. Las reseñas ayudan a otros usuarios a tomar mejores decisiones.</p>
             </div>
             
-            <div class="form-group">
-                <label for="resena">Tu reseña:</label>
-                <textarea id="resena" name="resena" rows="5" placeholder="Contanos tu experiencia con el servicio..." required></textarea>
-            </div>
-            
-            <button type="submit" class="btn-enviar">Enviar Reseña</button>
-        </form>
+            <form action="{{ url_for('confirmar_servicio', id_reserva=reserva) }}" method="POST" class="review-form">
+                <div class="form-group">
+                    <label for="puntuacion">¿Cómo calificarías el servicio?</label>
+                    <select id="puntuacion" name="puntuacion" required>
+                        <option value="">Seleccioná una puntuación</option>
+                        <option value="1">⭐ 1 - Muy malo</option>
+                        <option value="2">⭐⭐ 2 - Malo</option>
+                        <option value="3">⭐⭐⭐ 3 - Regular</option>
+                        <option value="4">⭐⭐⭐⭐ 4 - Bueno</option>
+                        <option value="5">⭐⭐⭐⭐⭐ 5 - Excelente</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resena">Escribí tu opinión</label>
+                    <textarea id="resena" name="resena" rows="4" placeholder="¿Qué te pareció el servicio? ¿Lo recomendarías?" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-enviar">Enviar opinión</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
