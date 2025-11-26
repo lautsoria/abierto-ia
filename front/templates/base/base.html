@@ -35,6 +35,7 @@
               name="q"
               required
             >
+            
             <button type="submit" class="search-btn">🔍</button>
         </form>
       </div>    
@@ -44,7 +45,7 @@
           {% if data.rol == 'proveedor' %}
             <a href="#categorias" class="nav-link">Registrar servicio</a>
             <a href="{{ url_for('mis_reservas') }}" class="nav-link">Calendario</a>
-            <a href="#" class="nav-link end">Mi perfil</a>
+            <a href="#" class="nav-link end">Mi perfil</a>  
             <a href="#" class="nav-link">Mis servicios</a>
           {% endif %}
 
@@ -121,5 +122,6 @@
   
   {% block scripts %}
   {% endblock %}
+<script src="{{ url_for('static', filename='js/filtro.js') }}"></script>
 </body>
 </html>

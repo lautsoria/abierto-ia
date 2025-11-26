@@ -384,13 +384,13 @@ def error(e):
 
 @app.route('/usuarios/<int:id>/eliminar', methods=['POST'])
 def eliminar_usuario(id):
-    response = requests.delete(f"{BACKEND_URL}/usuarios/{id}")
+    response = requests.delete(f"{BACKEND_URL}/usuarios/{id}/eliminar")
 
     if response.status_code != 200:
         return "Usuario no encontrado", 404
     
     
-    return redirect(url_for('listar_usuarios'))
+    return redirect(url_for('ver_usuarios'))
 
 
 @app.route('/usuarios')
@@ -423,6 +423,45 @@ def ver_usuarios():
 
     return render_template('usuarios.html',usuarios=usuarios)
 
+@app.route('/todos_servicios')
+@jwt_required(locations=['cookies'])
+def servicios():
+    data = get_jwt()
+    usuario_id = get_jwt_identity()
+    
+    user_data = data if data else None
+
+    if user_data is None:
+        return redirect(url_for('auth'))
+    
+    response_user = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
+
+    if response_user.status_code != 200:
+        return "Usuario no encontrado", 404
+
+    datos_user = response_user.json()
+
+    if datos_user.get("rol") != "admin":
+        return "permiso denegado", 404
+    
+    response = requests.get(f'{BACKEND_URL}/servicios/todos')
+    
+    if response.status_code != 200:
+        return "Usuarios no encontrados", 404
+    
+    servicios = response.json()
+
+    return render_template('servicios.html',servicios=servicios)
+
+@app.route('/usuarios/<int:id>/eliminar', methods=['POST'])
+def eliminar_servicio(id):
+    response = requests.delete(f"{BACKEND_URL}/servicio/{id}/eliminar")
+
+    if response.status_code != 200:
+        return "Usuario no encontrado", 404
+    
+    
+    return redirect(url_for('listar_usuarios'))
 
 
 @app.route('/buscar')

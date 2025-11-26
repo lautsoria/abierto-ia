@@ -31,7 +31,7 @@ def get_usuario(id):
         return jsonify({'error': str(e)}), 500
     
 # eliminar usuario por ID
-@usuarios_bp.route('/<string:id>', methods=['DELETE'])
+@usuarios_bp.route('/<string:id>/eliminar', methods=['DELETE'])
 def eliminar_usuario(id):
     try:
         conn = db_conn()
