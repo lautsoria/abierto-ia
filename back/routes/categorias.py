@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request
 from db.db import db_conn
 
-categoria_bp = Blueprint('categoria', __name__)
+categorias_bp = Blueprint('categorias', __name__)
 
-@categoria_bp.route('/<string:categoria_nombre>')
+@categorias_bp.route('/<string:categoria_nombre>')
 def cantidad_por_categoria(categoria_nombre):
     """cantidad de profesionales de una categoria"""
     try:
@@ -40,14 +40,14 @@ def cantidad_por_categoria(categoria_nombre):
         print(e)
         return jsonify({'error': str(e)}), 500
 
-@categoria_bp.route('')
+@categorias_bp.route('')
 def categorias():
     """categorias existentes"""
     try:
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
         query = """
-            SELECT nombre
+            SELECT id, nombre
             FROM categorias
             ORDER BY nombre ASC
         """

@@ -1,0 +1,188 @@
+{% extends "base/base.html" %}
+
+{% block title %}Editar Servicio{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/editar_servicio.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="form-section">
+        <div class="form-header">
+            <a href="{{ url_for('mis_servicios') }}" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Volver a mis servicios
+            </a>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-title">
+                <h1>Editar servicio</h1>
+                <p>Modificá los datos de tu servicio</p>
+            </div>
+
+            <form id="editServiceForm" method="POST" action="{{ url_for('actualizar_servicio', id=servicio.id) }}">
+                <div class="form-group">
+                    <label for="nombre">Nombre del servicio *</label>
+                    <input type="text" 
+                           id="nombre" 
+                           name="nombre" 
+                           value="{{ servicio.nombre }}"
+                           placeholder="Ej: Instalación de aire acondicionado"
+                           required
+                           oninput="updatePreview()">
+                    <span class="input-hint">Elegí un nombre claro y descriptivo</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria_id">Categoría *</label>
+                    <select id="categoria_id" name="categoria_id" required onchange="updatePreview()">
+                        <option value="">Seleccioná una categoría</option>
+                        {% for categoria in categorias %}
+                        <option value="{{ categoria.id }}" {% if categoria.id == servicio.categoria_id %}selected{% endif %}>
+                            {{ categoria.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción *</label>
+                    <textarea id="descripcion" 
+                              name="descripcion" 
+                              rows="4" 
+                              placeholder="Describí tu servicio en detalle..."
+                              required
+                              oninput="updatePreview()">{{ servicio.descripcion }}</textarea>
+                    <span class="input-hint">Incluí qué incluye el servicio, materiales, garantía, etc.</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precio">Precio (ARS) *</label>
+                        <div class="price-input">
+                            <span class="currency">$</span>
+                            <input type="number" 
+                                   id="precio" 
+                                   name="precio" 
+                                   value="{{ servicio.precio|int }}"
+                                   min="1" 
+                                   step="1"
+                                   placeholder="0"
+                                   required
+                                   oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="duracion">Duración (horas) *</label>
+                        <select id="duracion" name="duracion" required onchange="updatePreview()">
+                            <option value="">Seleccionar</option>
+                            {% for i in range(1, 9) %}
+                            <option value="{{ i }}" {% if i == servicio.duracion %}selected{% endif %}>{{ i }} hora{% if i > 1 %}s{% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hora_inicio">Hora de inicio *</label>
+                        <select id="hora_inicio" name="hora_inicio" required onchange="updatePreview()">
+                            <option value="">Desde</option>
+                            {% for i in range(6, 22) %}
+                            <option value="{{ i }}" {% if i == servicio.hora_inicio %}selected{% endif %}>{{ "%02d:00"|format(i) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hora_fin">Hora de fin *</label>
+                        <select id="hora_fin" name="hora_fin" required onchange="updatePreview()">
+                            <option value="">Hasta</option>
+                            {% for i in range(7, 23) %}
+                            <option value="{{ i }}" {% if i == servicio.hora_fin %}selected{% endif %}>{{ "%02d:00"|format(i) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="window.location.href='{{ url_for('mis_servicios') }}'">Cancelar</button>
+                    <button type="submit" class="btn-primary">Guardar cambios</button>
+                </div>
+                
+                <div class="delete-section">
+                    <button type="button" class="btn-secondary btn-delete" onclick="confirmarEliminacion()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Eliminar servicio
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="preview-section">
+        <h3>Vista previa</h3>
+        <div class="preview-card">
+            <div class="preview-image">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+            </div>
+            <div class="preview-content">
+                <span class="preview-category" id="previewCategory">{{ servicio.categoria_nombre or 'Categoría' }}</span>
+                <h4 class="preview-title" id="previewTitle">{{ servicio.nombre or 'Nombre del servicio' }}</h4>
+                <p class="preview-description" id="previewDescription">{{ servicio.descripcion[:80] if servicio.descripcion else 'Descripción del servicio...' }}{% if servicio.descripcion and servicio.descripcion|length > 80 %}...{% endif %}</p>
+                <div class="preview-meta">
+                    <span class="preview-price" id="previewPrice">$ {{ servicio.precio if servicio.precio else '0' }}</span>
+                    <span class="preview-duration" id="previewDuration">{{ servicio.duracion or '0' }}h</span>
+                </div>
+                <div class="preview-schedule" id="previewSchedule">
+                    {{ "%02d:00"|format(servicio.hora_inicio) if servicio.hora_inicio else '00:00' }} - {{ "%02d:00"|format(servicio.hora_fin) if servicio.hora_fin else '00:00' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updatePreview() {
+        const nombre = document.getElementById('nombre').value;
+        const categoria = document.getElementById('categoria_id');
+        const categoriaText = categoria.options[categoria.selectedIndex]?.text || 'Categoría';
+        const descripcion = document.getElementById('descripcion').value;
+        const precio = document.getElementById('precio').value;
+        const duracion = document.getElementById('duracion').value;
+        const horaInicio = document.getElementById('hora_inicio').value;
+        const horaFin = document.getElementById('hora_fin').value;
+
+        document.getElementById('previewTitle').textContent = nombre || 'Nombre del servicio';
+        document.getElementById('previewCategory').textContent = categoriaText !== 'Seleccioná una categoría' ? categoriaText : 'Categoría';
+        document.getElementById('previewDescription').textContent = descripcion ? (descripcion.substring(0, 80) + (descripcion.length > 80 ? '...' : '')) : 'Descripción del servicio...';
+        document.getElementById('previewPrice').textContent = precio ? '$ ' + Number(precio).toLocaleString('es-AR') : '$ 0';
+        document.getElementById('previewDuration').textContent = duracion ? duracion + 'h' : '0h';
+        
+        if (horaInicio && horaFin) {
+            document.getElementById('previewSchedule').textContent = `${horaInicio.padStart(2, '0')}:00 - ${horaFin.padStart(2, '0')}:00`;
+        }
+    }
+
+    function confirmarEliminacion() {
+        if (confirm('¿Estás seguro de que querés eliminar este servicio? Esta acción no se puede deshacer.')) {
+            window.location.href = '{{ url_for("eliminar_servicio_view", id=servicio.id) }}';
+        }
+    }
+
+    // Initialize preview on load
+    document.addEventListener('DOMContentLoaded', updatePreview);
+</script>
+{% endblock %}

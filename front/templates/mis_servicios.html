@@ -1,0 +1,265 @@
+{% extends "base/base.html" %}
+
+{% block title %}Mis Servicios{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mis_servicios.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="services-container">
+    <!-- Header -->
+    <div class="services-header">
+        <div class="header-left">
+            <h1>Mis Servicios</h1>
+            <p class="subtitle">Gestioná tus servicios publicados</p>
+        </div>
+        <a href="{{ url_for('registrar_servicio') }}" class="btn-new-service">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Publicar servicio
+        </a>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-value">{{ servicios|length }}</div>
+            <div class="stat-label">Servicios activos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_reservas }}</div>
+            <div class="stat-label">Reservas totales</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ "%.1f"|format(promedio_rating) if promedio_rating else "—" }}</div>
+            <div class="stat-label">Calificación promedio</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_resenas }}</div>
+            <div class="stat-label">Reseñas recibidas</div>
+        </div>
+    </div>
+
+    <!-- Services List -->
+    {% if servicios %}
+    <div class="services-list">
+        {% for servicio in servicios %}
+        <div class="service-card" data-id="{{ servicio.id }}">
+            <div class="service-main">
+                <div class="service-image">
+                    <img src="{{ servicio.imagen or 'https://via.placeholder.com/120x120?text=Servicio' }}" alt="{{ servicio.nombre }}">
+                </div>
+                <div class="service-info">
+                    <div class="service-category">{{ servicio.categoria_nombre }}</div>
+                    <h3 class="service-title">{{ servicio.nombre }}</h3>
+                    <p class="service-description">{{ servicio.descripcion[:100] }}{% if servicio.descripcion|length > 100 %}...{% endif %}</p>
+                    <div class="service-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            {{ servicio.hora_inicio }}:00 - {{ servicio.hora_fin }}:00
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            {{ servicio.duracion }}h por turno
+                        </span>
+                        {% if servicio.ubicacion %}
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            {{ servicio.ubicacion }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="service-stats">
+                <div class="stat">
+                    <div class="stat-icon rating">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFB300" stroke="#FFB300">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        {{ "%.1f"|format(servicio.calificacion_promedio) if servicio.calificacion_promedio else "—" }}
+                    </div>
+                    <span class="stat-text">{{ servicio.reviews_count or 0 }} reseñas</span>
+                </div>
+                <div class="service-price">
+                    $ {{ "{:,.0f}".format(servicio.precio).replace(",", ".") }}
+                </div>
+            </div>
+
+            <div class="service-actions">
+                <button class="btn-action btn-details" onclick="toggleDetails('{{ servicio.id }}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    Ver detalles
+                </button>
+                <button class="btn-action btn-reviews" onclick="toggleReviews('{{ servicio.id }}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Reseñas
+                </button>
+                <a href="{{ url_for('editar_servicio', id=servicio.id) }}" class="btn-action btn-edit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Editar
+                </a>
+            </div>
+
+            <!-- Expandable Details Panel -->
+            <div class="details-panel" id="details-{{ servicio.id }}">
+                <div class="panel-content">
+                    <h4>Descripción completa</h4>
+                    <p>{{ servicio.descripcion or 'Sin descripción' }}</p>
+                    
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Precio</span>
+                            <span class="detail-value">$ {{ "{:,.0f}".format(servicio.precio).replace(",", ".") }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Horario</span>
+                            <span class="detail-value">{{ servicio.hora_inicio }}:00 - {{ servicio.hora_fin }}:00</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Duración</span>
+                            <span class="detail-value">{{ servicio.duracion }} hora(s)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Categoría</span>
+                            <span class="detail-value">{{ servicio.categoria_nombre }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expandable Reviews Panel -->
+            <div class="reviews-panel" id="reviews-{{ servicio.id }}">
+                <div class="panel-content">
+                    <h4>Reseñas de clientes</h4>
+                    <div class="reviews-list" id="reviews-list-{{ servicio.id }}">
+                        <div class="loading-reviews">Cargando reseñas...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+        </div>
+        <h3>Todavía no tenés servicios publicados</h3>
+        <p>Publicá tu primer servicio y empezá a recibir reservas de clientes</p>
+        <a href="{{ url_for('registrar_servicio') }}" class="btn-new-service">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Publicar mi primer servicio
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% block scripts %}
+<script>
+    function toggleDetails(id) {
+        const panel = document.getElementById(`details-${id}`);
+        const reviewsPanel = document.getElementById(`reviews-${id}`);
+        
+        // Close reviews if open
+        reviewsPanel.classList.remove('open');
+        
+        // Toggle details
+        panel.classList.toggle('open');
+    }
+
+    function toggleReviews(id) {
+        const panel = document.getElementById(`reviews-${id}`);
+        const detailsPanel = document.getElementById(`details-${id}`);
+        const reviewsList = document.getElementById(`reviews-list-${id}`);
+        
+        // Close details if open
+        detailsPanel.classList.remove('open');
+        
+        // Toggle reviews
+        const isOpen = panel.classList.toggle('open');
+        
+        // Fetch reviews if opening and not loaded yet
+        if (isOpen && reviewsList.querySelector('.loading-reviews')) {
+            fetchReviews(id);
+        }
+    }
+
+    async function fetchReviews(servicioId) {
+        const reviewsList = document.getElementById(`reviews-list-${servicioId}`);
+        
+        try {
+            const response = await fetch(`/api/resenas/${servicioId}`);
+            const resenas = await response.json();
+            
+            if (resenas && resenas.length > 0) {
+                reviewsList.innerHTML = resenas.map(resena => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-author">${resena.usuario_nombre || 'Usuario'}</span>
+                            <div class="review-rating">
+                                ${generateStars(resena.puntuacion)}
+                            </div>
+                            <span class="review-date">${formatDate(resena.fecha)}</span>
+                        </div>
+                        <p class="review-comment">${resena.comentarios_cliente || 'Sin comentario'}</p>
+                    </div>
+                `).join('');
+            } else {
+                reviewsList.innerHTML = '<div class="no-reviews">Este servicio aún no tiene reseñas</div>';
+            }
+        } catch (error) {
+            reviewsList.innerHTML = '<div class="error-reviews">Error al cargar las reseñas</div>';
+        }
+    }
+
+    function generateStars(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                stars += '<svg class="star filled" width="14" height="14" viewBox="0 0 24 24" fill="#FFB300" stroke="#FFB300"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+            } else {
+                stars += '<svg class="star" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
+            }
+        }
+        return stars;
+    }
+
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+</script>
+{% endblock %}
+{% endblock %}

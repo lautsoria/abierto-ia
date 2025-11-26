@@ -39,8 +39,8 @@ def register():
     if provider:
       providerId = str(uuid.uuid4())
       cursor.execute('''
-        INSERT INTO proveedores (id, usuario_id) 
-        VALUES (%s, %s)''', (providerId, id))
+        INSERT INTO proveedores (id) 
+        VALUES (%s)''', (id,))
     
     # guarda los cambios que hicimos en la db
     conn.commit()

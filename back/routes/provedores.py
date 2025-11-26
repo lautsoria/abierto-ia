@@ -39,7 +39,7 @@ def get_proveedores():
                 SELECT DISTINCT p.*, u.usuario as nombre_usuario, u.email,
                 GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion
                 FROM proveedores p
-                INNER JOIN usuarios u ON p.usuario_id = u.id
+                INNER JOIN usuarios u ON p.id = u.id
                 INNER JOIN servicios s ON s.proveedor_id = p.id
                 INNER JOIN categorias c ON s.categoria_id = c.id
                 LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
@@ -54,7 +54,7 @@ def get_proveedores():
                 SELECT p.*, u.usuario as nombre_usuario, u.email,
                 GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion
                 FROM proveedores p
-                INNER JOIN usuarios u ON p.usuario_id = u.id
+                INNER JOIN usuarios u ON p.id = u.id
                 LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
                 LEFT JOIN barrios b ON bu.barrio_id = b.id
                 GROUP BY p.id
@@ -83,7 +83,7 @@ def get_proveedor(id):
             SELECT p.*, u.usuario as nombre_usuario, u.email,
             GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion
             FROM proveedores p
-            INNER JOIN usuarios u ON p.usuario_id = u.id
+            INNER JOIN usuarios u ON p.id = u.id
             LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE p.id = %s
@@ -252,6 +252,52 @@ def get_ubicaciones():
         conn.close()
         
         return jsonify(ubicaciones), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# Obtener estadísticas del proveedor
+@proveedores_bp.route('/<int:id>/estadisticas')
+def get_estadisticas_proveedor(id):
+    try:
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Total de reservas de todos los servicios del proveedor
+        query_reservas = """
+            SELECT COUNT(r.id) as total_reservas
+            FROM reservas r
+            INNER JOIN servicios s ON r.servicio_id = s.id
+            WHERE s.proveedor_id = %s
+        """
+        cursor.execute(query_reservas, (id,))
+        result_reservas = cursor.fetchone()
+        total_reservas = result_reservas['total_reservas'] if result_reservas else 0
+        
+        # Promedio de rating y total de reseñas de todos los servicios del proveedor
+        query_resenas = """
+            SELECT 
+                AVG(re.puntuacion) as promedio_rating,
+                COUNT(re.id) as total_resenas
+            FROM resenas re
+            INNER JOIN servicios s ON re.servicio_id = s.id
+            WHERE s.proveedor_id = %s
+        """
+        cursor.execute(query_resenas, (id,))
+        result_resenas = cursor.fetchone()
+        
+        promedio_rating = float(result_resenas['promedio_rating']) if result_resenas and result_resenas['promedio_rating'] else 0
+        total_resenas = result_resenas['total_resenas'] if result_resenas else 0
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'total_reservas': total_reservas,
+            'promedio_rating': round(promedio_rating, 1),
+            'total_resenas': total_resenas
+        }), 200
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500

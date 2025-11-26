@@ -128,15 +128,12 @@ def confirmar_servicio(id_reserva):
     return render_template("confirmado.html", reserva=id_reserva, data=data)
  
 
-
 def generar_qr(id_reserva):
     base_url = os.getenv('PUBLIC_URL', 'http://localhost:5000')
     url = f"{base_url}/confirmar-servicio/{id_reserva}"
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
     return f"static/qr_reserva_{id_reserva}.png"
-
-
 
 @app.route('/generar-qr')
 def generarqr():
@@ -214,7 +211,7 @@ def register():
         if provider:
             # si el proveedor se registra
             # debera completar los datos de su perfil
-            resp = make_response(redirect())
+            resp = make_response(redirect(url_for('registrar_servicio')))
         else:
             resp = make_response(redirect(next_url))
         
@@ -420,7 +417,6 @@ def ver_usuarios():
     return render_template('usuarios.html',usuarios=usuarios)
 
 
-
 @app.route('/buscar')
 def buscar_servicios():
     query = request.args.get("q", "").strip()
@@ -437,7 +433,151 @@ def buscar_servicios():
 
     return render_template("resultados_busqueda.html", servicios=servicios, query=query)
 
+@app.route('/registrar_servicio', methods=['GET', 'POST'])
+@jwt_required(locations=['cookies'])
+def registrar_servicio():
+    if get_jwt()['rol'] == 'proveedor': 
+        proveedor_id = get_jwt_identity()
+        if request.method == 'POST':
+            
+            res = requests.post(f'{BACKEND_URL}/servicios', json={
+                "proveedor_id": proveedor_id,
+                "categoria_id": request.form.get('categoria_id'),
+                "nombre": request.form.get('nombre'),
+                "descripcion": request.form.get('descripcion'),
+                "precio":  request.form.get('precio'),
+                "hora_inicio": request.form.get('hora_inicio'),
+                "hora_fin": request.form.get('hora_fin'),
+                "duracion": request.form.get('duracion')
+            })
 
+            if res.status_code != 200:
+                return {"message": "Error al cargar el servicio"}, 400
+                
+            return redirect(url_for('home'))
+        
+        if request.method == 'GET':
+            data = get_jwt()
+            categorias = obtener_categorias()
+            return render_template('registrar_servicio.html', categorias=categorias, data=data)
+
+    return render_template('404.html'), 401
+    
+
+@app.route('/mis_servicios', methods=['GET', 'POST'])
+@jwt_required(locations=['cookies'])
+def mis_servicios():
+    data = get_jwt()
+    proveedor_id = get_jwt_identity()
+    
+    # Verificar que el usuario sea proveedor
+    if data.get('rol') != 'proveedor':
+        return render_template('404.html'), 401
+    
+    if request.method == 'POST':
+        # Manejar eliminación de servicio (futuro)
+        return redirect(url_for('mis_servicios'))
+
+    if request.method == 'GET':
+        servicios = obtener_servicios_proveedor(proveedor_id)
+        estadisticas = obtener_estadisticas_proveedor(proveedor_id)
+        
+        return render_template(
+            'mis_servicios.html',
+            servicios=servicios,
+            total_reservas=estadisticas.get('total_reservas', 0),
+            promedio_rating=estadisticas.get('promedio_rating', 0),
+            total_resenas=estadisticas.get('total_resenas', 0),
+            data=data
+        )
+
+
+@app.route('/api/resenas/<string:servicio_id>')
+def api_resenas_servicio(servicio_id):
+    """API endpoint para obtener reseñas de un servicio (usado por AJAX)"""
+    resenas = obtener_resenas_servicio(servicio_id)
+    return resenas if resenas else []
+
+
+@app.route('/editar_servicio/<string:id>')
+@jwt_required(locations=['cookies'])
+def editar_servicio(id):
+    data = get_jwt()
+    proveedor_id = get_jwt_identity()
+    
+    if data.get('rol') != 'proveedor':
+        return render_template('404.html'), 401
+    
+    servicio = obtener_servicio_por_id(id)
+    
+    if not servicio or servicio.get('proveedor_id') != proveedor_id:
+        return render_template('404.html'), 404
+    
+    categorias = obtener_categorias()
+    
+    return render_template(
+        'editar_servicio.html',
+        servicio=servicio,
+        categorias=categorias,
+        data=data
+    )
+
+
+@app.route('/actualizar_servicio/<string:id>', methods=['POST'])
+@jwt_required(locations=['cookies'])
+def actualizar_servicio(id):
+    data = get_jwt()
+    proveedor_id = get_jwt_identity()
+    
+    if data.get('rol') != 'proveedor':
+        return render_template('404.html'), 401
+    
+    # Verificar que el servicio pertenece al proveedor
+    servicio = obtener_servicio_por_id(id)
+    if not servicio or servicio.get('proveedor_id') != proveedor_id:
+        return render_template('404.html'), 404
+    
+    res = requests.put(f'{BACKEND_URL}/servicios/{id}', json={
+        "proveedor_id": proveedor_id,
+        "categoria_id": request.form.get('categoria_id'),
+        "nombre": request.form.get('nombre'),
+        "descripcion": request.form.get('descripcion'),
+        "precio": request.form.get('precio'),
+        "hora_inicio": request.form.get('hora_inicio'),
+        "hora_fin": request.form.get('hora_fin'),
+        "duracion": request.form.get('duracion')
+    })
+    
+    if res.status_code == 200:
+        flash('Servicio actualizado exitosamente', 'success')
+    else:
+        flash('Error al actualizar el servicio', 'error')
+    
+    return redirect(url_for('mis_servicios'))
+
+
+@app.route('/eliminar_servicio/<string:id>')
+@jwt_required(locations=['cookies'])
+def eliminar_servicio_view(id):
+    data = get_jwt()
+    proveedor_id = get_jwt_identity()
+    
+    if data.get('rol') != 'proveedor':
+        return render_template('404.html'), 401
+    
+    # Verificar que el servicio pertenece al proveedor
+    servicio = obtener_servicio_por_id(id)
+    if not servicio or servicio.get('proveedor_id') != proveedor_id:
+        return render_template('404.html'), 404
+    
+    res = requests.delete(f'{BACKEND_URL}/servicios/{id}')
+    
+    if res.status_code == 200:
+        flash('Servicio eliminado exitosamente', 'success')
+    else:
+        flash('Error al eliminar el servicio', 'error')
+    
+    return redirect(url_for('mis_servicios'))
 
 
 if __name__ == '__main__':

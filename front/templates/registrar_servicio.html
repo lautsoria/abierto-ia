@@ -1,0 +1,229 @@
+{% extends "base/base.html" %}
+
+{% block title %}Publicar servicio{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/registrar_servicio.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="publish-container">
+    <div class="publish-header">
+        <h1>Publicar un servicio</h1>
+        <p>Completá los datos de tu servicio para que los clientes puedan encontrarte</p>
+    </div>
+
+    <form id="serviceForm" action="{{ url_for('registrar_servicio') }}" method="POST">
+        
+        <div class="card">
+            <h2 class="section-title">Información del servicio</h2>
+            
+            <div class="form-group">
+                <label class="form-label" for="nombre">Nombre del servicio</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" 
+                       placeholder="Ej: Instalación de aires acondicionados" 
+                       maxlength="100" required>
+                <div class="char-counter"><span id="nombreCount">0</span>/100</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="categoria">Categoría</label>
+                <select id="categoria" name="categoria_id" class="form-control" required>
+                    <option value="">Seleccioná una categoría</option>
+                    {% for cat in categorias %}
+                        <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="descripcion">Descripción <span class="form-hint">(Opcional)</span></label>
+                <textarea id="descripcion" name="descripcion" class="form-control" 
+                          placeholder="Describí en detalle qué incluye tu servicio, tu experiencia, materiales, garantías..."
+                          maxlength="500"></textarea>
+                <div class="char-counter"><span id="descripcionCount">0</span>/500</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Precio</h2>
+            
+            <div class="form-group">
+                <label class="form-label" for="precio">¿Cuánto cobrás por este servicio?</label>
+                <div class="input-prefix">
+                    <span class="prefix">$</span>
+                    <input type="number" id="precio" name="precio" class="form-control" 
+                           placeholder="0.00" min="100" step="0.01" required>
+                </div>
+                <p class="help-text">Precio mínimo: $100</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Disponibilidad horaria</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 1.5rem;">
+                Configurá tu horario de trabajo para que los clientes puedan reservar turnos
+            </p>
+            
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label class="form-label" for="hora_inicio">Hora de inicio</label>
+                    <select id="hora_inicio" name="hora_inicio" class="form-control" required>
+                        <option value="">Desde</option>
+                        {% for h in range(6, 22) %}
+                            <option value="{{ h }}">{{ '%02d:00' % h }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="hora_fin">Hora de fin</label>
+                    <select id="hora_fin" name="hora_fin" class="form-control" required>
+                        <option value="">Hasta</option>
+                        {% for h in range(7, 23) %}
+                            <option value="{{ h }}">{{ '%02d:00' % h }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="duracion">Duración del turno</label>
+                    <select id="duracion" name="duracion" class="form-control" required>
+                        <option value="">Seleccioná</option>
+                        <option value="1">1 hora</option>
+                        <option value="2">2 horas</option>
+                        <option value="3">3 horas</option>
+                        <option value="4">4 horas</option>
+                        <option value="5">5 horas</option>
+                        <option value="6">6 horas</option>
+                        <option value="8">8 horas</option>
+                    </select>
+                </div>
+            </div>
+            <p class="help-text">💡 La duración debe ser menor al rango horario disponible</p>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Vista previa</h2>
+            <p style="color: #666; font-size: 14px; margin-bottom: 1rem;">
+                Así se verá tu servicio para los clientes
+            </p>
+            
+            <div class="preview-card">
+                <div class="preview-img">Sin imagen</div>
+                <div class="preview-info">
+                    <h4 id="previewNombre">Nombre del servicio</h4>
+                    <div class="preview-price">$ <span id="previewPrecio">0</span></div>
+                    <div class="preview-category" id="previewCategoria">Categoría</div>
+                    <div class="preview-schedule">
+                        🕐 <span id="previewHorario">--:-- a --:--</span> 
+                        · <span id="previewDuracion">-</span> hs por turno
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="text-align: center;">
+            <button type="submit" class="btn-publish">Publicar servicio</button>
+            <p style="margin-top: 1rem; font-size: 12px; color: #999;">
+                Al publicar, aceptás los términos y condiciones de Abierto IA
+            </p>
+        </div>
+    </form>
+</div>
+
+{% block scripts %}
+<script>
+    document.getElementById('nombre').addEventListener('input', function() {
+        document.getElementById('nombreCount').textContent = this.value.length;
+        document.getElementById('previewNombre').textContent = this.value || 'Nombre del servicio';
+    });
+
+    document.getElementById('descripcion').addEventListener('input', function() {
+        document.getElementById('descripcionCount').textContent = this.value.length;
+    });
+
+    document.getElementById('precio').addEventListener('input', function() {
+        const precio = parseFloat(this.value) || 0;
+        document.getElementById('previewPrecio').textContent = precio.toLocaleString('es-AR');
+    });
+
+
+    document.getElementById('categoria').addEventListener('change', function() {
+        const selected = this.options[this.selectedIndex];
+        document.getElementById('previewCategoria').textContent = selected.text || 'Categoría';
+    });
+
+
+    function updateSchedulePreview() {
+        const inicio = document.getElementById('hora_inicio').value;
+        const fin = document.getElementById('hora_fin').value;
+        const duracion = document.getElementById('duracion').value;
+        
+        if (inicio && fin) {
+            document.getElementById('previewHorario').textContent = 
+                `${inicio.padStart(2, '0')}:00 a ${fin.padStart(2, '0')}:00`;
+        }
+        
+        if (duracion) {
+            document.getElementById('previewDuracion').textContent = duracion;
+        }
+    }
+
+    document.getElementById('hora_inicio').addEventListener('change', updateSchedulePreview);
+    document.getElementById('hora_fin').addEventListener('change', updateSchedulePreview);
+    document.getElementById('duracion').addEventListener('change', updateSchedulePreview);
+
+    document.getElementById('hora_fin').addEventListener('change', function() {
+        const inicio = parseInt(document.getElementById('hora_inicio').value);
+        const fin = parseInt(this.value);
+        
+        if (inicio && fin && fin <= inicio) {
+            alert('La hora de fin debe ser posterior a la hora de inicio');
+            this.value = '';
+        }
+    });
+
+    document.getElementById('duracion').addEventListener('change', function() {
+        const inicio = parseInt(document.getElementById('hora_inicio').value);
+        const fin = parseInt(document.getElementById('hora_fin').value);
+        const duracion = parseInt(this.value);
+        
+        if (inicio && fin && duracion) {
+            const rangoDisponible = fin - inicio;
+            if (duracion > rangoDisponible) {
+                alert(`La duración (${duracion}h) no puede ser mayor al rango horario disponible (${rangoDisponible}h)`);
+                this.value = '';
+            }
+        }
+    });
+
+    // validamos que los datos tengan sentido
+    document.getElementById('serviceForm').addEventListener('submit', function(e) {
+        const inicio = parseInt(document.getElementById('hora_inicio').value);
+        const fin = parseInt(document.getElementById('hora_fin').value);
+        const duracion = parseInt(document.getElementById('duracion').value);
+        const precio = parseFloat(document.getElementById('precio').value);
+
+        if (fin <= inicio) {
+            e.preventDefault();
+            alert('La hora de fin debe ser posterior a la hora de inicio');
+            return;
+        }
+
+        if (duracion > (fin - inicio)) {
+            e.preventDefault();
+            alert('La duración del turno no puede ser mayor al rango horario');
+            return;
+        }
+
+        if (precio < 100) {
+            e.preventDefault();
+            alert('El precio mínimo es $100');
+            return;
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}
+

@@ -22,9 +22,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE TABLE IF NOT EXISTS proveedores (
   id UUID PRIMARY KEY,
-  usuario_id UUID NULL,
   descripcion VARCHAR(500),
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+  FOREIGN KEY (id) REFERENCES usuarios(id)
 );
 
 CREATE TABLE IF NOT EXISTS categorias (
@@ -34,6 +33,8 @@ CREATE TABLE IF NOT EXISTS categorias (
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- TODO: agregar ubicacion al servicio
+-- tendremos que crear una nueva tabla que sea ubicaciones_servicio
 CREATE TABLE IF NOT EXISTS servicios (
   id UUID PRIMARY KEY,
   proveedor_id UUID NOT NULL,
@@ -65,7 +66,7 @@ CREATE TABLE IF NOT EXISTS reservas (
 );
 
 CREATE TABLE IF NOT EXISTS resenas (
-  id UUID() PRIMARY KEY,
+  id UUID PRIMARY KEY,
   usuario_id UUID NOT NULL,
   servicio_id UUID NOT NULL,
   puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),
@@ -210,9 +211,8 @@ JOIN barrios b ON
     (u.usuario = 'diego_torres' AND b.nombre = 'Recoleta');
 
 -- Insert dummy proveedores (using existing user IDs)
-INSERT INTO proveedores (id, usuario_id, descripcion) 
+INSERT INTO proveedores (id, descripcion) 
 SELECT 
-  UUID(),
   id,
   CASE 
     WHEN usuario = 'juan_perez' THEN 'Plomero profesional con 10 años de experiencia'
@@ -257,18 +257,19 @@ SELECT
   END, -- duracion en horas
   NOW()
 FROM proveedores p
+JOIN usuarios u ON p.id = u.id
 CROSS JOIN categorias c
-WHERE (p.usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez') AND c.nombre = 'Plomería')
-   OR (p.usuario_id = (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz') AND c.nombre = 'Electricidad')
-   OR (p.usuario_id = (SELECT id FROM usuarios WHERE usuario = 'luis_martin') AND c.nombre = 'Carpintería')
-   OR (p.usuario_id = (SELECT id FROM usuarios WHERE usuario = 'diego_torres') AND c.nombre = 'Limpieza')
+WHERE (u.usuario = 'juan_perez' AND c.nombre = 'Plomería')
+   OR (u.usuario = 'carlos_ruiz' AND c.nombre = 'Electricidad')
+   OR (u.usuario = 'luis_martin' AND c.nombre = 'Carpintería')
+   OR (u.usuario = 'diego_torres' AND c.nombre = 'Limpieza')
 LIMIT 4;
 
 -- Insert additional services
 INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, hora_inicio, hora_fin, duracion, fecha_creacion)
 SELECT 
   UUID(),
-  (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez')),
+  (SELECT id FROM usuarios WHERE usuario = 'juan_perez'),
   (SELECT id FROM categorias WHERE nombre = 'Plomería'),
   'Instalación de grifería',
   'Instalación y cambio de canillas y grifos',
@@ -281,52 +282,52 @@ SELECT
 -- Insert 10 more varied services
 INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, hora_inicio, hora_fin, duracion, fecha_creacion) VALUES
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez')),
+ (SELECT id FROM usuarios WHERE usuario = 'juan_perez'),
  (SELECT id FROM categorias WHERE nombre = 'Plomería'),
  'Destapación de cañerías', 'Servicio de destapación con máquina profesional', 4500.00, 8, 20, 2, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz')),
+ (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'),
  (SELECT id FROM categorias WHERE nombre = 'Electricidad'),
  'Instalación de tomas', 'Instalación de enchufes y tomas eléctricas', 3200.00, 9, 18, 2, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz')),
+ (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'),
  (SELECT id FROM categorias WHERE nombre = 'Electricidad'),
  'Revisión de tablero eléctrico', 'Inspección y mantenimiento de tableros', 5500.00, 8, 17, 3, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'luis_martin')),
+ (SELECT id FROM usuarios WHERE usuario = 'luis_martin'),
  (SELECT id FROM categorias WHERE nombre = 'Carpintería'),
  'Reparación de puertas', 'Ajuste y reparación de puertas de madera', 3800.00, 10, 18, 4, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'luis_martin')),
+ (SELECT id FROM usuarios WHERE usuario = 'luis_martin'),
  (SELECT id FROM categorias WHERE nombre = 'Carpintería'),
  'Instalación de estanterías', 'Colocación de estantes y repisas personalizadas', 6500.00, 9, 19, 5, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'diego_torres')),
+ (SELECT id FROM usuarios WHERE usuario = 'diego_torres'),
  (SELECT id FROM categorias WHERE nombre = 'Limpieza'),
  'Limpieza de oficinas', 'Servicio de limpieza empresarial completo', 8000.00, 7, 15, 6, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'diego_torres')),
+ (SELECT id FROM usuarios WHERE usuario = 'diego_torres'),
  (SELECT id FROM categorias WHERE nombre = 'Limpieza'),
  'Limpieza de vidrios', 'Lavado profesional de ventanas y cristales', 2200.00, 9, 17, 3, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'juan_perez')),
+ (SELECT id FROM usuarios WHERE usuario = 'juan_perez'),
  (SELECT id FROM categorias WHERE nombre = 'Jardinería'),
  'Mantenimiento de jardín', 'Corte de césped y poda de plantas', 4200.00, 8, 16, 5, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz')),
+ (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'),
  (SELECT id FROM categorias WHERE nombre = 'Pintura'),
  'Pintura de interiores', 'Pintura profesional de ambientes', 12000.00, 9, 18, 8, NOW()),
 
 (UUID(), 
- (SELECT id FROM proveedores WHERE usuario_id = (SELECT id FROM usuarios WHERE usuario = 'luis_martin')),
+ (SELECT id FROM usuarios WHERE usuario = 'luis_martin'),
  (SELECT id FROM categorias WHERE nombre = 'Pintura'),
  'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, 8, 20, 10, NOW());
 

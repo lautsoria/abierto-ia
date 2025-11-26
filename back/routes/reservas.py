@@ -123,7 +123,7 @@ def get_mis_reservas():
                 FROM reservas r
                 INNER JOIN servicios s ON r.servicio_id = s.id
                 INNER JOIN proveedores p ON s.proveedor_id = p.id
-                INNER JOIN usuarios u ON p.usuario_id = u.id
+                INNER JOIN usuarios u ON p.id = u.id
                 INNER JOIN categorias c ON s.categoria_id = c.id
                 WHERE r.usuario_id = %s
                 ORDER BY r.fecha_servicio ASC
@@ -146,7 +146,7 @@ def get_mis_reservas():
                     INNER JOIN proveedores p ON s.proveedor_id = p.id
                     INNER JOIN usuarios u ON r.usuario_id = u.id
                     INNER JOIN categorias c ON s.categoria_id = c.id
-                    WHERE p.usuario_id = %s
+                    WHERE p.id = %s
                     ORDER BY r.fecha_servicio DESC
             """
             cursor.execute(query, (usuario_id,))
@@ -206,7 +206,7 @@ def get_all_reservas():
             INNER JOIN servicios s ON r.servicio_id = s.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios uc ON r.usuario_id = uc.id
-            INNER JOIN usuarios up ON p.usuario_id = up.id
+            INNER JOIN usuarios up ON p.id = up.id
             INNER JOIN categorias c ON s.categoria_id = c.id
             ORDER BY r.fecha_reserva DESC
         """
@@ -295,7 +295,7 @@ def get_reserva(id):
             INNER JOIN servicios s ON r.servicio_id = s.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios uc ON r.usuario_id = uc.id
-            INNER JOIN usuarios up ON p.usuario_id = up.id
+            INNER JOIN usuarios up ON p.id = up.id
             INNER JOIN categorias c ON s.categoria_id = c.id
             LEFT JOIN barrios_usuarios bu ON up.id = bu.usuario_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id

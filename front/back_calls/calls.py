@@ -6,7 +6,7 @@ BACKEND_URL = 'http://localhost:5500'
 
 def obtener_cantidad_categoria(nombre):
     try:
-        response = requests.get(f'{BACKEND_URL}/categoria/{nombre}')
+        response = requests.get(f'{BACKEND_URL}/categorias/{nombre}')
         
         if response.status_code == 200:
             data = response.json()
@@ -83,7 +83,7 @@ def obtener_proveedor_detalle(proveedor_id):
 def obtener_categorias():
     try:
         response = requests.get(  
-            f'{BACKEND_URL}/categoria',
+            f'{BACKEND_URL}/categorias',
             timeout=5
         )
         
@@ -286,4 +286,42 @@ def generar_qr(id_reserva, token):
     url = f"http://localhost:5000/reservas/confirmar-servicio/{id_reserva}/{token}"
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
-    return f"static/qr_reserva_{id_reserva}.png" 
+    return f"static/qr_reserva_{id_reserva}.png"
+
+def obtener_servicios_proveedor(proveedor_id):
+    """Obtiene todos los servicios de un proveedor"""
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/servicios/proveedor/{proveedor_id}',
+            timeout=5
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        return []
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener servicios del proveedor: {e}")
+        return []
+
+def obtener_estadisticas_proveedor(proveedor_id):
+    """Obtiene estadísticas del proveedor (reservas, rating promedio, total reseñas)"""
+    try:
+        response = requests.get(
+            f'{BACKEND_URL}/proveedores/{proveedor_id}/estadisticas',
+            timeout=5
+        )
+        
+        if response.status_code == 200:
+            return response.json()
+        return {
+            'total_reservas': 0,
+            'promedio_rating': 0,
+            'total_resenas': 0
+        }
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener estadísticas del proveedor: {e}")
+        return {
+            'total_reservas': 0,
+            'promedio_rating': 0,
+            'total_resenas': 0
+        } 
