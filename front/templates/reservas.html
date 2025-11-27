@@ -26,11 +26,13 @@
                             data-bs-target="#modal-{{ reserva.id }}">
                         Ver Detalle
                     </button>
-                    {% if rol == "proveedor" %}   
-                        <a href="{{ url_for('generarqr', id_reserva=reserva.id) }}" 
-                        class="btn btn-success btn-sm ms-2">
-                        Generar QR
-                        </a>
+                    {% if rol == "proveedor" %}
+                        {% if reserva.estado != 'realizado' %}    
+                            <a href="{{ url_for('generarqr', id_reserva=reserva.id) }}" 
+                            class="btn btn-success btn-sm ms-2">
+                            Generar QR
+                            </a>
+                        {% endif %}
                     {% endif %}
                 </li>
 

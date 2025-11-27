@@ -3,12 +3,11 @@
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/usuarios.css') }}">
 {% endblock %}
+
 {% block content %}
 <div class="container">
-    <div class="header">
-        <h1>Gestión de Servicios</h1>
-        
-    </div>
+    <h1>Gestión de Servicios</h1>
+
     {% if servicios %}
     <div class="table-container">
         <table class="usuarios-table">
@@ -17,43 +16,73 @@
                     <th>ID</th>
                     <th>Proveedor</th>
                     <th>Nombre</th>
-                    <th>Categoria</th>
-                    <th>Descripcion</th>
-                    <th>Precio </th>
-                    <th>Duracion</th>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
+                    <th>acciones</th>
+                    
                 </tr>
             </thead>
+
             <tbody>
                 {% for servicio in servicios %}
                 <tr>
-                    <td>{{ servicio.id }}</td>
-                    <td>{{ servicio.proveedor_id }}</td>
-                    <td>{{ servicio.nombre }}</td>
-                    <td>{{ servicio.categoria }}</td>
-                    <td>{{ servicio.descripcion }}</td>
-                    <td>{{ servicio.precio }}</td>
-                    <td>{{ servicio.duracion }}</td>
-                    <td class="actions">
-                        <form action="{{ url_for('eliminar_servicio', id=usuario.id) }}" method="POST" style="display:inline;">
-                            <button type="submit" class="btn-icon btn-delete">
-                                <i class="fas fa-trash"></i>
+                    
+                    <form action="{{ url_for('editar_servicio', id=servicio.id) }}" method="POST">
+                        
+                        <td>{{ servicio.id }}</td>
+
+                        <td>
+                            <input type="text" name="proveedor_id" value="{{ servicio.proveedor_id }}">
+                        </td>
+
+                        <td>
+                            <input type="text" name="nombre" value="{{ servicio.nombre }}">
+                        </td>
+
+                        <td>
+                            <input type="text" name="categoria" value="{{ servicio.categoria }}">
+                        </td>
+
+                        <td>
+                            <textarea name="descripcion">{{ servicio.descripcion }}</textarea>
+                        </td>
+
+                        <td>
+                            <input type="number" step="0.01" name="precio" value="{{ servicio.precio }}">
+                        </td>
+
+                        <td>
+                            <input type="text" name="duracion" value="{{ servicio.duracion }}">
+                        </td>
+
+                        <td class="actions">
+                            <button type="submit" class="btn-icon btn-save" title="guardar cambios">
+                                <i class="fas fa-save"></i>
                             </button>
-                        </form>
-                                                
-                    </td>
+                        
+
+                            <form action="{{ url_for('eliminar_servicio', id=servicio.id) }}"
+                                  method="POST" style="display:inline;">
+                                <button type="submit" class="btn-icon btn-delete" title="eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+
+                    </form>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
     {% else %}
     <div class="empty-state">
         <i class="fas fa-users fa-4x"></i>
         <h2>No hay servicios registrados</h2>
-        
     </div>
     {% endif %}
 </div>
-
 {% endblock %}
-

@@ -7,7 +7,7 @@ resenas_bp = Blueprint('resenas', __name__)
 def resenas_de_servicio(id):
     try:
       conn = db_conn()
-      cursor = conn.cursor(dictionary=True)  # ✅ Added dictionary=True
+      cursor = conn.cursor(dictionary=True)
 
       query = '''
               SELECT 

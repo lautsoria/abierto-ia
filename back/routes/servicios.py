@@ -316,3 +316,56 @@ def eliminar_servicio(id):
         
     except Exception as e:
         return jsonify({'error': 'Error al eliminar el servicio'}), 500
+    
+@servicios_bp.route('/<string:id>/mod', methods=['PUT'])
+def mod_servicio(id):
+    try:
+        data = request.get_json()
+
+        conn = db_conn()
+        cursor = conn.cursor()
+
+        # fijarse si existe, puede ser innecesario
+        cursor.execute("SELECT id FROM servicios WHERE id = %s", (id,))
+        servicio = cursor.fetchone()
+
+        if servicio is None:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Servicio no encontrado'}), 404
+
+        # update
+        update_query = """
+            UPDATE servicios
+            SET proveedor_id = %s,
+                categoria_id = %s,
+                nombre = %s,
+                descripcion = %s,
+                precio = %s,
+                hora_inicio = %s,
+                hora_fin = %s,
+                duracion = %s
+            WHERE id = %s
+        """
+
+        cursor.execute(update_query, (
+            data.get('proveedor_id'),
+            data.get('categoria_id'),
+            data.get('nombre'),
+            data.get('descripcion'),
+            data.get('precio'),
+            data.get('hora_inicio'),
+            data.get('hora_fin'),
+            data.get('duracion'),
+            id
+        ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'message': 'Servicio modificado correctamente'}), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Error al modificar el servicio'}), 500

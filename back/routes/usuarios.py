@@ -82,3 +82,49 @@ def get_usuarios():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+@usuarios_bp.route('/<string:id>/mod', methods=['PUT'])
+def mod_usuario(id):
+    try:
+        data = request.get_json()
+
+        conn = db_conn()
+        cursor = conn.cursor()
+
+        # 1. Verificar si el usuario existe
+        cursor.execute("SELECT id FROM usuarios WHERE id = %s", (id,))
+        user = cursor.fetchone()
+
+        if user is None:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+
+        # 2. UPDATE correcto de la tabla usuarios
+        update_query = """
+            UPDATE usuarios
+            SET nombre = %s,
+                email = %s,
+                rol = %s
+            WHERE id = %s
+        """
+
+        cursor.execute(update_query, (
+            data.get('nombre'),
+            data.get('email'),
+            data.get('rol'),
+            id
+        ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({'message': 'Usuario modificado correctamente'}), 200
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Error al modificar el usuario'}), 500
+
+
