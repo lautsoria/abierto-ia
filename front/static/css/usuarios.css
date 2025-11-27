@@ -5,7 +5,29 @@
     padding: 0 1.5rem;
 }
 
+input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #2d3748;
+    background-color: white;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+input, select {
+    outline: none; 
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 10px;
+    transition: all 0.2s ease-in-out;
+}
 
+input:focus, select:focus {
+    border-color: #5b9bd5;
+    box-shadow: 0 0 5px rgba(91, 155, 213, 0.5);
+}
 .header {
     display: flex;
     justify-content: space-between;
@@ -35,7 +57,25 @@
     gap: 0.5rem;
     transition: all 0.3s ease;
 }
+.btn-save {
+    background-color: #d1fae5;
+    color: #065f46;
+}
 
+.btn-save:hover {
+    background-color: #10b981;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+}
+
+.btn-save:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
 .btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -98,22 +138,36 @@
     display: inline-block;
 }
 
-.badge-admin {
-    background-color: #fee;
-    color: #c53030;
+
+
+.roles {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    color: #333;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+    cursor: pointer;
 }
 
-.badge-proveedor{
-    background-color: #fef3c7;
-    color: #d97706;
-}
 
-.badge-usuario {
-    background-color: #dbeafe;
-    color: #1e40af;
+.roles:hover {
+    border-color: #888;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
 
+.roles:focus {
+    border-color: #5b9bd5;
+    box-shadow: 0 0 8px rgba(91, 155, 213, 0.5);
+}
+
+
+.roles option {
+    padding: 4px 8px;
+}
 
 
 

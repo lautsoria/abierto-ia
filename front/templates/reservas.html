@@ -15,19 +15,19 @@
                         <p class="text-muted">Para el: {{ reserva.fecha_servicio }} a las {{ reserva.hora_servicio }}</p>
                     </div>
                     
-                    <div class="reservation-actions">
-                        <span class="badge {% if reserva.estado == 'pendiente' %}badge-warning{% elif reserva.estado == 'confirmado' %}badge-primary{% elif reserva.estado == 'realizado' %}badge-success{% else %}badge-danger{% endif %}">
-                            {{ reserva.estado }}
-                        </span>
-                        <button class="btn btn-primary" onclick="openModal('modal-{{ reserva.id }}')">
-                            Ver Detalle
-                        </button>
-                        {% if rol == "proveedor" %}   
-                            <a href="{{ url_for('generarqr', id_reserva=reserva.id) }}" class="btn btn-success">
-                                Generar QR
+                    <button class="btn btn-primary btn-sm" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modal-{{ reserva.id }}">
+                        Ver Detalle
+                    </button>
+                    {% if rol == "proveedor" %}
+                        {% if reserva.estado != 'realizado' %}    
+                            <a href="{{ url_for('generarqr', id_reserva=reserva.id) }}" 
+                            class="btn btn-success btn-sm ms-2">
+                            Generar QR
                             </a>
                         {% endif %}
-                    </div>
+                    {% endif %}
                 </li>
 
                 <div id="modal-{{ reserva.id }}" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'modal-{{ reserva.id }}')">

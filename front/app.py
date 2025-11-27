@@ -373,6 +373,24 @@ def error(e):
    return render_template('404.html'), 404
 
 
+
+@app.route('/usuarios/<id>/editar', methods=['POST'])
+def editar_usuario(id):
+    data = request.form
+    payload = {
+        "nombre": data.get("nombre"),
+        "email": data.get("email"),
+        "rol": data.get("rol"),
+    }
+
+    response = requests.put(f"{BACKEND_URL}/usuarios/{id}/mod", json=payload)
+
+    if response.status_code != 200:
+        return "Error al modificar usuario", 400
+
+    return redirect(url_for('ver_usuarios'))
+
+
 @app.route('/usuarios/<int:id>/eliminar', methods=['POST'])
 def eliminar_usuario(id):
     response = requests.delete(f"{BACKEND_URL}/usuarios/{id}/eliminar")
@@ -413,6 +431,25 @@ def ver_usuarios():
     usuarios = response.json()
 
     return render_template('usuarios.html',usuarios=usuarios)
+
+
+@app.route('/servicios/<int:id>/editar', methods=['POST'])
+def editar_servicio(id):
+    payload = {
+        "proveedor_id": request.form.get("proveedor_id"),
+        "nombre": request.form.get("nombre"),
+        "categoria": request.form.get("categoria"),
+        "descripcion": request.form.get("descripcion"),
+        "precio": request.form.get("precio"),
+        "duracion": request.form.get("duracion"),
+    }
+
+    response = requests.put(f"{BACKEND_URL}/servicios/{id}/mod", json=payload)
+
+    if response.status_code not in (200, 204):
+        return "Error al actualizar servicio", 400
+
+    return redirect(url_for('servicios'))
 
 @app.route('/todos_servicios')
 @jwt_required(locations=['cookies'])
@@ -612,7 +649,6 @@ def cancelar_reserva(id):
 @jwt_required(locations=['cookies'])
 def logout():
     return 
-
 
 if __name__ == '__main__':
     app.run("localhost", port=1234, debug=True)
