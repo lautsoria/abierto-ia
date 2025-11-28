@@ -12,10 +12,10 @@
   <header class="header">
     <div class="header-top">
       <div class="header-left">
-        <div class="logo">
+        <a href="{{ url_for('home') }}" class="logo">
           <span class="logo-icon">🤝</span>
           <span class="logo-text">Mercado<br><strong>Servicios</strong></span>
-        </div>
+        </a>
         <div class="location">
           <span class="location-icon">📍</span>
           <div>
@@ -41,17 +41,18 @@
 
       <nav class="header-nav">
         {% if data %}
+
+          <a href="{{ url_for('perfil') }}" class="nav-link end">Hola, {{ data.user }}</a>
+
           {% if data.rol == 'proveedor' %}
             <a href="{{ url_for('mis_reservas') }}" class="nav-link">Calendario</a>
             <a href="{{ url_for('registrar_servicio') }}" class="nav-link">Registrar servicio</a>
-            <a href="{{ url_for('perfil') }}" class="nav-link end">Mi perfil</a>
-            <a href="#" class="nav-link">Mis servicios</a>
+            <a href="{{ url_for('mis_servicios') }}" class="nav-link">Mis servicios</a>
           {% endif %}
 
           {% if data.rol == 'cliente' %}
             <a href="{{ url_for('home') }}#categorias" class="nav-link">Categorías</a>
             <a href="{{ url_for('mis_reservas') }}" class="nav-link">Reservas Agendadas</a>
-            <a href="{{ url_for('perfil') }}" class="nav-link end">Mi Perfil</a>   
           {% endif %}
           
           {% if data.rol == 'admin' %}
@@ -62,7 +63,7 @@
         
         {% else %}
           <a href="{{ url_for('home') }}#categorias" class="nav-link">Categorías</a>
-          <a href="{{ url_for('auth') }}" class="nav-link end">Inicia Sesion</a>
+          <a href="{{ url_for('auth') }}" class="nav-link end">Ingresar</a>
         {% endif %}
       </nav>
     </div>

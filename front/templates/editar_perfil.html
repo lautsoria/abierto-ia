@@ -18,7 +18,7 @@
                 
                 <div class="form-group">
                     <label>Nombre Completo</label>
-                    <input type="text" name="nombre" value="{{ usuario.nombre }}" required>
+                    <input type="text" name="nombre" value="{{ usuario.usuario }}" required>
                 </div>
 
                 <div class="form-row form-group">
@@ -53,7 +53,8 @@
 
                 <div class="btn-container">
                     <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                    <a href="#" class="btn btn-secondary">Cancelar</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger">Cerrar Sesión</a>
+                    <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancelar</a>
                 </div>
 
             </form>

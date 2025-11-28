@@ -302,26 +302,3 @@ def obtener_servicios_proveedor(proveedor_id):
     except requests.exceptions.RequestException as e:
         print(f"Error al obtener servicios del proveedor: {e}")
         return []
-
-def obtener_estadisticas_proveedor(proveedor_id):
-    """Obtiene estadísticas del proveedor (reservas, rating promedio, total reseñas)"""
-    try:
-        response = requests.get(
-            f'{BACKEND_URL}/proveedores/{proveedor_id}/estadisticas',
-            timeout=5
-        )
-        
-        if response.status_code == 200:
-            return response.json()
-        return {
-            'total_reservas': 0,
-            'promedio_rating': 0,
-            'total_resenas': 0
-        }
-    except requests.exceptions.RequestException as e:
-        print(f"Error al obtener estadísticas del proveedor: {e}")
-        return {
-            'total_reservas': 0,
-            'promedio_rating': 0,
-            'total_resenas': 0
-        } 

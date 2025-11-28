@@ -37,15 +37,52 @@
                             <button type="button" class="btn-close" onclick="closeModal('modal-{{ reserva.id }}')">&times;</button>
                         </div>
                         <div class="modal-body">
-                            <p><strong>Trabajo:</strong> {{ reserva.servicio_nombre }}</p>
-                            <p><strong>Proveedor:</strong> {{ reserva.proveedor_nombre }}</p>
-                            <p><strong>Horario y Fecha:</strong> {{ reserva.fecha_servicio }}</p>
-                            <hr style="border: 0; border-top: 1px solid #dee2e6;">
-                            <p><strong>Categoría:</strong> {{ reserva.categoria }}</p>
-                            <p><strong>Estado:</strong> <span class="badge">{{ reserva.estado }}</span></p>
-                            <p><strong>Tus comentarios:</strong> "{{ reserva.comentarios_cliente }}"</p>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Trabajo</span>
+                                    <span class="detail-value">{{ reserva.servicio_nombre }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Proveedor</span>
+                                    <span class="detail-value">{{ reserva.proveedor_nombre }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Fecha</span>
+                                    <span class="detail-value">{{ reserva.fecha_servicio }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Hora</span>
+                                    <span class="detail-value">{{ reserva.hora_servicio }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Categoría</span>
+                                    <span class="detail-value">{{ reserva.categoria }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Estado</span>
+                                    <div>
+                                        <span class="badge {% if reserva.estado == 'pendiente' %}badge-warning{% elif reserva.estado == 'confirmado' %}badge-primary{% elif reserva.estado == 'realizado' %}badge-success{% else %}badge-danger{% endif %}">
+                                            {{ reserva.estado }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if reserva.comentarios_cliente %}
+                                <div class="detail-item full-width">
+                                    <span class="detail-label">Tus comentarios</span>
+                                    <p class="detail-text">"{{ reserva.comentarios_cliente }}"</p>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="modal-footer">
+                            {% if reserva.estado == 'pendiente' %}
+                            
+                                <form action="{{ url_for('cancelar_reserva', id=reserva.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas cancelar esta reserva?')">
+                                        Cancelar Reserva
+                                    </button>
+                                </form>
+                            {% endif %}
                             <button type="button" class="btn btn-secondary" onclick="closeModal('modal-{{ reserva.id }}')">Cerrar</button>
                         </div>
                     </div>

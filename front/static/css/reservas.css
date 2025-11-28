@@ -183,3 +183,58 @@ color: #000;
 .btn-success:hover {
     background-color: #157347;
 }
+
+/* Modal Detail Styles */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.detail-value {
+    font-size: 1rem;
+    color: #212529;
+    font-weight: 500;
+}
+
+.detail-text {
+    font-style: italic;
+    color: #495057;
+    margin: 0;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}

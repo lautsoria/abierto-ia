@@ -8,7 +8,6 @@
 
 {% block content %}
 <div class="services-container">
-    <!-- Header -->
     <div class="services-header">
         <div class="header-left">
             <h1>Mis Servicios</h1>
@@ -23,27 +22,6 @@
         </a>
     </div>
 
-    <!-- Stats Summary -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-value">{{ servicios|length }}</div>
-            <div class="stat-label">Servicios activos</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ total_reservas }}</div>
-            <div class="stat-label">Reservas totales</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ "%.1f"|format(promedio_rating) if promedio_rating else "—" }}</div>
-            <div class="stat-label">Calificación promedio</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ total_resenas }}</div>
-            <div class="stat-label">Reseñas recibidas</div>
-        </div>
-    </div>
-
-    <!-- Services List -->
     {% if servicios %}
     <div class="services-list">
         {% for servicio in servicios %}
@@ -87,15 +65,6 @@
             </div>
             
             <div class="service-stats">
-                <div class="stat">
-                    <div class="stat-icon rating">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFB300" stroke="#FFB300">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                        {{ "%.1f"|format(servicio.calificacion_promedio) if servicio.calificacion_promedio else "—" }}
-                    </div>
-                    <span class="stat-text">{{ servicio.reviews_count or 0 }} reseñas</span>
-                </div>
                 <div class="service-price">
                     $ {{ "{:,.0f}".format(servicio.precio).replace(",", ".") }}
                 </div>
@@ -110,12 +79,6 @@
                     </svg>
                     Ver detalles
                 </button>
-                <button class="btn-action btn-reviews" onclick="toggleReviews('{{ servicio.id }}')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    Reseñas
-                </button>
                 <a href="{{ url_for('editar_servicio', id=servicio.id) }}" class="btn-action btn-edit">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -125,7 +88,6 @@
                 </a>
             </div>
 
-            <!-- Expandable Details Panel -->
             <div class="details-panel" id="details-{{ servicio.id }}">
                 <div class="panel-content">
                     <h4>Descripción completa</h4>
@@ -148,16 +110,6 @@
                             <span class="detail-label">Categoría</span>
                             <span class="detail-value">{{ servicio.categoria_nombre }}</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Expandable Reviews Panel -->
-            <div class="reviews-panel" id="reviews-{{ servicio.id }}">
-                <div class="panel-content">
-                    <h4>Reseñas de clientes</h4>
-                    <div class="reviews-list" id="reviews-list-{{ servicio.id }}">
-                        <div class="loading-reviews">Cargando reseñas...</div>
                     </div>
                 </div>
             </div>
@@ -188,77 +140,11 @@
 
 {% block scripts %}
 <script>
+    // cuando ver mas es clickeado, se agrega la clase open y se saca al clickear de nuevo
+    // pues por defecto el panel tiene altura 0
     function toggleDetails(id) {
         const panel = document.getElementById(`details-${id}`);
-        const reviewsPanel = document.getElementById(`reviews-${id}`);
-        
-        // Close reviews if open
-        reviewsPanel.classList.remove('open');
-        
-        // Toggle details
         panel.classList.toggle('open');
-    }
-
-    function toggleReviews(id) {
-        const panel = document.getElementById(`reviews-${id}`);
-        const detailsPanel = document.getElementById(`details-${id}`);
-        const reviewsList = document.getElementById(`reviews-list-${id}`);
-        
-        // Close details if open
-        detailsPanel.classList.remove('open');
-        
-        // Toggle reviews
-        const isOpen = panel.classList.toggle('open');
-        
-        // Fetch reviews if opening and not loaded yet
-        if (isOpen && reviewsList.querySelector('.loading-reviews')) {
-            fetchReviews(id);
-        }
-    }
-
-    async function fetchReviews(servicioId) {
-        const reviewsList = document.getElementById(`reviews-list-${servicioId}`);
-        
-        try {
-            const response = await fetch(`/api/resenas/${servicioId}`);
-            const resenas = await response.json();
-            
-            if (resenas && resenas.length > 0) {
-                reviewsList.innerHTML = resenas.map(resena => `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <span class="review-author">${resena.usuario_nombre || 'Usuario'}</span>
-                            <div class="review-rating">
-                                ${generateStars(resena.puntuacion)}
-                            </div>
-                            <span class="review-date">${formatDate(resena.fecha)}</span>
-                        </div>
-                        <p class="review-comment">${resena.comentarios_cliente || 'Sin comentario'}</p>
-                    </div>
-                `).join('');
-            } else {
-                reviewsList.innerHTML = '<div class="no-reviews">Este servicio aún no tiene reseñas</div>';
-            }
-        } catch (error) {
-            reviewsList.innerHTML = '<div class="error-reviews">Error al cargar las reseñas</div>';
-        }
-    }
-
-    function generateStars(rating) {
-        let stars = '';
-        for (let i = 1; i <= 5; i++) {
-            if (i <= rating) {
-                stars += '<svg class="star filled" width="14" height="14" viewBox="0 0 24 24" fill="#FFB300" stroke="#FFB300"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
-            } else {
-                stars += '<svg class="star" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
-            }
-        }
-        return stars;
-    }
-
-    function formatDate(dateStr) {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
     }
 </script>
 {% endblock %}

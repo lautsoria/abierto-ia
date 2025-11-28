@@ -79,7 +79,7 @@ def mis_reservas():
 
 @app.route('/confirmar-servicio/<string:id_reserva>', methods=['GET', 'POST'])
 @jwt_required(locations=['cookies'])
-def confirmar_servicio(id_reserva):
+def confirmar_servicio(id_reserva): 
 
     # verificar que el usuario autenticado sea el dueño de la reserva
     data = get_jwt()
@@ -161,9 +161,7 @@ def perfil():
     if response.status_code != 200:
         return "Usuario no encontrado", 404
 
-    datos_user = response.json()
-
-    if datos_user.get("rol") == "proveedor":
+    if data['rol'] == "proveedor":
         response = requests.get(f"{BACKEND_URL}/proveedores/{usuario_id}")
         
         if response.status_code != 200:
@@ -464,7 +462,7 @@ def registrar_servicio():
     return render_template('404.html'), 401
     
 
-@app.route('/mis_servicios', methods=['GET', 'POST'])
+@app.route('/mis_servicios', methods=['GET'])
 @jwt_required(locations=['cookies'])
 def mis_servicios():
     data = get_jwt()
@@ -473,30 +471,15 @@ def mis_servicios():
     # Verificar que el usuario sea proveedor
     if data.get('rol') != 'proveedor':
         return render_template('404.html'), 401
-    
-    if request.method == 'POST':
-        # Manejar eliminación de servicio (futuro)
-        return redirect(url_for('mis_servicios'))
 
     if request.method == 'GET':
         servicios = obtener_servicios_proveedor(proveedor_id)
-        estadisticas = obtener_estadisticas_proveedor(proveedor_id)
         
         return render_template(
             'mis_servicios.html',
             servicios=servicios,
-            total_reservas=estadisticas.get('total_reservas', 0),
-            promedio_rating=estadisticas.get('promedio_rating', 0),
-            total_resenas=estadisticas.get('total_resenas', 0),
             data=data
         )
-
-
-@app.route('/api/resenas/<string:servicio_id>')
-def api_resenas_servicio(servicio_id):
-    """API endpoint para obtener reseñas de un servicio (usado por AJAX)"""
-    resenas = obtener_resenas_servicio(servicio_id)
-    return resenas if resenas else []
 
 
 @app.route('/editar_servicio/<string:id>')
@@ -578,6 +561,18 @@ def eliminar_servicio_view(id):
         flash('Error al eliminar el servicio', 'error')
     
     return redirect(url_for('mis_servicios'))
+
+# TODO
+@app.route('/cancelar_reserva/<string:id>', methods=['POST'])
+@jwt_required(locations=['cookies'])
+def cancelar_reserva(id):
+    return
+
+# TODO
+@app.route('/logout')
+@jwt_required(locations=['cookies'])
+def logout():
+    return 
 
 
 if __name__ == '__main__':

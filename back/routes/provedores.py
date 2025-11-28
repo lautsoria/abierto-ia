@@ -72,7 +72,7 @@ def get_proveedores():
 
 
 # provedor por id
-@proveedores_bp.route('/<int:id>')
+@proveedores_bp.route('/<string:id>')
 def get_proveedor(id):
     try:
         conn = db_conn()
@@ -80,7 +80,10 @@ def get_proveedor(id):
         
         # datos del provedor
         query = """
-            SELECT p.*, u.usuario as nombre_usuario, u.email,
+            SELECT p.*, 
+            u.usuario as usuario, 
+            u.email,
+            u.telefono,
             GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion
             FROM proveedores p
             INNER JOIN usuarios u ON p.id = u.id
