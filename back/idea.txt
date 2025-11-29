@@ -1,8 +1,0 @@
-la idea de esta rama es poder meter el rol en el jwt
-para ello hay que meter el rol de cada usuario en la base de datos una vez que se registra
-
-todo:
-  - crear usuario con rol en db
-  - devolver jwt con el rol en el payload
-    -- con el register ya vamos a tener el rol
-    -- con el login vamos a tener que buscar en la db el rol del usuario

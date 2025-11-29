@@ -1,5 +1,3 @@
-/* Reservas page styles - works with base.html */
-
 :root {
     --primary-color: #0d6efd;
     --secondary-color: #6c757d;
@@ -139,10 +137,10 @@ text-align: right;
 
 .badge {
 display: inline-block;
-padding: 0.35em 0.65em;
-font-size: 0.75em;
-font-weight: 700;
-border-radius: 0.25rem;
+padding: 8px 16px;
+font-size: 0.9rem;
+font-weight: 600;
+border-radius: 4px;
 background-color: #0dcaf0; 
 color: #000;
 }
@@ -184,7 +182,6 @@ color: #000;
     background-color: #157347;
 }
 
-/* Modal Detail Styles */
 .detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

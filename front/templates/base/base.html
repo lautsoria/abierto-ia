@@ -26,7 +26,7 @@
       </div>
 
       <div class="header-center">
-          <form class="search-form" role="search" action="{{ url_for('buscar_servicios') }}" method="GET">
+          <form class="search-form" role="search" action="{{ url_for('servicios.buscar_servicios') }}" method="GET">
             <input 
               type="text" 
               class="search-input" 
@@ -43,28 +43,28 @@
       <nav class="header-nav">
         {% if data %}
 
-          <a href="{{ url_for('perfil') }}" class="nav-link end">Hola, {{ data.user }}</a>
+          <a href="{{ url_for('usuarios.perfil') }}" class="nav-link">Hola, {{ data.user }}</a>
 
           {% if data.rol == 'proveedor' %}
-            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Calendario</a>
-            <a href="{{ url_for('registrar_servicio') }}" class="nav-link">Registrar servicio</a>
-            <a href="{{ url_for('mis_servicios') }}" class="nav-link">Mis servicios</a>
+            <a href="{{ url_for('reservas.mis_reservas') }}" class="nav-link">Calendario</a>
+            <a href="{{ url_for('servicios.registrar_servicio') }}" class="nav-link">Registrar servicio</a>
+            <a href="{{ url_for('servicios.mis_servicios') }}" class="nav-link end">Mis servicios</a>
           {% endif %}
 
           {% if data.rol == 'cliente' %}
             <a href="{{ url_for('home') }}#categorias" class="nav-link">Categorías</a>
-            <a href="{{ url_for('mis_reservas') }}" class="nav-link">Reservas Agendadas</a>
+            <a href="{{ url_for('reservas.mis_reservas') }}" class="nav-link">Reservas Agendadas</a>
           {% endif %}
           
           {% if data.rol == 'admin' %}
-            <a href="{{ url_for('admin-categorias') }}" class="nav-link">Categorías</a>
-            <a href="{{ url_for('admin-servicios') }}" class="nav-link">Servicios</a>
-            <a href="{{ url_for('admin-usuarios') }}" class="nav-link end">Usuarios</a>  
+            <!-- <a href="{{ url_for('admin-categorias') }}" class="nav-link">Categorías</a> -->
+            <a href="{{ url_for('servicios.admin_servicios') }}" class="nav-link">Servicios</a>
+            <a href="{{ url_for('usuarios.admin_usuarios') }}" class="nav-link end">Usuarios</a>
           {% endif %}
         
         {% else %}
           <a href="{{ url_for('home') }}#categorias" class="nav-link">Categorías</a>
-          <a href="{{ url_for('auth') }}" class="nav-link end">Ingresar</a>
+          <a href="{{ url_for('auth.auth') }}" class="nav-link end">Ingresar</a>
         {% endif %}
       </nav>
     </div>

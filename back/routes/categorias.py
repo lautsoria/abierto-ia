@@ -40,7 +40,7 @@ def cantidad_por_categoria(categoria_nombre):
         print(e)
         return jsonify({'error': str(e)}), 500
 
-@categorias_bp.route('')
+@categorias_bp.route('/')
 def categorias():
     """categorias existentes"""
     try:

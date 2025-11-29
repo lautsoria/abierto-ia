@@ -1,17 +1,11 @@
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-body {
+.qr-page-wrapper {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #3483FA 0%, #2968C8 100%);
-    min-height: 100vh;
+    min-height: calc(100vh - 140px);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 40px 20px;
 }
 .container {
     background: white;
@@ -33,7 +27,7 @@ body {
         transform: translateY(0);
     }
 }
-.header {
+.qr-header {
     margin-bottom: 30px;
 }
 h1 {
@@ -91,7 +85,7 @@ h1 {
     margin-bottom: 8px;
     list-style-position: inside;
 }
-.footer {
+.qr-footer {
     margin-top: 25px;
     padding-top: 20px;
     border-top: 2px solid #f5f5f5;

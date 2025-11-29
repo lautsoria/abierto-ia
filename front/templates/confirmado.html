@@ -22,7 +22,7 @@
                 <p>Tu opinión es muy importante. Las reseñas ayudan a otros usuarios a tomar mejores decisiones.</p>
             </div>
             
-            <form action="{{ url_for('confirmar_servicio', id_reserva=reserva) }}" method="POST" class="review-form">
+            <form action="{{ url_for('reservas.realizada', id_reserva=reserva) }}" method="POST" class="review-form">
                 <div class="form-group">
                     <label for="puntuacion">¿Cómo calificarías el servicio?</label>
                     <select id="puntuacion" name="puntuacion" required>

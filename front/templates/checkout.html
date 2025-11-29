@@ -11,7 +11,7 @@
     <div class="checkout-main">
         <h1 class="checkout-title">Confirmá tu reserva</h1>
 
-        <form id="bookingForm" action="{{ url_for('crear_reserva', servicio=servicio.id) }}" method="POST">
+        <form id="bookingForm" action="{{ url_for('reservas.crear_reserva', id_servicio=servicio.id) }}" method="POST">
             
             <div class="card">
                 <h2 class="section-title">Servicio seleccionado</h2>

@@ -18,7 +18,7 @@
             Filtros
         </div>
         
-        <form method="GET" action="{{ url_for('categoria', nombre=categoria_nombre) }}">
+        <form method="GET" action="{{ url_for('categorias.categoria', nombre=categoria_nombre) }}">
             <div class="filter-group">
                 <label for="ubicacion">Ubicación</label>
                 <select id="ubicacion" name="ubicacion">
@@ -32,7 +32,7 @@
             </div>
 
             <button type="submit" class="btn-filter">Aplicar</button>
-            <a href="{{ url_for('categoria', nombre=categoria_nombre) }}" class="btn-clear" style="text-decoration: none; display: block; text-align: center;">
+            <a href="{{ url_for('categorias.categoria', nombre=categoria_nombre) }}" class="btn-clear" style="text-decoration: none; display: block; text-align: center;">
                 Limpiar filtros
             </a>
         </form>
@@ -41,7 +41,7 @@
         {% if servicios %}
         <div class="servicios-grid">
             {% for servicio in servicios %}
-            <div class="servicio-card" onclick="window.location.href='/servicio/id/{{ servicio.id }}'">
+            <div class="servicio-card" onclick="window.location.href='/servicios/id/{{ servicio.id }}'">
                 <img 
                     src="{{ servicio.imagen or 'https://via.placeholder.com/300x200?text=' + servicio.nombre }}" 
                     alt="{{ servicio.nombre }}"
@@ -97,11 +97,11 @@
 </div>
 
 <script>
-function ordenarServicios(criterio) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('ordenar', criterio);
-    window.location.href = url.toString();
-}
+    function ordenarServicios(criterio) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('ordenar', criterio);
+        window.location.href = url.toString();
+    }
 </script>
 {% endblock %}
 

@@ -7,12 +7,12 @@
     <div class="editar-perfil-container">
         <div class="profile-card">
         <div class="card-header">
-            <h4>✏️ Editar Perfil ({{ usuario.rol|capitalize }})</h4>
+            <h4>✏️ Editar Perfil de {{data.rol|capitalize }}</h4>
         </div>
         
         <div class="card-body">
             
-            <form action="/perfil/editar" method="POST">
+            <form action="/perfil/editar" method="POST" id="editForm">
                 
                 <h5 class="form-section-title">Datos Personales</h5>
                 
@@ -51,13 +51,19 @@
                     </div>
                 {% endif %}
 
-                <div class="btn-container">
-                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                    <a href="{{ url_for('logout') }}" class="btn btn-danger">Cerrar Sesión</a>
+            </form>
+
+            <div class="btn-container">
+                <button type="submit" form="editForm" class="btn btn-success">Guardar Cambios</button>
+                
+                <div class="secondary-btns">
+                    <form action="{{ url_for('auth.logout') }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+                    </form>
+                    
                     <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancelar</a>
                 </div>
-
-            </form>
+            </div>
 
         </div>
         </div>

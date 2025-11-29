@@ -80,7 +80,7 @@ def create_reserva():
         return jsonify({'error': str(e)}), 500
 
 
-# reservas de un usuario/provee
+# reservas de un usuario/proveedor
 @reservas_bp.route('', methods=['GET'])
 def get_mis_reservas():
     try:
@@ -357,30 +357,6 @@ def confirmar_servicio(id_reserva):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
-# @reservas_bp.route('/<string:id_reserva>/token')
-# def get_reserva_token(id_reserva):
-#     try:
-#         if not id_reserva:
-#             return jsonify({"error": "Falta id_reserva"}), 400
-
-#         conn = db_conn()
-#         cursor = conn.cursor(dictionary=True)
-#         cursor.execute("SELECT token_qr FROM reservas WHERE id = %s", (id_reserva,))
-#         data = cursor.fetchone()
-#         cursor.close()
-#         conn.close()
-
-#         if not data:
-#             return jsonify({'error': 'Reserva no encontrada'}), 404
-
-#         return jsonify({
-#             "id_reserva": id_reserva,
-#             "token_qr": data["token_qr"]
-#         }), 200
-
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
     
 @reservas_bp.route('/<string:id>', methods=['PUT', 'GET'])
 def reserva(id):

@@ -11,7 +11,7 @@
     <div class="success-banner">
         <div class="success-icon">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#00a650" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
         <h1 class="success-title">¡Reserva confirmada!</h1>
@@ -113,7 +113,7 @@
 
     <div class="actions">
         <a href="{{ url_for('home') }}" class="btn-secondary">Volver al inicio</a>
-        <a href="{{ url_for('mis_reservas') }}" class="btn-primary">Ver mis reservas</a>
+        <a href="{{ url_for('reservas.mis_reservas') }}" class="btn-primary">Ver mis reservas</a>
     </div>
 </div>
 {% endblock %}

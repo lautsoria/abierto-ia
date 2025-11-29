@@ -1,21 +1,22 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escanea el Código QR</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/qr.css') }}">
-</head>
-<body>
+{% extends "base/base.html" %}
+
+{% block title %}Mis Servicios{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/qr.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="qr-page-wrapper">
     <div class="container">
-        <div class="header">
+        <div class="qr-header">
             <h1>🔵 Escanea el Código QR</h1>
             <p class="subtitle">Acerca tu cámara al código para continuar</p>
         </div>
 
         <div class="qr-container">
             <div class="qr-code">
-                <img src="{{ qr_path }}"  alt="Código QR">
+                <img src="{{ url_for('static', filename=qr_path) }}"  alt="Código QR">
             </div>
         </div>
 
@@ -29,9 +30,9 @@
             </ol>
         </div>
 
-        <div class="footer">
+        <div class="qr-footer">
             <span class="badge">✓ Seguro y Verificado</span>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

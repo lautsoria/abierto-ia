@@ -10,8 +10,8 @@
 <div class="register-container">
     <div class="form-section">
         <div class="form-header">
-            <a href="{{ url_for('mis_servicios') }}" class="back-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <a href="{{ url_for('servicios.mis_servicios') }}" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
                 Volver a mis servicios
@@ -24,7 +24,7 @@
                 <p>Modificá los datos de tu servicio</p>
             </div>
 
-            <form id="editServiceForm" method="POST" action="{{ url_for('actualizar_servicio', id=servicio.id) }}">
+            <form id="editServiceForm" method="POST" action="{{ url_for('servicios.actualizar_servicio', id=servicio.id) }}">
                 <div class="form-group">
                     <label for="nombre">Nombre del servicio *</label>
                     <input type="text" 
@@ -111,7 +111,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.location.href='{{ url_for('mis_servicios') }}'">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="window.location.href='{{ url_for('servicios.mis_servicios') }}'">Cancelar</button>
                     <button type="submit" class="btn-primary">Guardar cambios</button>
                 </div>
                 
@@ -178,7 +178,7 @@
 
     function confirmarEliminacion() {
         if (confirm('¿Estás seguro de que querés eliminar este servicio? Esta acción no se puede deshacer.')) {
-            window.location.href = '{{ url_for("eliminar_servicio_view", id=servicio.id) }}';
+            window.location.href = '{{ url_for("servicios.eliminar", id=servicio.id) }}';
         }
     }
 

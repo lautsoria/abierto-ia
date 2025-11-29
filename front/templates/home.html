@@ -49,7 +49,7 @@
         <div class="categorias-grid">
 
         {% for cat in categorias %}
-        <a href="{{ url_for('categoria', nombre=cat.nombre) }}" style="text-decoration: none; color: inherit;">
+        <a href="{{ url_for('categorias.categoria', nombre=cat.nombre) }}" style="text-decoration: none; color: inherit;">
         <article class="categoria-card">
             <div class="card-icon">
                 <span>{{ cat.icono }}</span>
@@ -107,7 +107,7 @@
                             <span>Desde</span>
                             <strong>${{ "{:,.0f}".format(servicio.precio | float) }}</strong>
                         </div>
-                        <a href="{{ url_for('servicio', id=servicio.id) }}" class="btn-contact">Reservar</a>
+                        <a href="{{ url_for('servicios.servicio', id=servicio.id) }}" class="btn-contact">Reservar</a>
                     </div>
                 </div>
             </div>

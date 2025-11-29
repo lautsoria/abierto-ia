@@ -1,6 +1,3 @@
-
-        /* Editar Perfil page styles - works with base.html */
-
 :root {
     --primary-color: #0d6efd;
     --success-color: #198754;
@@ -144,4 +141,18 @@
             border: 0;
             border-top: 1px solid var(--border-color);
             margin: 1.5rem 0;
+        }
+
+        .secondary-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .secondary-btns form {
+            display: grid;
+        }
+
+        .secondary-btns .btn {
+            width: 100%;
         }

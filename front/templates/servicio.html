@@ -11,7 +11,7 @@
     <div class="breadcrumb">
         <a href="{{ url_for('home') }}">Inicio</a>
         <span>></span>
-        <a href="{{ url_for('categoria', nombre=servicio.categoria_nombre) }}">{{ servicio.categoria_nombre }}</a>
+        <a href="{{ url_for('categorias.categoria', nombre=servicio.categoria_nombre) }}">{{ servicio.categoria_nombre }}</a>
         <span>></span>
         <span>{{ servicio.nombre }}</span>
     </div>
@@ -58,7 +58,7 @@
             </div>
 
             <div class="actions-container">
-                <a href="{{ url_for('checkout', id=servicio.id) }}" class="btn-primary">Contratar ahora</a>
+                <a href="{{ url_for('reservas.checkout', id=servicio.id) }}" class="btn-primary">Contratar ahora</a>
                 <!-- <a href="#" class="btn-secondary">Agregar al carrito</a> -->
             </div>
 
