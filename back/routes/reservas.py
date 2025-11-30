@@ -162,6 +162,7 @@ def get_mis_reservas():
             reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat().split('T')[0]
             reserva['hora_servicio'] = f"{int(reserva['hora_servicio']):02d}:00"
         
+        print(reservas)
         return jsonify(reservas), 200
         
     except Exception as e:
@@ -297,7 +298,7 @@ def get_reserva(id):
             INNER JOIN usuarios uc ON r.usuario_id = uc.id
             INNER JOIN usuarios up ON p.id = up.id
             INNER JOIN categorias c ON s.categoria_id = c.id
-            LEFT JOIN barrios_usuarios bu ON up.id = bu.usuario_id
+            LEFT JOIN barrios_servicios bu ON sp.id = bu.servicio_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE r.id = %s
             GROUP BY r.id

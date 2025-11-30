@@ -5,39 +5,63 @@ from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 BACKEND_URL = 'http://localhost:5500/api'
 usuarios_bp = Blueprint('usuarios', __name__)
 
-@usuarios_bp.route('/mi-perfil')
-@jwt_required(locations=['cookies'])
-def perfil():
-    data = get_jwt()
-    usuario_id = get_jwt_identity()
 
+def mostrar_perfil(data, usuario_id):
     response = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
 
     if response.status_code != 200:
         return "Usuario no encontrado", 404
-
-    if data['rol'] == "proveedor":
-        response = requests.get(f"{BACKEND_URL}/proveedores/{usuario_id}")
-        
-        if response.status_code != 200:
-            return "Proveedor no encontrado", 404
         
     datos_user = response.json()
         
     return render_template("editar_perfil.html", usuario=datos_user, data=data)
 
 
-
-@usuarios_bp.route('/<id>/editar', methods=['POST'])
-def editar_usuario(id):
+def editar_perfil(id):
+    
     data = request.form
     payload = {
+        "nombre": data.get("nombre"),
+        "email": data.get("email"),
+        "telefono": data.get("telefono"),
+    }
+
+    response = requests.patch(f"{BACKEND_URL}/usuarios/{id}", json=payload)
+
+    if response.status_code != 204:
+        return "Error al modificar usuario", 400
+
+    return redirect(url_for('usuarios.perfil'))
+
+
+
+@usuarios_bp.route('/mi-perfil', methods=['GET', 'POST'])
+@jwt_required(locations=['cookies'])
+def perfil():
+    data = get_jwt()
+    usuario_id = data['sub']
+
+    if request.method == 'GET':
+        return mostrar_perfil(data, usuario_id)
+    
+    if request.method == 'POST':
+        return editar_perfil(usuario_id)
+
+
+
+@usuarios_bp.route('/editar', methods=['POST'])
+@jwt_required(locations=['cookies'])
+def editar_usuario():
+    id = get_jwt_identity()
+    data = request.form
+    payload = {
+        "id": data.get("id"),
         "nombre": data.get("nombre"),
         "email": data.get("email"),
         "rol": data.get("rol"),
     }
 
-    response = requests.put(f"{BACKEND_URL}/usuarios/{id}/mod", json=payload)
+    response = requests.patch(f"{BACKEND_URL}/usuarios/mod", json=payload)
 
     if response.status_code != 200:
         return "Error al modificar usuario", 400
@@ -46,9 +70,21 @@ def editar_usuario(id):
 
 
 
-@usuarios_bp.route('/<int:id>/eliminar', methods=['POST'])
-def eliminar_usuario(id):
-    response = requests.delete(f"{BACKEND_URL}/usuarios/{id}/eliminar")
+@usuarios_bp.route('/eliminar', methods=['POST'])
+@jwt_required(locations=['cookies'])
+def eliminar_usuario():
+    
+    data = request.form
+    id = data.get("id")
+    rol = data.get("rol")
+
+    
+    payload = {
+        "id": id,
+        "rol": rol
+    }
+
+    response = requests.delete(f"{BACKEND_URL}/usuarios/eliminar", json=payload)
 
     if response.status_code != 200:
         return "Usuario no encontrado", 404
@@ -63,21 +99,9 @@ def eliminar_usuario(id):
 def admin_usuarios():
     data = get_jwt()
     usuario_id = get_jwt_identity()
-    
-    # user_data = data if data else None
 
     if data['rol'] != 'admin':
-        return "permiso denegado", 404
-    
-    # response_user = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
-
-    # if response_user.status_code != 200:
-    #     return "Usuario no encontrado", 404
-
-    # datos_user = response_user.json()
-
-    # if datos_user.get("rol") != "admin":
-    #     
+        return "permiso denegado", 404     
     
     response = requests.get(f'{BACKEND_URL}/usuarios/todos')
     
@@ -86,6 +110,6 @@ def admin_usuarios():
     
     usuarios = response.json()
 
-    return render_template('usuarios.html',usuarios=usuarios)
+    return render_template('usuarios.html', usuarios=usuarios, data=data)
 
 

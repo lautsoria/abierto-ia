@@ -29,7 +29,7 @@ def servicios_por_categoria(nombre):
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.id = u.id
-            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios_servicios bu ON s.id = bu.servicio_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE LOWER(c.nombre) = LOWER(%s)
         """
@@ -88,14 +88,14 @@ def servicios_top_rating():
                 c.nombre as categoria,
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
-                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as proveedor_ubicacion,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion,
                 AVG(r.puntuacion) as rating,
                 COUNT(r.id) as reviews_count
             FROM servicios s
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.id = u.id
-            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios_servicios bu ON s.id = bu.servicio_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
             LEFT JOIN resenas r ON r.servicio_id = s.id
             GROUP BY s.id
@@ -145,7 +145,7 @@ def servicios_por_precio():
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.id = u.id
-            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios_servicios bu ON s.id = bu.servicio_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE 1=1
         """
@@ -204,7 +204,7 @@ def servicio(id):
                 INNER JOIN categorias c ON s.categoria_id = c.id
                 INNER JOIN proveedores p ON s.proveedor_id = p.id
                 INNER JOIN usuarios u ON p.id = u.id
-                LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+                LEFT JOIN barrios_servicios bu ON s.id = bu.servicio_id
                 LEFT JOIN barrios b ON bu.barrio_id = b.id
                 WHERE s.id = %s
                 GROUP BY s.id
@@ -329,6 +329,7 @@ def registrar_servicio():
         return {"message": "ok"}, 200
     
     except Exception as e:
+        print(e)
         return {"message": str(e)}, 400
 
 
@@ -372,8 +373,11 @@ def actualizar_servicio(id):
         return {"message": str(e)}, 400
 
 
-@servicios_bp.route('/<string:id>', methods=['DELETE'])
-def eliminar_servicio(id):
+@servicios_bp.route('/', methods=['DELETE'])
+def eliminar_servicio():
+    
+    id = request.json['id']
+    
     try:
         conn = db_conn()
         cursor = conn.cursor()
@@ -392,6 +396,9 @@ def eliminar_servicio(id):
         # Eliminar reservas asociadas
         cursor.execute("DELETE FROM reservas WHERE servicio_id = %s", (id,))
         
+        # Borramos los barrios asociados a sus servicios
+        cursor.execute("DELETE FROM barrios_servicios WHERE servicio_id = %s", (id,))
+
         # Eliminar el servicio
         cursor.execute("DELETE FROM servicios WHERE id = %s", (id,))
         
@@ -402,6 +409,7 @@ def eliminar_servicio(id):
         return {"message": "Servicio eliminado"}, 200
     
     except Exception as e:
+        print(e)
         return {"message": str(e)}, 400
     
 
@@ -426,7 +434,7 @@ def servicios_proveedor(id):
             INNER JOIN categorias c ON s.categoria_id = c.id
             INNER JOIN proveedores p ON s.proveedor_id = p.id
             INNER JOIN usuarios u ON p.id = u.id
-            LEFT JOIN barrios_usuarios bu ON u.id = bu.usuario_id
+            LEFT JOIN barrios_servicios bu ON s.id = bu.servicio_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE p.id = %s
             GROUP BY s.id
@@ -453,39 +461,43 @@ def servicios_proveedor(id):
 
 
 @servicios_bp.route('/todos', methods=['GET'])
-def todos_servicios ():
+def todos_servicios():
     try:
         conn = db_conn()
         cursor = conn.cursor(dictionary=True)
 
         query = """
-            SELECT s.*, 
+            SELECT s.*, u.usuario as proveedor, c.nombre as categoria
             FROM servicios s
+            JOIN categorias c
+            ON c.id = s.categoria_id
+            JOIN usuarios u 
+            ON s.proveedor_id = u.id
         """
         
         cursor.execute(query)
-        usuarios = cursor.fetchall()
+        servicios = cursor.fetchall()
 
         cursor.close()
         conn.close()
         
-        return jsonify(usuarios), 200
+        return jsonify(servicios), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
     
-@servicios_bp.route('/<string:id>/mod', methods=['PUT'])
-def mod_servicio(id):
+@servicios_bp.route('/mod', methods=['PATCH'])
+def mod_servicio():
     try:
-        data = request.get_json()
+        data = request.json
 
         conn = db_conn()
         cursor = conn.cursor()
 
         # fijarse si existe, puede ser innecesario
-        cursor.execute("SELECT id FROM servicios WHERE id = %s", (id,))
+        cursor.execute("SELECT id FROM servicios WHERE id = %s", (data['id'],))
         servicio = cursor.fetchone()
 
         if servicio is None:
@@ -496,28 +508,21 @@ def mod_servicio(id):
         # update
         update_query = """
             UPDATE servicios
-            SET proveedor_id = %s,
-                categoria_id = %s,
+            SET 
                 nombre = %s,
                 descripcion = %s,
                 precio = %s,
-                hora_inicio = %s,
-                hora_fin = %s,
                 duracion = %s
             WHERE id = %s
         """
 
         cursor.execute(update_query, (
-            data.get('proveedor_id'),
-            data.get('categoria_id'),
-            data.get('nombre'),
-            data.get('descripcion'),
-            data.get('precio'),
-            data.get('hora_inicio'),
-            data.get('hora_fin'),
-            data.get('duracion'),
-            id
-        ))
+            data['nombre'],
+            data['descripcion'],
+            data['precio'],
+            data['duracion'],
+            data['id']
+        ))  
 
         conn.commit()
         cursor.close()

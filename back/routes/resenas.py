@@ -46,6 +46,7 @@ def resenas_de_servicio(id):
 @resenas_bp.route('', methods=['POST'])
 def resena():
   payload = request.json
+  print(payload)
 
   try:
      conn = db_conn()
@@ -57,10 +58,11 @@ def resena():
             id,
             usuario_id,
             servicio_id,
+            reserva_id,
             puntuacion,
             comentarios_cliente
             )
-            values (%s, %s, %s, %s, %s)
+            values (%s, %s, %s, %s, %s, %s)
              '''
      
      cursor.execute(query, (
@@ -81,4 +83,5 @@ def resena():
   except Exception as e:
     # si la db da error es xq desde el schema no se puede agregar
     # mas de una resena con el mismo id de reserva
+    print(e)
     return {"status": "Resena ya existente"}, 409

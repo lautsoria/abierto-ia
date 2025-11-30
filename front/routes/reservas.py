@@ -59,7 +59,7 @@ def realizada(id_reserva):
             "descripcion": descripcion,
             "usuario_id":usuario_id,
             "servicio_id":servicio_id,
-            "reerva_id":id_reserva
+            "reserva_id":id_reserva
         }
 
         response = requests.post(

@@ -57,7 +57,6 @@
           {% endif %}
           
           {% if data.rol == 'admin' %}
-            <!-- <a href="{{ url_for('admin-categorias') }}" class="nav-link">Categorías</a> -->
             <a href="{{ url_for('servicios.admin_servicios') }}" class="nav-link">Servicios</a>
             <a href="{{ url_for('usuarios.admin_usuarios') }}" class="nav-link end">Usuarios</a>
           {% endif %}
@@ -122,6 +121,5 @@
   
   {% block scripts %}
   {% endblock %}
-<script src="{{ url_for('static', filename='js/filtro.js') }}"></script>
 </body>
 </html>

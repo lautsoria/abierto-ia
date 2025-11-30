@@ -4,7 +4,6 @@ from db.db import db_conn
 usuarios_bp = Blueprint('usuarios', __name__)
 
 # encontrar usuario por id
-@usuarios_bp.route('/<string:id>')
 def get_usuario(id):
     try:
         conn = db_conn()
@@ -29,10 +28,21 @@ def get_usuario(id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@usuarios_bp.route('/<string:id>', methods=['GET'])
+def usuario(id):
+    if request.method == 'GET':
+        return get_usuario(id)
+
     
 # eliminar usuario por ID
-@usuarios_bp.route('/<string:id>/eliminar', methods=['DELETE'])
-def eliminar_usuario(id):
+@usuarios_bp.route('/eliminar', methods=['DELETE'])
+def eliminar_usuario():
+    data = request.json
+    print(data)
+    id = data['id']
+    rol = data['rol']
+    
     try:
         conn = db_conn()
         cursor = conn.cursor()
@@ -46,17 +56,57 @@ def eliminar_usuario(id):
             return jsonify({'error': 'Usuario no encontrado'}), 404
         
         
-        cursor.execute('DELETE FROM proveedores WHERE usuario_id = %s', (id,))
+        if rol == 'proveedor':
+            # hay que borrar las resenas que tienen sus servicios
+            cursor.execute("""
+                DELETE FROM resenas 
+                WHERE servicio_id IN (
+                    SELECT id FROM servicios WHERE proveedor_id = %s
+                )
+            """, (id,))
+
+            # Las reservas de sus servicios
+            cursor.execute("""
+                DELETE FROM reservas 
+                WHERE servicio_id IN (
+                    SELECT id FROM servicios WHERE proveedor_id = %s
+                )
+            """, (id,))
+
+            # Borramos los barrios asociados a sus servicios
+            cursor.execute("""
+                DELETE FROM barrios_servicios 
+                WHERE servicio_id IN (
+                    SELECT id FROM servicios WHERE proveedor_id = %s
+                )
+            """, (id,))
+
+            # Borramos los servicios
+            cursor.execute('DELETE FROM servicios WHERE proveedor_id = %s', (id,))
+
+            # lo borramos de proveedores
+            cursor.execute('DELETE FROM proveedores WHERE id = %s', (id,))
+            conn.commit()        
         
+        if rol == 'cliente':
+            # lo mismo pasa para los clientes
+            # hay q borrar resenas y reservas
+            cursor.execute('DELETE FROM resenas WHERE usuario_id = %s', (id,))
+            
+            cursor.execute('DELETE FROM reservas WHERE usuario_id = %s', (id,))
+            conn.commit()
+
+        # finalmente podemos borrar el usuario
         cursor.execute('DELETE FROM usuarios WHERE id = %s', (id,))
-        
         conn.commit()
+        
         cursor.close()
         conn.close()
         
         return jsonify({'message': 'Usuario eliminado correctamente'}), 200
         
     except Exception as e:
+        print(e)
         return jsonify({'error': 'Error al eliminar el usuario'}), 500
 
 
@@ -67,7 +117,11 @@ def get_usuarios():
         cursor = conn.cursor(dictionary=True)
 
         query = """
-            SELECT u.*, r.rol
+            SELECT u.id,
+                   u.usuario,
+                   u.email,
+                   u.fecha_registro,
+                   r.rol
             FROM usuarios u
             LEFT JOIN roles r ON u.rol_id = r.id
         """
@@ -84,37 +138,38 @@ def get_usuarios():
         return jsonify({'error': str(e)}), 500
     
 
-@usuarios_bp.route('/<string:id>/mod', methods=['PUT'])
-def mod_usuario(id):
+@usuarios_bp.route('/mod', methods=['PATCH'])
+def mod_usuario():
     try:
-        data = request.get_json()
+        data = request.json
+        print(data)
 
         conn = db_conn()
         cursor = conn.cursor()
 
-        # 1. Verificar si el usuario existe
-        cursor.execute("SELECT id FROM usuarios WHERE id = %s", (id,))
-        user = cursor.fetchone()
+        cursor.execute("""
+                       SELECT id
+                       FROM roles
+                       WHERE rol = %s
+                       """,
+                       (data['rol'],))
 
-        if user is None:
-            cursor.close()
-            conn.close()
-            return jsonify({'error': 'Usuario no encontrado'}), 404
+        rol_id = cursor.fetchone()[0]
 
         # 2. UPDATE correcto de la tabla usuarios
         update_query = """
             UPDATE usuarios
-            SET nombre = %s,
+            SET usuario = %s,
                 email = %s,
-                rol = %s
+                rol_id = %s
             WHERE id = %s
-        """
+            """
 
         cursor.execute(update_query, (
-            data.get('nombre'),
-            data.get('email'),
-            data.get('rol'),
-            id
+            data['nombre'],
+            data['email'],
+            rol_id,
+            data['id']
         ))
 
         conn.commit()

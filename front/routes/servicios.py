@@ -13,29 +13,17 @@ def admin_servicios():
     data = get_jwt()
     usuario_id = get_jwt_identity()
     
-    user_data = data if data else None
-
-    if user_data is None:
-        return redirect(url_for('auth.auth'))
-    
-    response_user = requests.get(f"{BACKEND_URL}/usuarios/{usuario_id}")
-
-    if response_user.status_code != 200:
-        return "Usuario no encontrado", 404
-
-    datos_user = response_user.json()
-
-    if datos_user.get("rol") != "admin":
-        return "permiso denegado", 404
+    if data['rol'] != 'admin':
+        return "Acceso denegado", 401
     
     response = requests.get(f'{BACKEND_URL}/servicios/todos')
     
     if response.status_code != 200:
-        return "Usuarios no encontrados", 404
+        return "Servicios no encontrados", 404
     
     servicios = response.json()
 
-    return render_template('servicios.html',servicios=servicios)
+    return render_template('servicios.html',servicios=servicios, data=data)
 
 
 
@@ -60,7 +48,7 @@ def buscar_servicios():
 @servicios_bp.route('/registrar_servicio', methods=['GET', 'POST'])
 @jwt_required(locations=['cookies'])
 def registrar_servicio():
-    if get_jwt()['rol'] == 'proveedor': 
+    if get_jwt()['rol'] == 'proveedor':
         proveedor_id = get_jwt_identity()
         if request.method == 'POST':
             
@@ -131,24 +119,30 @@ def editar_servicio_view(id):
 
 def editar_servicio(id):
     payload = {
-        "proveedor_id": request.form.get("proveedor_id"),
+        "id": id,
         "nombre": request.form.get("nombre"),
-        "categoria": request.form.get("categoria"),
         "descripcion": request.form.get("descripcion"),
         "precio": request.form.get("precio"),
         "duracion": request.form.get("duracion"),
     }
 
-    response = requests.put(f"{BACKEND_URL}/servicios/{id}/mod", json=payload)
+    response = requests.patch(f"{BACKEND_URL}/servicios/mod", json=payload)
 
     if response.status_code not in (200, 204):
         return "Error al actualizar servicio", 400
 
     return redirect(url_for('servicios.admin_servicios'))
 
-@servicios_bp.route('/editar_servicio/<string:id>')
+@servicios_bp.route('/editar_servicio', methods=['GET', 'POST'])
 @jwt_required(locations=['cookies'])
-def editar(id):
+def editar():
+
+    if get_jwt()['rol'] != 'admin':
+        return "Acceso denegado", 401
+
+    data = request.form
+    id = data.get("id")
+    
     if request.method == 'POST':
         return editar_servicio(id)
     
@@ -213,22 +207,24 @@ def eliminar_servicio_view(id):
     return redirect(url_for('servicios.mis_servicios'))
 
 def eliminar_servicio(id):
-    response = requests.delete(f"{BACKEND_URL}/servicio/{id}/eliminar")
+    response = requests.delete(f"{BACKEND_URL}/servicios", json={"id": id})
 
     if response.status_code != 200:
-        return "Usuario no encontrado", 404
+        return "Error al eliminar el servicio", response.status_code
     
-    return redirect(url_for('usuarios.admin_usuarios'))
+    return redirect(url_for('servicios.admin_servicios'))
 
-@servicios_bp.route('/eliminar_servicio/<string:id>', methods=['POST', 'GET'])
+@servicios_bp.route('/eliminar_servicio', methods=['POST', 'GET'])
 @jwt_required(locations=['cookies'])
-def eliminar(id):
+def eliminar():
+    data = request.form
+    id = data.get("id")
+    
     if request.method == 'POST':
         return eliminar_servicio(id)
     
     if request.method == 'GET':
       return eliminar_servicio_view(id)
-
 
 
 

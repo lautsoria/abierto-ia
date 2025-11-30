@@ -306,6 +306,12 @@ body {
     color: #e0e0e0; 
 }
 
+.ubicacion {
+    font-size: 13px;
+    color: #777;
+    margin-left: 8px;
+}
+
 .review-count {
     font-size: 13px;
     color: #777;

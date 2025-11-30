@@ -1,12 +1,14 @@
 {% extends "base/base.html" %}
 {% block title %}Lista De Servicios{% endblock %}
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/usuarios.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/servicios.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>Gestión de Servicios</h1>
+    <div class="header">
+        <h1>Gestión de Servicios</h1>
+    </div>
 
     {% if servicios %}
     <div class="table-container">
@@ -27,53 +29,59 @@
 
             <tbody>
                 {% for servicio in servicios %}
+                {# Creamos una variable para poder asignar el valor correcto de id a cada servicio #}
+                {% set form_id = 'edit-form-' ~ servicio.id %}
+            
                 <tr>
-                    
-                    <form action="{{ url_for('editar_servicio', id=servicio.id) }}" method="POST">
+                    <td>{{ servicio.id }}</td>
+            
+                    <td>
+                        <span>{{ servicio.proveedor }}</span>
+                    </td>
+            
+                    <td>
+                        <input type="text" name="nombre" value="{{ servicio.nombre }}" form="{{ form_id }}_editar" class="tall-input">
+                    </td>
+            
+                    <td>
+                        <span>{{ servicio.categoria }}</span>
+                    </td>
+            
+                    <td>
+                        <textarea name="descripcion" form="{{ form_id }}_editar" rows="3">{{ servicio.descripcion }}</textarea>
+                    </td>
+            
+                    <td>
+                        <input type="number" step="0.01" name="precio" value="{{ servicio.precio }}" form="{{ form_id }}_editar">
+                    </td>
+            
+                    <td>
+                        <input type="text" name="duracion" value="{{ servicio.duracion }}" form="{{ form_id }}_editar">
+                    </td>
+            
+                    <td class="actions">
                         
-                        <td>{{ servicio.id }}</td>
-
-                        <td>
-                            <input type="text" name="proveedor_id" value="{{ servicio.proveedor_id }}">
-                        </td>
-
-                        <td>
-                            <input type="text" name="nombre" value="{{ servicio.nombre }}">
-                        </td>
-
-                        <td>
-                            <input type="text" name="categoria" value="{{ servicio.categoria }}">
-                        </td>
-
-                        <td>
-                            <textarea name="descripcion">{{ servicio.descripcion }}</textarea>
-                        </td>
-
-                        <td>
-                            <input type="number" step="0.01" name="precio" value="{{ servicio.precio }}">
-                        </td>
-
-                        <td>
-                            <input type="text" name="duracion" value="{{ servicio.duracion }}">
-                        </td>
-
-                        <td class="actions">
+                        <form id="{{ form_id }}_editar" action="{{ url_for('servicios.editar') }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="id" value="{{ servicio.id }}" form="{{ form_id }}_editar">
                             <button type="submit" class="btn-icon btn-save" title="guardar cambios">
-                                <i class="fas fa-save"></i>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 13L9 17L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             </button>
-                        
-
-                            <form action="{{ url_for('servicios.eliminar_servicio', id=servicio.id) }}"
-                                method="POST" style="display:inline;">
-                                <button type="submit" class="btn-icon btn-delete" title="eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-
-                    </form>
+                        </form>
+            
+                        <form id="{{ form_id }}_eliminar" action="{{ url_for('servicios.eliminar') }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="id" value="{{ servicio.id }}" form="{{ form_id }}_eliminar">
+                            <button type="submit" class="btn-icon btn-delete" title="eliminar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 7L5 21M5 7L19 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </form>
+            
+                    </td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
     </div>

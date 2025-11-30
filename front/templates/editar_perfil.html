@@ -12,7 +12,7 @@
         
         <div class="card-body">
             
-            <form action="/perfil/editar" method="POST" id="editForm">
+            <form action="{{ url_for('usuarios.perfil') }}" method="POST" id="editForm">
                 
                 <h5 class="form-section-title">Datos Personales</h5>
                 
@@ -32,7 +32,7 @@
                     </div>
                 </div>
 
-                {% if usuario.rol == 'proveedor' %}
+                <!-- {% if usuario.rol == 'proveedor' %}
                     <hr>
                     <h5 class="form-section-title">Datos Profesionales</h5>
                     
@@ -49,7 +49,7 @@
                         <label>Descripción / Presentación</label>
                         <textarea name="descripcion" rows="3">{{ usuario.descripcion }}</textarea>
                     </div>
-                {% endif %}
+                {% endif %} -->
 
             </form>
 
