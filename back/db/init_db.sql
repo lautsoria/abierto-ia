@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS servicios (
   categoria_id UUID NOT NULL,
   nombre VARCHAR(255) NOT NULL,
   descripcion TEXT,
+  imagen VARCHAR(255),
   precio DECIMAL(10,2) NOT NULL,
   hora_inicio INT CHECK (hora_inicio BETWEEN 1 AND 24),
   hora_fin INT CHECK (hora_fin BETWEEN 1 AND 24),
@@ -69,11 +70,13 @@ CREATE TABLE IF NOT EXISTS resenas (
   id UUID PRIMARY KEY,
   usuario_id UUID NOT NULL,
   servicio_id UUID NOT NULL,
+  reserva_id UUID NOT NULL UNIQUE,
   puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),
   comentarios_cliente TEXT,
   fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id)
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id),
+  FOREIGN KEY (reserva_id) REFERENCES reservas(id)
 );
 
 CREATE TABLE IF NOT EXISTS barrios (
@@ -367,31 +370,13 @@ CROSS JOIN servicios s
 WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
 LIMIT 10;
 
--- Insert dummy reseñas (only for completed reservas)
--- INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
--- SELECT 
---   UUID(),
---   r.usuario_id,
---   r.servicio_id,
---   FLOOR(3 + (RAND() * 3)),
---   CASE FLOOR(RAND() * 5)
---     WHEN 0 THEN 'Excelente trabajo, muy profesional'
---     WHEN 1 THEN 'Buen servicio pero llegó tarde'
---     WHEN 2 THEN 'Muy satisfecho con el resultado'
---     WHEN 3 THEN 'Cumplió con lo prometido'
---     ELSE 'Recomendable, volvería a contratar'
---   END,
---   DATE_ADD(r.fecha_servicio, INTERVAL 1 DAY)
--- FROM reservas r
--- WHERE r.estado = 'realizado'
--- LIMIT 6;
-
--- Insert reseñas for ALL services (multiple reviews per service)
-INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente, fecha)
+-- Insert reseñas based on completed reservations
+INSERT INTO resenas (id, usuario_id, servicio_id, reserva_id, puntuacion, comentarios_cliente, fecha)
 SELECT 
   UUID(),
-  u.id,
-  s.id,
+  r.usuario_id,
+  r.servicio_id,
+  r.id,
   CASE FLOOR(RAND() * 10)
     WHEN 0 THEN 3
     WHEN 1 THEN 3
@@ -421,10 +406,7 @@ SELECT
     WHEN 13 THEN 'Trabajo impecable, totalmente recomendable'
     ELSE 'Servicio correcto, sin sorpresas'
   END,
-  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) DAY), '%Y-%m-%dT%H:%i')
-FROM servicios s
-CROSS JOIN usuarios u
-WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
-  AND RAND() < 0.6
-ORDER BY RAND()
-LIMIT 40;
+  DATE_FORMAT(DATE_ADD(r.fecha_servicio, INTERVAL 1 DAY), '%Y-%m-%dT%H:%i')
+FROM reservas r
+WHERE r.estado = 'realizado'
+  AND RAND() < 0.7;

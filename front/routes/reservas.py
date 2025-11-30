@@ -58,7 +58,8 @@ def realizada(id_reserva):
             "estrellas": estrellas,
             "descripcion": descripcion,
             "usuario_id":usuario_id,
-            "servicio_id":servicio_id
+            "servicio_id":servicio_id,
+            "reerva_id":id_reserva
         }
 
         response = requests.post(
@@ -67,8 +68,13 @@ def realizada(id_reserva):
         )
 
         if response.status_code != 200:
-            return "Error al enviar la reseña", 400
+            if response.status_code == 409:
+                flash('Ya has dejado una reseña para este servicio', 'warning')
+                return redirect(url_for('reservas.mis_reservas'))
+            flash('Error al enviar la reseña', 'error')
+            return redirect(url_for('reservas.mis_reservas'))
 
+        flash('Reseña enviada exitosamente', 'success')
         return redirect(url_for('home'))
     
     # confirmar el servicio con el id de reserva
@@ -181,5 +187,5 @@ def reserva(id):
 # TODO
 @reservas_bp.route('/cancelar_reserva/<string:id>', methods=['POST'])
 @jwt_required(locations=['cookies'])
-def cancelar_reserva(id):
+def cancelar(id):
     return

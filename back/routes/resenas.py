@@ -50,7 +50,7 @@ def resena():
   try:
      conn = db_conn()
      cursor = conn.cursor(dictionary=True)
-
+    
      query = '''
             INSERT
             INTO resenas (
@@ -67,6 +67,7 @@ def resena():
             str(uuid.uuid4()),
             payload["usuario_id"],
             payload["servicio_id"],
+            payload["reserva_id"],
             payload["estrellas"],
             payload["descripcion"]
      ))
@@ -78,4 +79,6 @@ def resena():
      return {'message': 'success'}, 200
   
   except Exception as e:
-    return {'message': str(e)}, 400
+    # si la db da error es xq desde el schema no se puede agregar
+    # mas de una resena con el mismo id de reserva
+    return {"status": "Resena ya existente"}, 409

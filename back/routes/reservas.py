@@ -399,41 +399,4 @@ def servicio_reservas(id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-
-@reservas_bp.route('/proveedores/añadir_puntuacion/<string:id_reserva>', methods=['POST'])
-def agregar_puntuacion(id_reserva):
-    try:
-        data = request.get_json()
-
-        estrellas = int(data.get("estrellas"))
-        comentarios = data.get("descripcion")
-        usuario_id = data.get("usuario_id")
-        servicio_id = data.get("servicio_id")
-
-        conn = db_conn()
-        cursor = conn.cursor(dictionary=True)
-
-        # comentario en la reserva
-        cursor.execute("""
-            UPDATE reservas
-            SET comentarios_cliente = %s
-            WHERE id = %s
-        """, (comentarios, id_reserva))
-        
-
-        # reseña en tabla RESENAS
-        cursor.execute("""
-            INSERT INTO resenas (id, usuario_id, servicio_id, puntuacion, comentarios_cliente)
-            VALUES (UUID(), %s, %s, %s, %s)
-        """, (usuario_id, servicio_id, estrellas, comentarios))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        return jsonify({"status": "reseña guardada correctamente"}), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
