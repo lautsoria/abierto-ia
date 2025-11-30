@@ -1,3 +1,32 @@
+## 30 de Noviembre, 2025
+
+### Actualización crítica de esquema, seeds y rutas
+
+**Base de Datos & Seeds:**
+- Renombrada/ajustada la tabla de junction: ahora `barrios_servicios` (linkea `servicio_id` ↔ `barrio_id`).
+- Seed de `usuarios`, `categorias`, `barrios` y `servicios` reescrita: inserciones en bloque con `UUID()` y referencias por subqueries.
+- Se agregaron 10 servicios adicionales y se asegura que cada servicio tenga al menos 1 barrio asociado (inserción aleatoria); se añade un segundo barrio aleatorio a un subconjunto de servicios.
+- Seeds de `reservas` ampliadas: generación aleatoria de reservas pasadas y aumento del volumen (hasta 60 registros) para pruebas.
+- Seeds de `resenas` generadas a partir de reservas realizadas (hasta 3 reseñas por servicio) con fechas y puntajes aleatorios.
+
+**Rutas / Backend:**
+- Reemplazo consistente de `barrios_usuarios` por `barrios_servicios` en múltiples endpoints (`proveedores`, `servicios`, `reservas`, `servicios_top_rating`, etc.).
+- `servicios`:
+  - Endpoint `GET /servicios/todos` arreglado para devolver la lista completa de servicios (ahora incluye `proveedor` y `categoria`).
+  - `DELETE` de servicio modificado para recibir JSON con `id` y ahora borra también registros en `barrios_servicios` relacionados.
+  - Actualización de servicio: ahora `PATCH /servicios/mod` que recibe `data['id']` y simplifica los campos actualizados.
+  - Mejor manejo de errores y logs agregados en varias rutas.
+- `proveedores` y consultas relacionadas adaptadas para trabajar con `barrios_servicios` y mostrar ubicaciones por servicio.
+- `usuarios`:
+  - Endpoint de eliminación unificado (`/eliminar`) actualizado para recibir JSON; la lógica borra reseñas, reservas y datos relacionados antes de eliminar el usuario según su rol (`proveedor` o `cliente`).
+
+**Otros cambios y notas:**
+- Correcciones en `init_db.sql` (uso correcto de `UUID()` y reordenamiento/agrupación de inserts para consistencia).
+- Ajustes en generación de datos (fechas, límites, formatos) para que sean más realistas y compatibles con la API.
+- Pequeños refactors en controladores: impresión de excepciones para facilitar debugging y limpieza de queries.
+
+Advertencia: estas migraciones y seeds modifican datos y relaciones; al aplicarlas en un entorno con datos reales es recomendable usar scripts de migración o reseed controlado.
+
 ## 25 de Noviembre, 2025
 
 ### Sistema de Reseñas - Endpoint POST
