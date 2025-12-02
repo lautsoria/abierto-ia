@@ -39,7 +39,7 @@ CREATE TABLE servicios (
   categoria_id CHAR(36) NOT NULL,
   nombre VARCHAR(255) NOT NULL,
   descripcion TEXT,
-  imagen VARCHAR(255),
+  imagen INT CHECK (imagen BETWEEN 1 AND 10),
   precio DECIMAL(10,2) NOT NULL,
   hora_inicio INT,
   hora_fin INT,

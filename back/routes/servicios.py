@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from db.db import db_conn
 import uuid
+import random
 
 servicios_bp = Blueprint('servicios', __name__)
 
@@ -302,7 +303,7 @@ def registrar_servicio():
     hora_fin,
     duracion
     ) = payload.values()
-
+    imagen = random.randint(1,10)
     try:
         conn = db_conn()
         cursor = conn.cursor()
@@ -314,13 +315,14 @@ def registrar_servicio():
                 categoria_id,
                 nombre,
                 descripcion,
+                imagen,
                 precio,
                 hora_inicio,
                 hora_fin,
                 duracion 
                 )
                 VALUES
-                (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
         cursor.execute(query, (
             str(uuid.uuid4()),
@@ -328,6 +330,7 @@ def registrar_servicio():
             categoria_id,
             nombre,
             descripcion,
+            imagen,
             precio,
             hora_inicio,
             hora_fin,
