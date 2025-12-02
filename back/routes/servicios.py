@@ -7,7 +7,11 @@ servicios_bp = Blueprint('servicios', __name__)
 #servicios por categoria
 @servicios_bp.route('/<string:nombre>')
 def servicios_por_categoria(nombre):
-    ubicacion = request.args.get('ubicacion', '')
+    
+    ubicacion = request.args.get('ubicacion')
+    ordenar = request.args.get('ordenar')
+    precio_min = request.args.get('precio_min')
+    precio_max = request.args.get('precio_max')
     
     try:
         conn = db_conn()
@@ -19,6 +23,7 @@ def servicios_por_categoria(nombre):
                 s.nombre,
                 s.descripcion,
                 s.precio,
+                s.imagen,
                 c.nombre as categoria_nombre,
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
@@ -36,27 +41,32 @@ def servicios_por_categoria(nombre):
         
         params = [nombre]
         
-        # Agregar filtro de ubicación
         if ubicacion:
             query += " AND b.nombre = %s"
             params.append(ubicacion)
+
+        if precio_min:
+            query += " AND s.precio >= %s"
+            params.append(precio_min)
         
+        if precio_max:
+            query += " AND s.precio <= %s"
+            params.append(precio_max)
+
         query += " GROUP BY s.id"
 
-        # Agregar ordenamiento
-        # if ordenar == 'precio_asc':
-        #     query += " ORDER BY s.precio ASC"
-        # elif ordenar == 'precio_desc':
-        #     query += " ORDER BY s.precio DESC"
-        # elif ordenar == 'rating':
-        #     query += " ORDER BY calificacion_promedio DESC"
-        # else:  # relevancia o default
-        query += " ORDER BY calificacion_promedio DESC, s.precio ASC"
+        if ordenar == 'precio_asc':
+            query += " ORDER BY s.precio ASC"
+        elif ordenar == 'precio_desc':
+            query += " ORDER BY s.precio DESC"
+        elif ordenar == 'calificacion_desc':
+            query += " ORDER BY calificacion_promedio DESC"
+        else:
+            query += " ORDER BY calificacion_promedio DESC, s.precio ASC"
 
         cursor.execute(query, params)
         servicios = cursor.fetchall()
         
-        # Convert Decimal to float for JSON serialization
         for servicio in servicios:
             if servicio.get('calificacion_promedio'):
                 servicio['calificacion_promedio'] = float(servicio['calificacion_promedio'])
@@ -69,6 +79,7 @@ def servicios_por_categoria(nombre):
         return jsonify(servicios), 200
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 
