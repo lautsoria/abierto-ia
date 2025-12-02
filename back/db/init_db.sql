@@ -1,93 +1,97 @@
--- DROP SCHEMA ids;
--- CREATE DATABASE IF NOT EXISTS ids;
--- use ids;
+-- DROP DATABASE IF EXISTS ids;
+-- CREATE DATABASE ids;
+-- USE ids;
 
-CREATE TABLE IF NOT EXISTS roles (
-  id UUID PRIMARY KEY,
+CREATE TABLE roles (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   rol VARCHAR(50) UNIQUE NOT NULL
   -- hay que tener en cuenta que debemos tener solo 3 roles
   -- (cliente, proveedor, admin)
 );
 
-CREATE TABLE IF NOT EXISTS usuarios (
-  id UUID PRIMARY KEY,
+CREATE TABLE usuarios (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   usuario VARCHAR(25) NOT NULL UNIQUE,
   email VARCHAR(50) NOT NULL UNIQUE,
-  contrasena VARCHAR(12) NOT NULL,
-  rol_id UUID,
+  contrasena VARCHAR(255) NOT NULL,
+  rol_id CHAR(36),
   telefono VARCHAR(20),
   fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (rol_id) REFERENCES roles(id)
 );
 
-CREATE TABLE IF NOT EXISTS proveedores (
-  id UUID PRIMARY KEY,
+CREATE TABLE proveedores (
+  id CHAR(36) PRIMARY KEY,
   descripcion VARCHAR(500),
-  FOREIGN KEY (id) REFERENCES usuarios(id)
+  FOREIGN KEY (id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS categorias (
-  id UUID PRIMARY KEY,
+CREATE TABLE categorias (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   nombre VARCHAR(255) NOT NULL UNIQUE,
   descripcion TEXT,
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS servicios (
-  id UUID PRIMARY KEY,
-  proveedor_id UUID NOT NULL,
-  categoria_id UUID NOT NULL,
+CREATE TABLE servicios (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  proveedor_id CHAR(36) NOT NULL,
+  categoria_id CHAR(36) NOT NULL,
   nombre VARCHAR(255) NOT NULL,
   descripcion TEXT,
   imagen VARCHAR(255),
   precio DECIMAL(10,2) NOT NULL,
-  hora_inicio INT CHECK (hora_inicio BETWEEN 1 AND 24),
-  hora_fin INT CHECK (hora_fin BETWEEN 1 AND 24),
-  duracion INT CHECK (duracion BETWEEN 1 AND 12),
+  hora_inicio INT,
+  hora_fin INT,
+  duracion INT,
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT check_horas CHECK (hora_fin > hora_inicio),
-  FOREIGN KEY (proveedor_id) REFERENCES proveedores(id),
-  FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+  FOREIGN KEY (proveedor_id) REFERENCES proveedores(id) ON DELETE CASCADE,
+  FOREIGN KEY (categoria_id) REFERENCES categorias(id),
+  CHECK (hora_inicio BETWEEN 1 AND 24),
+  CHECK (hora_fin BETWEEN 1 AND 24),
+  CHECK (duracion BETWEEN 1 AND 12),
+  CHECK (hora_fin > hora_inicio)
 );
 
-CREATE TABLE IF NOT EXISTS reservas (
-  id UUID PRIMARY KEY,
-  usuario_id UUID NOT NULL,
-  servicio_id UUID NOT NULL,
+CREATE TABLE reservas (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  usuario_id CHAR(36) NOT NULL,
+  servicio_id CHAR(36) NOT NULL,
   fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
   fecha_servicio DATETIME NOT NULL,
   hora_servicio INT NOT NULL,
   direccion VARCHAR(100),
   estado ENUM('pendiente', 'confirmado', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id)
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS resenas (
-  id UUID PRIMARY KEY,
-  usuario_id UUID NOT NULL,
-  servicio_id UUID NOT NULL,
-  reserva_id UUID NOT NULL UNIQUE,
-  puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),
+CREATE TABLE resenas (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  usuario_id CHAR(36) NOT NULL,
+  servicio_id CHAR(36) NOT NULL,
+  reserva_id CHAR(36) NOT NULL UNIQUE,
+  puntuacion INT,
   comentarios_cliente TEXT,
   fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id),
-  FOREIGN KEY (reserva_id) REFERENCES reservas(id)
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
+  FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
+  CHECK (puntuacion BETWEEN 1 AND 5)
 );
 
-CREATE TABLE IF NOT EXISTS barrios (
-  id UUID PRIMARY KEY,
+CREATE TABLE barrios (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   nombre VARCHAR(30)
 );
 
-CREATE TABLE IF NOT EXISTS barrios_servicios (
-  id UUID PRIMARY KEY,
-  servicio_id UUID NOT NULL,
-  barrio_id UUID NOT NULL,
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id),
-  FOREIGN KEY (barrio_id) REFERENCES barrios(id)
+CREATE TABLE barrios_servicios (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  servicio_id CHAR(36) NOT NULL,
+  barrio_id CHAR(36) NOT NULL,
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
+  FOREIGN KEY (barrio_id) REFERENCES barrios(id) ON DELETE CASCADE
 );
 
 -- Insert Roles
