@@ -1,12 +1,6 @@
 import requests
-from dotenv import load_dotenv
-import os
-from dotenv import load_dotenv
 
-env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
-load_dotenv(dotenv_path=env_path)
-
-BACKEND_URL = os.getenv('BACEKND_URL')
+BACKEND_URL = 'https://abiertoia.pythonanywhere.com/api'
 
 def obtener_cantidad_categoria(nombre):
     try:
