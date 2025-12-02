@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS servicios (
   categoria_id UUID NOT NULL,
   nombre VARCHAR(255) NOT NULL,
   descripcion TEXT,
-  imagen VARCHAR(255),
+  imagen INT CHECK (imagen BETWEEN 1 AND 10),
   precio DECIMAL(10,2) NOT NULL,
   hora_inicio INT CHECK (hora_inicio BETWEEN 1 AND 24),
   hora_fin INT CHECK (hora_fin BETWEEN 1 AND 24),
