@@ -14,30 +14,75 @@
     </div>
 
     <aside class="filters-container">
-        <div class="filters-title">
-            Filtros
-        </div>
-        
         <form method="GET" action="{{ url_for('categorias.categoria', nombre=categoria_nombre) }}">
-            <div class="filter-group">
-                <label for="ubicacion">Ubicación</label>
-                <select id="ubicacion" name="ubicacion">
-                    <option value="">Todas</option>
-                    {% for ubicacion in ubicaciones %}
-                    <option value="{{ ubicacion }}" {% if ubicacion_seleccionada == ubicacion %}selected{% endif %}>
-                        {{ ubicacion }}
-                    </option>
-                    {% endfor %}
-                </select>
+            {% if request.args.get('ordenar') %}
+            <input type="hidden" name="ordenar" value="{{ request.args.get('ordenar') }}">
+            {% endif %}
+
+            <div class="filter-section">
+                <h3 class="filter-title">Filtros</h3>
+                
+                <div class="filter-group">
+                    <label for="ubicacion">Ubicación</label>
+                    <select id="ubicacion" name="ubicacion">
+                        <option value="">Todas</option>
+                        {% for ubicacion in ubicaciones %}
+                        <option value="{{ ubicacion }}" {% if ubicacion_seleccionada == ubicacion %}selected{% endif %}>
+                            {{ ubicacion }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Precio</label>
+                    <div class="price-inputs">
+                        <input type="number" name="precio_min" placeholder="Mínimo" value="{{ request.args.get('precio_min', '') }}">
+                        <span class="separator">—</span>
+                        <input type="number" name="precio_max" placeholder="Máximo" value="{{ request.args.get('precio_max', '') }}">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Calificación</label>
+                    <div class="rating-options">
+                        <label class="radio-option">
+                            <input type="radio" name="calificacion" value="" {% if not request.args.get('calificacion') %}checked{% endif %}>
+                            <span>Todas</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="calificacion" value="4" {% if request.args.get('calificacion') == '4' %}checked{% endif %}>
+                            <span>4 estrellas o más</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="calificacion" value="3" {% if request.args.get('calificacion') == '3' %}checked{% endif %}>
+                            <span>3 estrellas o más</span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit" class="btn-filter">Aplicar</button>
-            <a href="{{ url_for('categorias.categoria', nombre=categoria_nombre) }}" class="btn-clear" style="text-decoration: none; display: block; text-align: center;">
-                Limpiar filtros
-            </a>
+            <div class="filter-section">
+                <h3 class="filter-title">Ordenar por</h3>
+                <div class="filter-group">
+                    <select id="ordenar" name="ordenar" class="sort-select-sidebar">
+                        <option value="precio_asc" {% if request.args.get('ordenar') == 'precio_asc' %}selected{% endif %}>Menor precio</option>
+                        <option value="precio_desc" {% if request.args.get('ordenar') == 'precio_desc' %}selected{% endif %}>Mayor precio</option>
+                        <option value="calificacion" {% if request.args.get('ordenar') == 'calificacion' %}selected{% endif %}>Mejor calificación</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn-filter">Aplicar</button>
+                <a href="{{ url_for('categorias.categoria', nombre=categoria_nombre) }}" class="btn-clear">
+                    Limpiar
+                </a>
+            </div>
         </form>
     </aside>
 
+    <div class="results-container">
         {% if servicios %}
         <div class="servicios-grid">
             {% for servicio in servicios %}
@@ -93,16 +138,8 @@
             <p>Intenta ajustar los filtros o buscar en otra categoría</p>
         </div>
         {% endif %}
-    </main>
+    </div>
 </div>
-
-<script>
-    function ordenarServicios(criterio) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('ordenar', criterio);
-        window.location.href = url.toString();
-    }
-</script>
 {% endblock %}
 
 

@@ -4,12 +4,18 @@ import qrcode
 
 BACKEND_URL = 'http://localhost:5500/api'
 
-def obtener_servicios_por_categoria(nombre, ubicacion=None):
-    """Obtiene servicios filtrados por categoría y opcionalmente por ubicación"""
+def obtener_servicios_por_categoria(nombre, ubicacion=None, ordenar=None, precio_min=None, precio_max=None):
+    """Obtiene servicios por categoría con filtros y ordenamiento """
     try:
         params = {}
         if ubicacion:
             params['ubicacion'] = ubicacion
+        if ordenar:
+            params['ordenar'] = ordenar
+        if precio_min:
+            params['precio_min'] = precio_min
+        if precio_max:
+            params['precio_max'] = precio_max
 
         response = requests.get(
             f'{BACKEND_URL}/servicios/{nombre}',

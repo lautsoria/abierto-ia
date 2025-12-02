@@ -1,11 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response, Blueprint
-from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt, get_jwt_identity
-from flask_cors import CORS
-import os
-from dotenv import load_dotenv
-import qrcode
+from flask import render_template, request, Blueprint
+from flask_jwt_extended import jwt_required, get_jwt
 
-from static.icons import icons
 from back_calls.categorias import *
 from back_calls.ubicaciones import *
 from back_calls.servicios import obtener_servicios_por_categoria
@@ -22,11 +17,19 @@ def categoria(nombre):
 
     # Obtener parámetros de filtro
     ubicacion_seleccionada = request.args.get('ubicacion', '')
+    ordenar_seleccionado = request.args.get('ordenar', '')
+    precio_min_seleccionado = request.args.get('precio_min', '')
+    precio_max_seleccionado = request.args.get('precio_max', '')
 
     # Obtener servicios filtrados
-    servicios = obtener_servicios_por_categoria(nombre, ubicacion_seleccionada if ubicacion_seleccionada else None)
+    servicios = obtener_servicios_por_categoria(
+        nombre,
+        ubicacion=ubicacion_seleccionada if ubicacion_seleccionada else None,
+        ordenar=ordenar_seleccionado if ordenar_seleccionado else None,
+        precio_min=precio_min_seleccionado if precio_min_seleccionado else None,
+        precio_max=precio_max_seleccionado if precio_max_seleccionado else None
+    )
     
-    # Obtener ubicaciones para el filtro
     ubicaciones = obtener_ubicaciones()
     
     # Obtener total de servicios sin filtros
@@ -39,5 +42,8 @@ def categoria(nombre):
         total_servicios=total_servicios,
         ubicaciones=ubicaciones,
         ubicacion_seleccionada=ubicacion_seleccionada,
+        ordenar_seleccionado=ordenar_seleccionado,
+        precio_min_seleccionado=precio_min_seleccionado,
+        precio_max_seleccionado=precio_max_seleccionado,
         data=user_data
     )

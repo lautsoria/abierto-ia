@@ -1,11 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response, Blueprint
-from flask_jwt_extended import jwt_required, JWTManager, verify_jwt_in_request, get_jwt, get_jwt_identity
-from flask_cors import CORS
-import os
-from dotenv import load_dotenv
-import qrcode
+from flask import render_template, request, redirect, url_for, flash, make_response, Blueprint
+from flask_jwt_extended import jwt_required, verify_jwt_in_request
 
-from static.icons import icons
 from back_calls.auth import *
 
 
