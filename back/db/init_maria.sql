@@ -87,25 +87,11 @@ CREATE TABLE barrios (
 );
 
 CREATE TABLE IF NOT EXISTS barrios_servicios (
-<<<<<<< HEAD
-<<<<<<<< HEAD:back/db/init_maria.sql
-  id UUID PRIMARY KEY,
-  servicio_id UUID NOT NULL,
-  barrio_id UUID NOT NULL,
-========
-  id VARCHAR(36) PRIMARY KEY,
-  servicio_id VARCHAR(36) NOT NULL,
-  barrio_id VARCHAR(36) NOT NULL,
->>>>>>>> main:back/db/init_mysql.sql
-  UNIQUE KEY unique_servicio_barrio (servicio_id, barrio_id),
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id),
-=======
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   servicio_id CHAR(36) NOT NULL,
   barrio_id CHAR(36) NOT NULL,
   UNIQUE KEY unique_servicio_barrio (servicio_id, barrio_id),
   FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
->>>>>>> main
   FOREIGN KEY (barrio_id) REFERENCES barrios(id)
 );
 
@@ -115,11 +101,7 @@ INSERT INTO roles (id, rol) VALUES
 (UUID(), 'proveedor'),
 (UUID(), 'admin');
 
-<<<<<<< HEAD
--- Insert Users
-=======
 -- Insert Users (fetching role IDs dynamically)
->>>>>>> main
 INSERT INTO usuarios (id, usuario, email, contrasena, rol_id, telefono, fecha_registro) VALUES
 (UUID(), 'juan_perez', 'juan@gmail.com', 'pass123', (SELECT id FROM roles WHERE rol = 'proveedor'), '11-5555-1234', NOW()),
 (UUID(), 'maria_gomez', 'maria@gmail.com', 'pass456', (SELECT id FROM roles WHERE rol = 'cliente'), '11-5555-2345', NOW()),
@@ -223,20 +205,12 @@ INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, imag
 (UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Pintura'), 'Pintura de fachadas', 'Pintura exterior de edificios y casas', FLOOR(1 + (RAND() * 10)), 18000.00, 8, 20, 10, NOW());
 
 -- ==========================================
-<<<<<<< HEAD
--- CRITICAL UPDATE: Link Barrios to Services
-=======
 -- 3. CRITICAL UPDATE: Link Barrios to Services
->>>>>>> main
 -- ==========================================
 -- Guaranteed: EVERY service gets at least 1 random barrio
 INSERT INTO barrios_servicios (id, servicio_id, barrio_id)
 SELECT 
-<<<<<<< HEAD
-  UUID(),
-=======
   UUID(), 
->>>>>>> main
   s.id, 
   (SELECT id FROM barrios ORDER BY RAND() LIMIT 1)
 FROM servicios s;
@@ -244,22 +218,6 @@ FROM servicios s;
 -- Optional: Add a second random barrio to 30% of services to vary the data
 INSERT INTO barrios_servicios (id, servicio_id, barrio_id)
 SELECT 
-<<<<<<< HEAD
-  UUID(),
-  s.id, 
-  (SELECT id FROM barrios ORDER BY RAND() LIMIT 1)
-FROM servicios s
-WHERE RAND() < 0.3
-AND NOT EXISTS (
-  SELECT 1 FROM barrios_servicios bs2 
-  WHERE bs2.servicio_id = s.id 
-  GROUP BY bs2.servicio_id 
-  HAVING COUNT(*) >= 2
-);
-
--- ==========================================
--- INSERT RESERVATIONS & REVIEWS
-=======
   UUID(), 
   s.id, 
   (SELECT id FROM barrios ORDER BY RAND() LIMIT 1)
@@ -268,7 +226,6 @@ WHERE RAND() < 0.3;
 
 -- ==========================================
 -- 4. INSERT RESERVATIONS & REVIEWS
->>>>>>> main
 -- ==========================================
 
 -- Insert past reservations (completed)
@@ -289,29 +246,6 @@ WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
 ORDER BY RAND()
 LIMIT 60;
 
-<<<<<<< HEAD
--- Insert Reviews (3 per service) - MySQL compatible version
-INSERT INTO resenas (id, usuario_id, servicio_id, reserva_id, puntuacion, comentarios_cliente, fecha)
-SELECT 
-  UUID(),
-  usuario_id,
-  servicio_id,
-  id,
-  FLOOR(3 + (RAND() * 3)),
-  'Excelente trabajo, muy recomendable.',
-  DATE_FORMAT(DATE_ADD(fecha_servicio, INTERVAL 1 DAY), '%Y-%m-%dT%H:%i')
-FROM (
-  SELECT 
-    r.*,
-    @row_num := IF(@servicio = r.servicio_id, @row_num + 1, 1) as rn,
-    @servicio := r.servicio_id
-  FROM reservas r
-  CROSS JOIN (SELECT @row_num := 0, @servicio := NULL) vars
-  WHERE r.estado = 'realizado'
-  ORDER BY r.servicio_id, RAND()
-) ranked_reservations
-WHERE ranked_reservations.rn <= 3;
-=======
 -- Insert Reviews (3 per service)
 INSERT INTO resenas (id, usuario_id, servicio_id, reserva_id, puntuacion, comentarios_cliente, fecha)
 SELECT 
@@ -330,4 +264,3 @@ FROM (
   WHERE r.estado = 'realizado'
 ) ranked_reservations
 WHERE ranked_reservations.rn <= 3;
->>>>>>> main

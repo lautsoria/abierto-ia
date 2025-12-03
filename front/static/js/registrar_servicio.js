@@ -62,7 +62,92 @@ document.getElementById('nombre').addEventListener('input', function() {
         }
     });
 
-    // validamos que los datos tengan sentido
+    const MAX_BARRIOS = 3;
+    let selectedBarrios = [];
+
+    const barrioSelect = document.getElementById('barrioSelect');
+    const selectedBarriosContainer = document.getElementById('selectedBarrios');
+    const barriosPlaceholder = document.getElementById('barriosPlaceholder');
+    const barriosCount = document.getElementById('barriosCount');
+    const barriosInputs = document.getElementById('barriosInputs');
+    const barriosHelp = document.getElementById('barriosHelp');
+
+    function updateBarriosUI() {
+        
+        barriosCount.textContent = selectedBarrios.length;
+        
+        // actualiza el barios seleccionados
+        barriosPlaceholder.style.display = selectedBarrios.length === 0 ? 'block' : 'none';
+        
+        // verificamos que no se pueda agregar mas de 3 barrios
+        if (selectedBarrios.length >= MAX_BARRIOS) {
+            barrioSelect.disabled = true;
+            barriosHelp.textContent = 'Máximo de barrios alcanzado';
+            barriosHelp.style.color = '#d32f2f';
+        } else {
+            barrioSelect.disabled = false;
+            barriosHelp.textContent = `Podés seleccionar hasta ${MAX_BARRIOS - selectedBarrios.length} barrio${MAX_BARRIOS - selectedBarrios.length !== 1 ? 's' : ''} más`;
+            barriosHelp.style.color = '#666';
+        }
+
+        // actualizamos los inputs escondidos
+        barriosInputs.innerHTML = '';
+        selectedBarrios.forEach(barrio => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'barrios[]';
+            input.value = barrio.id;
+            barriosInputs.appendChild(input);
+        });
+    }
+
+
+    function addBarrio(id, nombre) {
+        if (selectedBarrios.length >= MAX_BARRIOS) return;
+        if (selectedBarrios.find(b => b.id === id)) return;
+
+        selectedBarrios.push({ id, nombre });
+
+        // los barrios que seleccionamos aparecen en la barra de arriba
+        const tag = document.createElement('span');
+        tag.className = 'barrio-tag';
+        tag.dataset.id = id;
+        tag.innerHTML = `
+            ${nombre}
+            <button type="button" class="remove-barrio" title="Quitar barrio">&times;</button>
+        `;
+
+        tag.querySelector('.remove-barrio').addEventListener('click', () => removeBarrio(id));
+        selectedBarriosContainer.appendChild(tag);
+
+        // deshabilitamos el barrio seleccionado
+        const option = barrioSelect.querySelector(`option[value="${id}"]`);
+        if (option) option.disabled = true;
+
+        updateBarriosUI();
+    }
+
+    // borramos el barrio de la barra de seleccionados
+    function removeBarrio(id) {
+        selectedBarrios = selectedBarrios.filter(b => b.id !== id);
+
+        const tag = selectedBarriosContainer.querySelector(`[data-id="${id}"]`);
+        if (tag) tag.remove();
+
+        const option = barrioSelect.querySelector(`option[value="${id}"]`);
+        if (option) option.disabled = false;
+
+        updateBarriosUI();
+    }
+
+    barrioSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.value) {
+            addBarrio(selectedOption.value, selectedOption.dataset.nombre);
+            this.value = ''; // Reset select
+        }
+    });
+
     document.getElementById('serviceForm').addEventListener('submit', function(e) {
         const inicio = parseInt(document.getElementById('hora_inicio').value);
         const fin = parseInt(document.getElementById('hora_fin').value);
@@ -84,6 +169,12 @@ document.getElementById('nombre').addEventListener('input', function() {
         if (precio < 100) {
             e.preventDefault();
             alert('El precio mínimo es $100');
+            return;
+        }
+
+        if (selectedBarrios.length === 0) {
+            e.preventDefault();
+            alert('Debés seleccionar al menos un barrio');
             return;
         }
     });

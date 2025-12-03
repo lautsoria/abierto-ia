@@ -4,6 +4,8 @@ from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 
 from back_calls.servicios import *
 from back_calls.categorias import obtener_categorias
+from back_calls.ubicaciones import obtener_ubicaciones
+
 
 servicios_bp = Blueprint('servicios', __name__)
 
@@ -61,7 +63,8 @@ def registrar_servicio():
                 "precio":  request.form.get('precio'),
                 "hora_inicio": request.form.get('hora_inicio'),
                 "hora_fin": request.form.get('hora_fin'),
-                "duracion": request.form.get('duracion')
+                "duracion": request.form.get('duracion'),
+                "barrios": request.form.getlist('barrios[]')
             })
 
             if res.status_code != 200:
@@ -72,7 +75,10 @@ def registrar_servicio():
         if request.method == 'GET':
             data = get_jwt()
             categorias = obtener_categorias()
-            return render_template('registrar_servicio.html', categorias=categorias, data=data)
+            barrios = obtener_ubicaciones()
+            print(barrios)
+
+            return render_template('registrar_servicio.html', categorias=categorias, data=data, barrios=barrios)
 
     return render_template('404.html'), 401
     

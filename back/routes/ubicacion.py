@@ -7,21 +7,21 @@ ubicacion_bp = Blueprint('ubicacion', __name__)
 def ubicaciones():
     try:
       conn = db_conn()
-      cursor = conn.cursor()
+      cursor = conn.cursor(dictionary=True)
 
       query = '''
-              SELECT nombre
+              SELECT id, nombre
               FROM barrios              
               '''
       cursor.execute(query)
-      ubicaciones = cursor.fetchall()
+      barrios = cursor.fetchall()
       cursor.close()
       conn.close()
 
-      if (ubicaciones == None):
-        barrios = []
-      else:
-        barrios = [barrio[0] for barrio in ubicaciones]
+      # if (ubicaciones == None):
+      #   barrios = []
+      # else:
+      #   barrios = [barrio[0] for barrio in ubicaciones]
       
       return jsonify(barrios), 200
     except Exception as e:

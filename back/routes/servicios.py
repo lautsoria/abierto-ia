@@ -298,14 +298,9 @@ def buscar_servicios():
                 GROUP BY s.id
                 """
 
-<<<<<<< HEAD
-            u.usuario AS proveedor_nombre,
-            
-=======
         cursor.execute(query, (like_q, like_q, like_q, like_q))
         servicios = cursor.fetchall()
         print(servicios)
->>>>>>> main
 
         for servicio in servicios:
             if servicio.get('calificacion_promedio'):
@@ -327,7 +322,6 @@ def buscar_servicios():
 @servicios_bp.route('/', methods=['POST'])
 def registrar_servicio():
     payload = request.json
-    print(payload)
     (
     proveedor_id,
     categoria_id,
@@ -336,9 +330,13 @@ def registrar_servicio():
     precio,
     hora_inicio,
     hora_fin,
-    duracion
+    duracion,
+    barrios
     ) = payload.values()
+    print(barrios)
     imagen = random.randint(1,10)
+    id = str(uuid.uuid4())
+    
     try:
         conn = db_conn()
         cursor = conn.cursor()
@@ -360,7 +358,7 @@ def registrar_servicio():
                 (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
         cursor.execute(query, (
-            str(uuid.uuid4()),
+            id,
             proveedor_id,
             categoria_id,
             nombre,
@@ -371,6 +369,15 @@ def registrar_servicio():
             hora_fin,
             duracion
         ))
+
+        for barrio in barrios:
+            cursor.execute("""
+                           INSERT INTO barrios_servicios
+                           (id, barrio_id, servicio_id)
+                           VALUES
+                           (%s, %s, %s)
+                           """, (str(uuid.uuid4()), barrio, id))
+
         conn.commit()
         cursor.close()
         conn.close()
