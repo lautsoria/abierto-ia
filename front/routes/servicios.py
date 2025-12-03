@@ -29,12 +29,12 @@ def admin_servicios():
 
 @servicios_bp.route('/buscar')
 def buscar_servicios():
-    query = request.args.get("q", "").strip()
+    query = request.args.get("query", "").strip()
 
     if not query:
         return render_template("resultados_busqueda.html", servicios=[],)
 
-    response = requests.get(f"{BACKEND_URL}/servicios/buscar", params={"q": query})
+    response = requests.get(f"{BACKEND_URL}/servicios/buscar", params={"query": query})
     
 
     if response.status_code != 200:

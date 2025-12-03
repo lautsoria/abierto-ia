@@ -1,7 +1,7 @@
 import requests
 import qrcode
 
-BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
+BACKEND_URL = 'http://localhost:5500/api'
 
 def obtener_mis_reservas(usuario_id):
     try:

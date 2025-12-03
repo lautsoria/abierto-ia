@@ -5,14 +5,18 @@ import random
 
 servicios_bp = Blueprint('servicios', __name__)
 
-#servicios por categoria
+#servicios por categoria y filtros
 @servicios_bp.route('/<string:nombre>')
 def servicios_por_categoria(nombre):
-    
+
+    print(request.args)
+
     ubicacion = request.args.get('ubicacion')
     ordenar = request.args.get('ordenar')
     precio_min = request.args.get('precio_min')
     precio_max = request.args.get('precio_max')
+
+    print(ubicacion, ordenar, precio_min, precio_max)
     
     try:
         conn = db_conn()
@@ -60,11 +64,12 @@ def servicios_por_categoria(nombre):
             query += " ORDER BY s.precio ASC"
         elif ordenar == 'precio_desc':
             query += " ORDER BY s.precio DESC"
-        elif ordenar == 'calificacion_desc':
+        elif ordenar == 'calificacion':
             query += " ORDER BY calificacion_promedio DESC"
         else:
             query += " ORDER BY calificacion_promedio DESC, s.precio ASC"
 
+        print(query)
         cursor.execute(query, params)
         servicios = cursor.fetchall()
         
@@ -96,7 +101,10 @@ def servicios_top_rating():
 
         query = """
             SELECT 
-                s.*,
+                s.nombre,
+                s.precio,
+                s.imagen,
+                s.descripcion,
                 c.nombre as categoria,
                 p.id as proveedor_id,
                 u.usuario as proveedor_nombre,
@@ -237,55 +245,76 @@ def servicio(id):
 
 @servicios_bp.route('/buscar', methods=['GET'])
 def buscar_servicios():
-    q = request.args.get("q", "").strip()
+    q = request.args.get("query", "").strip()
+    print(q)
 
     if not q:
         return jsonify([]), 200
 
-    palabras = q.split()
+    try:
+        palabras = q.split()
 
-    conditions = " OR ".join([
-        "(s.nombre LIKE %s OR s.descripcion LIKE %s)"
-        for _ in palabras
-    ])
+        # mete una query por palabra
+        # conditions = " OR ".join([
+        #     "(LOWER(s.nombre) LIKE %s OR LOWER(s.descripcion) LIKE %s OR LOWER(c.nombre) LIKE %s OR u.usuario LIKE %s)"
+        #     for _ in palabras
+        # ])
 
-    params = []
-    for palabra in palabras:
-        like = f"%{palabra}%"
-        params.extend([like, like])
+        # params = []
+        # for palabra in palabras:
+        #     like = f"%{palabra}%"
+        #     params.extend([like, like, like, like])
 
-    conn = db_conn()
-    cursor = conn.cursor(dictionary=True)
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
 
-    query = f"""
-        SELECT 
-            s.id,
-            s.nombre,
-            s.descripcion,
-            s.precio,
+        # agregamos wildcards a lo buscado asi no debe ser exactamente igual a lo q buscamos
+        # ejemplo: si busco juan, vere todos los proveedores que se llamen juan
+        like_q = f"%{q}%"
 
-            c.nombre AS categoria_nombre,
+        query = """
+                SELECT 
+                s.id,
+                s.nombre,
+                s.descripcion,
+                s.precio,
+                s.imagen,
+                c.nombre AS categoria,
+                u.usuario AS proveedor,
+                GROUP_CONCAT(DISTINCT b.nombre SEPARATOR ', ') as ubicacion,
+                (SELECT AVG(puntuacion) FROM resenas WHERE servicio_id = s.id) as calificacion_promedio,
+                (SELECT COUNT(*) FROM resenas WHERE servicio_id = s.id) as reviews_count
+                FROM servicios s
+                INNER JOIN categorias c ON s.categoria_id = c.id
+                INNER JOIN proveedores p ON s.proveedor_id = p.id
+                INNER JOIN usuarios u ON p.id = u.id
+                LEFT JOIN barrios_servicios bu ON s.id = bu.servicio_id
+                LEFT JOIN barrios b ON bu.barrio_id = b.id
+                WHERE LOWER(s.nombre) LIKE LOWER(%s) 
+                   OR LOWER(s.descripcion) LIKE LOWER(%s) 
+                   OR LOWER(c.nombre) LIKE LOWER(%s) 
+                   OR LOWER(u.usuario) LIKE LOWER(%s)
+                GROUP BY s.id
+                """
 
-            u.usuario AS proveedor_nombre,
-            
+        cursor.execute(query, (like_q, like_q, like_q, like_q))
+        servicios = cursor.fetchall()
+        print(servicios)
 
-            p.id AS proveedor_id
+        for servicio in servicios:
+            if servicio.get('calificacion_promedio'):
+                servicio['calificacion_promedio'] = float(servicio['calificacion_promedio'])
+            if servicio.get('precio'):
+                servicio['precio'] = float(servicio['precio'])
 
-        FROM servicios s
-        JOIN categorias c ON s.categoria_id = c.id
-        JOIN proveedores p ON s.proveedor_id = p.id
-        JOIN usuarios u ON p.id = u.id
+        cursor.close()
+        conn.close()
 
-        WHERE {conditions}
-    """
+        return jsonify(servicios), 200
 
-    cursor.execute(query, params)
-    servicios = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
-    return jsonify(servicios), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)}), 500
 
 
 
