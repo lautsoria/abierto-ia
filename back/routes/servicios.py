@@ -100,7 +100,8 @@ def servicios_top_rating():
         cursor = conn.cursor(dictionary=True)
 
         query = """
-            SELECT 
+            SELECT
+                s.id, 
                 s.nombre,
                 s.precio,
                 s.imagen,

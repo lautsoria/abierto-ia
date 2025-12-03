@@ -67,7 +67,7 @@ def registrar_servicio():
             if res.status_code != 200:
                 return {"message": "Error al cargar el servicio"}, 400
                 
-            return redirect(url_for('home'))
+            return redirect(url_for('servicios.mis_servicios'))
         
         if request.method == 'GET':
             data = get_jwt()
@@ -100,6 +100,7 @@ def mis_servicios():
 def editar_servicio_view(id):
     data = get_jwt()
     proveedor_id = get_jwt_identity()
+
     
     if data.get('rol') != 'proveedor':
         return render_template('404.html'), 401
@@ -138,7 +139,7 @@ def editar_servicio(id):
 @jwt_required(locations=['cookies'])
 def editar():
 
-    if get_jwt()['rol'] != 'admin':
+    if get_jwt()['rol'] not in ['admin','proveedor']:
         return "Acceso denegado", 401
 
     data = request.form
@@ -148,6 +149,7 @@ def editar():
         return editar_servicio(id)
     
     if request.method == 'GET':
+      id = request.args.get('id')
       return editar_servicio_view(id)
 
 
@@ -186,19 +188,15 @@ def actualizar_servicio(id):
 
 
 
-def eliminar_servicio_view(id):
-    data = get_jwt()
+def eliminar_servicio_proveedor(id):
     proveedor_id = get_jwt_identity()
-    
-    if data.get('rol') != 'proveedor':
-        return render_template('404.html'), 401
     
     # Verificar que el servicio pertenece al proveedor
     servicio = obtener_servicio_por_id(id)
     if not servicio or servicio.get('proveedor_id') != proveedor_id:
         return render_template('404.html'), 404
     
-    res = requests.delete(f'{BACKEND_URL}/servicios/{id}')
+    res = requests.delete(f"{BACKEND_URL}/servicios", json={"id": id})
     
     if res.status_code == 200:
         flash('Servicio eliminado exitosamente', 'success')
@@ -207,7 +205,7 @@ def eliminar_servicio_view(id):
     
     return redirect(url_for('servicios.mis_servicios'))
 
-def eliminar_servicio(id):
+def eliminar_servicio_admin(id):
     response = requests.delete(f"{BACKEND_URL}/servicios", json={"id": id})
 
     if response.status_code != 200:
@@ -215,17 +213,20 @@ def eliminar_servicio(id):
     
     return redirect(url_for('servicios.admin_servicios'))
 
-@servicios_bp.route('/eliminar_servicio', methods=['POST', 'GET'])
+@servicios_bp.route('/eliminar_servicio', methods=['POST'])
 @jwt_required(locations=['cookies'])
 def eliminar():
     data = request.form
-    id = data.get("id")
+    servicio_id = data.get("id")
+    rol = get_jwt()['rol']
     
-    if request.method == 'POST':
-        return eliminar_servicio(id)
+    if rol == 'admin':
+        return eliminar_servicio_admin(servicio_id)
     
-    if request.method == 'GET':
-      return eliminar_servicio_view(id)
+    if rol == 'proveedor':
+      return eliminar_servicio_proveedor(servicio_id)
+    
+    return render_template('404.html'), 401
 
 
 
