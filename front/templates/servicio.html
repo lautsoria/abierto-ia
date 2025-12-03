@@ -20,18 +20,15 @@
         <div class="gallery-container">
             <div class="thumbnail-list">
                 
-                {% if servicio.imagen %}
-                    <img src="{{ url_for('static', filename='images/servicios/{}.jpg'.format(servicio.imagen)) }}" class="thumbnail" alt="Thumbnail">
-                {% else %}
-                    <img src="https://via.placeholder.com/50" class="thumbnail" alt="Thumbnail">
-                {% endif %}
+                
+                <img src="{{ url_for('static', filename='images/manos.png') }}" class="thumbnail" alt="Thumbnail">
                 
             </div>
             <div class="main-image-container">
                 {% if servicio.imagen %}
-                    <img src="{{ url_for('static', filename='images/servicios/{}.jpg'.format(servicio.imagen)) }}" class="main-image" alt="{{ servicio.nombre }}">
+                    <img src="{{ url_for('static', filename='images/{}.jpg'.format(servicio.imagen)) }}" class="main-image" alt="{{ servicio.nombre }}">
                 {% else %}
-                    <img src='https://via.placeholder.com/600x400?text=Servicio' class="main-image" alt="{{ servicio.nombre }}">
+                    <img src="{{ url_for('static', filename='images/fondo.png') }}"  class="main-image" alt="{{ servicio.nombre }}">
                 {% endif %}
             </div>
         </div>

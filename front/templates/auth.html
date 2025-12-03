@@ -47,20 +47,9 @@
         </div>
     </div>
 </div>
-<script>
-    const $ = id => document.getElementById(id)
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
 
-    const flipcard = document.getElementById('flipCard');
-    const registerText = document.getElementById('Registertext');
-    const LoginText = document.getElementById('loginText');
+    
 
-    registerText.addEventListener('click', () => {
-        flipcard.style.transform = "rotateY(180deg)";
-    });
 
-    LoginText.addEventListener('click', () => {
-        flipcard.style.transform = "rotateY(0deg)";
-    });
-
-</script>
 </body>

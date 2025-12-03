@@ -32,14 +32,13 @@
                            name="nombre" 
                            value="{{ servicio.nombre }}"
                            placeholder="Ej: Instalación de aire acondicionado"
-                           required
-                           oninput="updatePreview()">
+                           required>
                     <span class="input-hint">Elegí un nombre claro y descriptivo</span>
                 </div>
 
                 <div class="form-group">
                     <label for="categoria_id">Categoría *</label>
-                    <select id="categoria_id" name="categoria_id" required onchange="updatePreview()">
+                    <select id="categoria_id" name="categoria_id" required>
                         <option value="">Seleccioná una categoría</option>
                         {% for categoria in categorias %}
                         <option value="{{ categoria.id }}" {% if categoria.id == servicio.categoria_id %}selected{% endif %}>
@@ -55,8 +54,7 @@
                               name="descripcion" 
                               rows="4" 
                               placeholder="Describí tu servicio en detalle..."
-                              required
-                              oninput="updatePreview()">{{ servicio.descripcion }}</textarea>
+                              required>{{ servicio.descripcion }}</textarea>
                     <span class="input-hint">Incluí qué incluye el servicio, materiales, garantía, etc.</span>
                 </div>
 
@@ -72,14 +70,13 @@
                                    min="1" 
                                    step="1"
                                    placeholder="0"
-                                   required
-                                   oninput="updatePreview()">
+                                   required>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="duracion">Duración (horas) *</label>
-                        <select id="duracion" name="duracion" required onchange="updatePreview()">
+                        <select id="duracion" name="duracion" required>
                             <option value="">Seleccionar</option>
                             {% for i in range(1, 9) %}
                             <option value="{{ i }}" {% if i == servicio.duracion %}selected{% endif %}>{{ i }} hora{% if i > 1 %}s{% endif %}</option>
@@ -91,7 +88,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="hora_inicio">Hora de inicio *</label>
-                        <select id="hora_inicio" name="hora_inicio" required onchange="updatePreview()">
+                        <select id="hora_inicio" name="hora_inicio" required>
                             <option value="">Desde</option>
                             {% for i in range(6, 22) %}
                             <option value="{{ i }}" {% if i == servicio.hora_inicio %}selected{% endif %}>{{ "%02d:00"|format(i) }}</option>
@@ -101,7 +98,7 @@
 
                     <div class="form-group">
                         <label for="hora_fin">Hora de fin *</label>
-                        <select id="hora_fin" name="hora_fin" required onchange="updatePreview()">
+                        <select id="hora_fin" name="hora_fin" required>
                             <option value="">Hasta</option>
                             {% for i in range(7, 23) %}
                             <option value="{{ i }}" {% if i == servicio.hora_fin %}selected{% endif %}>{{ "%02d:00"|format(i) }}</option>
@@ -111,12 +108,24 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="window.location.href='{{ url_for('servicios.mis_servicios') }}'">Cancelar</button>
+                    <button 
+                        type="button" 
+                        id="btnCancelar" 
+                        class="btn-secondary"
+                        data-url="{{ url_for('servicios.mis_servicios') }}"
+                    >
+                        Cancelar
+                    </button>
                     <button type="submit" class="btn-primary">Guardar cambios</button>
                 </div>
                 
                 <div class="delete-section">
-                    <button type="button" class="btn-secondary btn-delete" onclick="confirmarEliminacion()">
+                    <button 
+                        type="button" 
+                        id="btnEliminar" 
+                        data-url="{{ url_for('servicios.eliminar_servicio', id=servicio.id) }}"
+                        class="btn-eliminar"
+                    >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -154,35 +163,7 @@
     </div>
 </div>
 
-<script>
-    function updatePreview() {
-        const nombre = document.getElementById('nombre').value;
-        const categoria = document.getElementById('categoria_id');
-        const categoriaText = categoria.options[categoria.selectedIndex]?.text || 'Categoría';
-        const descripcion = document.getElementById('descripcion').value;
-        const precio = document.getElementById('precio').value;
-        const duracion = document.getElementById('duracion').value;
-        const horaInicio = document.getElementById('hora_inicio').value;
-        const horaFin = document.getElementById('hora_fin').value;
-
-        document.getElementById('previewTitle').textContent = nombre || 'Nombre del servicio';
-        document.getElementById('previewCategory').textContent = categoriaText !== 'Seleccioná una categoría' ? categoriaText : 'Categoría';
-        document.getElementById('previewDescription').textContent = descripcion ? (descripcion.substring(0, 80) + (descripcion.length > 80 ? '...' : '')) : 'Descripción del servicio...';
-        document.getElementById('previewPrice').textContent = precio ? '$ ' + Number(precio).toLocaleString('es-AR') : '$ 0';
-        document.getElementById('previewDuration').textContent = duracion ? duracion + 'h' : '0h';
-        
-        if (horaInicio && horaFin) {
-            document.getElementById('previewSchedule').textContent = `${horaInicio.padStart(2, '0')}:00 - ${horaFin.padStart(2, '0')}:00`;
-        }
-    }
-
-    function confirmarEliminacion() {
-        if (confirm('¿Estás seguro de que querés eliminar este servicio? Esta acción no se puede deshacer.')) {
-            window.location.href = '{{ url_for("servicios.eliminar", id=servicio.id) }}';
-        }
-    }
-
-    // inicializa la preview, DOMContentLoaded es cuando todos los elementos se renderizan
-    document.addEventListener('DOMContentLoaded', updatePreview);
-</script>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/edit_serv.js') }}"></script>
+{% endblock %}
 {% endblock %}

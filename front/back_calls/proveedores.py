@@ -1,6 +1,6 @@
 import requests
 
-BACKEND_URL = 'https://abiertoia.pythonanywhere.com/api'
+BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
 
 def obtener_proveedores(filtro_servicio=None):
     """Obtiene proveedores desde el backend"""

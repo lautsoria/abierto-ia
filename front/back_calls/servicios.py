@@ -1,7 +1,7 @@
 import requests
 import logging
 
-BACKEND_URL = 'https://abiertoia.pythonanywhere.com/api'
+BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
 
 def obtener_servicios_por_categoria(nombre, ubicacion=None, ordenar=None, precio_min=None, precio_max=None):
     """Obtiene servicios por categoría con filtros y ordenamiento """

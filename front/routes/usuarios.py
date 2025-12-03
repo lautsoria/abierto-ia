@@ -2,7 +2,7 @@ import requests
 from flask import render_template, request, redirect, url_for, Blueprint
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 
-BACKEND_URL = 'http://localhost:5500/api'
+BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
 usuarios_bp = Blueprint('usuarios', __name__)
 
 

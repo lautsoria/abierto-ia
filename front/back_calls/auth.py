@@ -1,6 +1,6 @@
 import requests 
 
-BACKEND_URL = 'https://abiertoia.pythonanywhere.com/api'
+BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
 
 def registrar_usuario(user, email, password, provider):
     """Registra un nuevo usuario en el backend"""

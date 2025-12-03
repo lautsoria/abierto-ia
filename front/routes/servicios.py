@@ -32,9 +32,10 @@ def buscar_servicios():
     query = request.args.get("q", "").strip()
 
     if not query:
-        return render_template("resultados_busqueda.html", servicios=[])
+        return render_template("resultados_busqueda.html", servicios=[],)
 
     response = requests.get(f"{BACKEND_URL}/servicios/buscar", params={"q": query})
+    
 
     if response.status_code != 200:
         return render_template("resultados_busqueda.html", servicios=[])
