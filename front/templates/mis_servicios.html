@@ -28,7 +28,9 @@
         <div class="service-card" data-id="{{ servicio.id }}">
             <div class="service-main">
                 <div class="service-image">
-                    <img src="{{ servicio.imagen or 'https://via.placeholder.com/120x120?text=Servicio' }}" alt="{{ servicio.nombre }}">
+                    <img src="{{ url_for('static', filename='images/' ~ servicio.categoria ~ '/' ~ servicio.imagen ~ '.jpg') }}"
+                    alt="{{ servicio.nombre }}"
+                    onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/' ~ servicio.imagen ~ '.jpg') }}'">
                 </div>
                 <div class="service-info">
                     <div class="service-category">{{ servicio.categoria_nombre }}</div>

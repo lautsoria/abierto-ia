@@ -16,7 +16,9 @@
             <div class="card">
                 <h2 class="section-title">Servicio seleccionado</h2>
                 <div class="service-preview">
-                    <img src="{{ servicio.imagen or 'https://via.placeholder.com/80' }}" alt="{{ servicio.nombre }}" class="service-img">
+                    <img src="{{ url_for('static', filename='images/' ~ servicio.categoria ~ '/' ~ servicio.imagen ~ '.jpg') }}" class="service-img"
+                    alt="{{ servicio.nombre }}"
+                    onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/' ~ servicio.imagen ~ '.jpg') }}'">
                     <div class="service-info">
                         <h3>{{ servicio.nombre }}</h3>
                         <p class="service-provider">Por {{ servicio.proveedor_nombre }}</p>

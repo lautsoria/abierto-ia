@@ -1,0 +1,22 @@
+meta {
+  name: Cancelar
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{base_url}}/reservas/cancelar
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "reserva_id": "b32b6a60-4379-4e0c-a666-d335f94a707e"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

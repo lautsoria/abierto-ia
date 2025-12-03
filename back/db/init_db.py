@@ -8,7 +8,7 @@ load_dotenv(dotenv_path=env_path)
 
 # ahora leemos las querys del archivo 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-sql_file = os.path.join(script_dir, 'init_db.sql')
+sql_file = os.path.join(script_dir, 'init_maria.sql')
 
 with open(sql_file) as f:
   sql = f.read()
