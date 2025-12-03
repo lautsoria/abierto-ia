@@ -27,7 +27,7 @@ env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:1234"], supports_credentials=True, methods=['POST', 'GET', 'UPDATE', 'DELETE'])
+CORS(app, origins="*", supports_credentials=True, methods=['POST', 'GET', 'UPDATE', 'DELETE'])
 
 # configuracion de JWT en nuestra app
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
@@ -38,14 +38,14 @@ app.config['JWT_COOKIE_NAME'] = 'access_token_cookie'
 
 jwt = JWTManager(app) 
 
-app.register_blueprint(auth, url_prefix="/auth")
-app.register_blueprint(proveedores, url_prefix='/proveedores')
-app.register_blueprint(reservas, url_prefix="/reservas")
-app.register_blueprint(servicios, url_prefix="/servicios")
-app.register_blueprint(categorias, url_prefix="/categorias")
-app.register_blueprint(ubicacion, url_prefix="/ubicacion")
-app.register_blueprint(resenas, url_prefix="/resenas")
-app.register_blueprint(usuarios, url_prefix="/usuarios")
+app.register_blueprint(auth, url_prefix="/api/auth")
+app.register_blueprint(proveedores, url_prefix='/api/proveedores')
+app.register_blueprint(reservas, url_prefix="/api/reservas")
+app.register_blueprint(servicios, url_prefix="/api/servicios")
+app.register_blueprint(categorias, url_prefix="/api/categorias")
+app.register_blueprint(ubicacion, url_prefix="/api/ubicacion")
+app.register_blueprint(resenas, url_prefix="/api/resenas")
+app.register_blueprint(usuarios, url_prefix="/api/usuarios")
 
 if __name__ == "__main__":
     app.run(port=5500, debug=True)

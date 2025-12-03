@@ -1,6 +1,6 @@
--- DROP DATABASE IF EXISTS ids;
--- CREATE DATABASE ids;
--- USE ids;
+DROP DATABASE IF EXISTS ids;
+CREATE DATABASE ids;
+USE ids;
 
 CREATE TABLE roles (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
@@ -87,11 +87,11 @@ CREATE TABLE barrios (
 );
 
 CREATE TABLE IF NOT EXISTS barrios_servicios (
-  id UUID PRIMARY KEY,
-  servicio_id UUID NOT NULL,
-  barrio_id UUID NOT NULL,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  servicio_id CHAR(36) NOT NULL,
+  barrio_id CHAR(36) NOT NULL,
   UNIQUE KEY unique_servicio_barrio (servicio_id, barrio_id),
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id),
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
   FOREIGN KEY (barrio_id) REFERENCES barrios(id)
 );
 

@@ -1,7 +1,11 @@
 import requests
 import qrcode
+import os
+from dotenv import load_dotenv
 
-BACKEND_URL = 'http://localhost:5500/api'
+env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path=env_path)
+BACKEND_URL = os.getenv('BACKEND_URL')
 
 def obtener_mis_reservas(usuario_id):
     try:
