@@ -2,7 +2,7 @@ import requests
 import logging
 import qrcode
 
-BACKEND_URL = 'http://localhost:5500/api'
+BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
 
 def registrar_usuario(user, email, password, provider):
     """Registra un nuevo usuario en el backend"""

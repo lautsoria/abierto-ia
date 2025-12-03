@@ -1,6 +1,6 @@
 import requests
 
-BACKEND_URL = 'http://localhost:5500/api'
+BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
 
 def obtener_cantidad_categoria(nombre):
     try:

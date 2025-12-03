@@ -96,21 +96,7 @@
         </ul>
     </div>
 
-    <script>
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.remove('active');
-        }
-
-        function closeModalOnOutsideClick(event, modalId) {
-            if (event.target.id === modalId) {
-                closeModal(modalId);
-            }
-        }
-    </script>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/reservas.js') }}"></script>
+{% endblock %}
 {% endblock %}

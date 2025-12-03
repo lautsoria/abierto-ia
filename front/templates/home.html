@@ -73,7 +73,11 @@
             {% for servicio in servicios %}
             <div class="service-card">
                 <div class="card-image-container">
-                    <img src="{{ servicio.imagen if servicio.imagen else 'https://via.placeholder.com/300x200?text=Servicio' }}" alt="{{ servicio.nombre }}">
+                    {% if servicio.imagen %}
+                        <img src="{{ url_for('static', filename='images/{}.jpg'.format(servicio.imagen)) }}" alt="{{ servicio.nombre }}">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/fondo.png') }}"   alt="{{ servicio.nombre }}">
+                    {% endif %}
                     {% if servicio.rating and servicio.rating >= 4.5 %}
                     <span class="badge">Destacado</span>
                     {% endif %}

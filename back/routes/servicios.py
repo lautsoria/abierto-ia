@@ -266,7 +266,7 @@ def buscar_servicios():
 
             c.nombre AS categoria_nombre,
 
-            u.nombre AS proveedor_nombre,
+            u.usuario AS proveedor_nombre,
             
 
             p.id AS proveedor_id
