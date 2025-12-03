@@ -126,7 +126,7 @@ def get_mis_reservas():
                 INNER JOIN usuarios u ON p.id = u.id
                 INNER JOIN categorias c ON s.categoria_id = c.id
                 WHERE r.usuario_id = %s
-                ORDER BY r.fecha_servicio ASC
+                ORDER BY r.fecha_servicio DESC
             """
             cursor.execute(query, (usuario_id,))
             
@@ -162,7 +162,6 @@ def get_mis_reservas():
             reserva['fecha_servicio'] = reserva['fecha_servicio'].isoformat().split('T')[0]
             reserva['hora_servicio'] = f"{int(reserva['hora_servicio']):02d}:00"
         
-        print(reservas)
         return jsonify(reservas), 200
         
     except Exception as e:
@@ -298,7 +297,7 @@ def get_reserva(id):
             INNER JOIN usuarios uc ON r.usuario_id = uc.id
             INNER JOIN usuarios up ON p.id = up.id
             INNER JOIN categorias c ON s.categoria_id = c.id
-            LEFT JOIN barrios_servicios bu ON sp.id = bu.servicio_id
+            LEFT JOIN barrios_servicios bu ON s.id = bu.servicio_id
             LEFT JOIN barrios b ON bu.barrio_id = b.id
             WHERE r.id = %s
             GROUP BY r.id
@@ -401,3 +400,36 @@ def servicio_reservas(id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+
+@reservas_bp.route('/cancelar', methods=['PATCH'])
+def cancelar():
+    reserva_id, usuario_id = request.json.values()
+    print(request.json.values())
+
+    try:        
+        conn = db_conn()
+        cursor = conn.cursor(dictionary=True)
+        
+        query = """
+                UPDATE reservas
+                set estado = 'cancelado'
+                """
+        
+        if usuario_id != 'None':
+            query += "where usuario_id = %s AND id = %s"
+            print(query)
+            cursor.execute(query, (usuario_id, reserva_id))
+        else:
+            query += "where id = %s"
+            print(query)
+            cursor.execute(query, (reserva_id,))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"status": "Reserva cancelada"})
+    except Exception as e:
+        print(e)
+        return jsonify({'error': str(e)}), 500    

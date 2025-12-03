@@ -25,7 +25,7 @@
                             Ver Detalle
                         </button>
                         {% if rol == "proveedor" %}
-                            {% if reserva.estado != 'realizado' %}    
+                            {% if reserva.estado != 'realizado' and reserva.estado != 'cancelado' %}    
                                 <a href="{{ url_for('reservas.qr', id_reserva=reserva.id) }}" 
                                 class="btn btn-success btn-sm">
                                 Generar QR

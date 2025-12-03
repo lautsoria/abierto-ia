@@ -184,8 +184,16 @@ def reserva(id):
 
 
 
-# TODO
 @reservas_bp.route('/cancelar_reserva/<string:id>', methods=['POST'])
 @jwt_required(locations=['cookies'])
 def cancelar(id):
-    return
+    data = get_jwt()
+    user_id = get_jwt_identity()
+
+    if data['rol'] == 'proveedor':
+        cancelar = cancelar_reserva(id)
+    
+    if data['rol'] == 'cliente':
+        cancelar = cancelar_reserva(id, user_id)
+
+    return mis_reservas()

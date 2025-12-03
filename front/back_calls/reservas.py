@@ -76,3 +76,17 @@ def generar_qr(id_reserva, token):
     qr = qrcode.make(url)
     qr.save(f"static/qr_reserva_{id_reserva}.png")
     return f"static/qr_reserva_{id_reserva}.png"
+
+def cancelar_reserva(reserva_id=None, usuario_id=None):
+    try:
+        response = requests.patch(
+            f'{BACKEND_URL}/reservas/cancelar',
+            json={"usuario_id": usuario_id, "reserva_id": reserva_id},
+            timeout=2
+        )
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except Exception as e:
+        print(e)
+        return None

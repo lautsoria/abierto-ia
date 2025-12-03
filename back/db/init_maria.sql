@@ -39,7 +39,7 @@ CREATE TABLE servicios (
   categoria_id CHAR(36) NOT NULL,
   nombre VARCHAR(255) NOT NULL,
   descripcion TEXT,
-  imagen INT CHECK (imagen BETWEEN 1 AND 10),
+  imagen INT NOT NULL DEFAULT 1 CHECK (imagen BETWEEN 1 AND 10),
   precio DECIMAL(10,2) NOT NULL,
   hora_inicio INT,
   hora_fin INT,
@@ -86,12 +86,13 @@ CREATE TABLE barrios (
   nombre VARCHAR(30)
 );
 
-CREATE TABLE barrios_servicios (
-  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
-  servicio_id CHAR(36) NOT NULL,
-  barrio_id CHAR(36) NOT NULL,
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
-  FOREIGN KEY (barrio_id) REFERENCES barrios(id) ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS barrios_servicios (
+  id UUID PRIMARY KEY,
+  servicio_id UUID NOT NULL,
+  barrio_id UUID NOT NULL,
+  UNIQUE KEY unique_servicio_barrio (servicio_id, barrio_id),
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id),
+  FOREIGN KEY (barrio_id) REFERENCES barrios(id)
 );
 
 -- Insert Roles
@@ -149,7 +150,7 @@ FROM usuarios
 WHERE usuario IN ('juan_perez', 'carlos_ruiz', 'luis_martin', 'diego_torres');
 
 -- Insert Initial Services
-INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, hora_inicio, hora_fin, duracion, fecha_creacion)
+INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, imagen, precio, hora_inicio, hora_fin, duracion, fecha_creacion)
 SELECT 
   UUID(),
   p.id,
@@ -166,6 +167,7 @@ SELECT
     WHEN c.nombre = 'Carpintería' THEN 'Muebles personalizados de calidad'
     WHEN c.nombre = 'Limpieza' THEN 'Limpieza completa incluyendo cocina y baños'
   END,
+  FLOOR(1 + (RAND() * 10)),
   CASE 
     WHEN c.nombre = 'Plomería' THEN 3500.00
     WHEN c.nombre = 'Electricidad' THEN 4000.00
@@ -190,17 +192,17 @@ WHERE (u.usuario = 'juan_perez' AND c.nombre = 'Plomería')
 LIMIT 4;
 
 -- Insert Additional Services
-INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, precio, hora_inicio, hora_fin, duracion, fecha_creacion) VALUES
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'juan_perez'), (SELECT id FROM categorias WHERE nombre = 'Plomería'), 'Destapación de cañerías', 'Servicio de destapación con máquina profesional', 4500.00, 8, 20, 2, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'), (SELECT id FROM categorias WHERE nombre = 'Electricidad'), 'Instalación de tomas', 'Instalación de enchufes y tomas eléctricas', 3200.00, 9, 18, 2, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'), (SELECT id FROM categorias WHERE nombre = 'Electricidad'), 'Revisión de tablero eléctrico', 'Inspección y mantenimiento de tableros', 5500.00, 8, 17, 3, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Carpintería'), 'Reparación de puertas', 'Ajuste y reparación de puertas de madera', 3800.00, 10, 18, 4, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Carpintería'), 'Instalación de estanterías', 'Colocación de estantes y repisas personalizadas', 6500.00, 9, 19, 5, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'diego_torres'), (SELECT id FROM categorias WHERE nombre = 'Limpieza'), 'Limpieza de oficinas', 'Servicio de limpieza empresarial completo', 8000.00, 7, 15, 6, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'diego_torres'), (SELECT id FROM categorias WHERE nombre = 'Limpieza'), 'Limpieza de vidrios', 'Lavado profesional de ventanas y cristales', 2200.00, 9, 17, 3, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'juan_perez'), (SELECT id FROM categorias WHERE nombre = 'Jardinería'), 'Mantenimiento de jardín', 'Corte de césped y poda de plantas', 4200.00, 8, 16, 5, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'), (SELECT id FROM categorias WHERE nombre = 'Pintura'), 'Pintura de interiores', 'Pintura profesional de ambientes', 12000.00, 9, 18, 8, NOW()),
-(UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Pintura'), 'Pintura de fachadas', 'Pintura exterior de edificios y casas', 18000.00, 8, 20, 10, NOW());
+INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, imagen, precio, hora_inicio, hora_fin, duracion, fecha_creacion) VALUES
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'juan_perez'), (SELECT id FROM categorias WHERE nombre = 'Plomería'), 'Destapación de cañerías', 'Servicio de destapación con máquina profesional', FLOOR(1 + (RAND() * 10)), 4500.00, 8, 20, 2, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'), (SELECT id FROM categorias WHERE nombre = 'Electricidad'), 'Instalación de tomas', 'Instalación de enchufes y tomas eléctricas', FLOOR(1 + (RAND() * 10)), 3200.00, 9, 18, 2, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'), (SELECT id FROM categorias WHERE nombre = 'Electricidad'), 'Revisión de tablero eléctrico', 'Inspección y mantenimiento de tableros', FLOOR(1 + (RAND() * 10)), 5500.00, 8, 17, 3, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Carpintería'), 'Reparación de puertas', 'Ajuste y reparación de puertas de madera', FLOOR(1 + (RAND() * 10)), 3800.00, 10, 18, 4, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Carpintería'), 'Instalación de estanterías', 'Colocación de estantes y repisas personalizadas', FLOOR(1 + (RAND() * 10)), 6500.00, 9, 19, 5, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'diego_torres'), (SELECT id FROM categorias WHERE nombre = 'Limpieza'), 'Limpieza de oficinas', 'Servicio de limpieza empresarial completo', FLOOR(1 + (RAND() * 10)), 8000.00, 7, 15, 6, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'diego_torres'), (SELECT id FROM categorias WHERE nombre = 'Limpieza'), 'Limpieza de vidrios', 'Lavado profesional de ventanas y cristales', FLOOR(1 + (RAND() * 10)), 2200.00, 9, 17, 3, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'juan_perez'), (SELECT id FROM categorias WHERE nombre = 'Jardinería'), 'Mantenimiento de jardín', 'Corte de césped y poda de plantas', FLOOR(1 + (RAND() * 10)), 4200.00, 8, 16, 5, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'carlos_ruiz'), (SELECT id FROM categorias WHERE nombre = 'Pintura'), 'Pintura de interiores', 'Pintura profesional de ambientes', FLOOR(1 + (RAND() * 10)), 12000.00, 9, 18, 8, NOW()),
+(UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Pintura'), 'Pintura de fachadas', 'Pintura exterior de edificios y casas', FLOOR(1 + (RAND() * 10)), 18000.00, 8, 20, 10, NOW());
 
 -- ==========================================
 -- 3. CRITICAL UPDATE: Link Barrios to Services
@@ -232,8 +234,8 @@ SELECT
   UUID(),
   u.id,
   s.id,
-  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) + 7 DAY), '%Y-%m-%dT%H:%i'),
-  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) + 7 DAY), '%Y-%m-%d'),
+  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) + 7 DAY), '%Y-%m-%d %H:%i:%s'),
+  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 60) + 7 DAY), '%Y-%m-%d %H:%i:%s'),
   s.hora_inicio + (FLOOR(RAND() * (FLOOR((s.hora_fin - s.duracion - s.hora_inicio) / s.duracion) + 1)) * s.duracion),
   'Av. Siempre Viva 123',
   'realizado',
