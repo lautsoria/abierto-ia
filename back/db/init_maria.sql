@@ -1,93 +1,111 @@
-DROP SCHEMA ids;
-CREATE DATABASE IF NOT EXISTS ids;
-use ids;
+DROP DATABASE IF EXISTS ids;
+CREATE DATABASE ids;
+USE ids;
 
-CREATE TABLE IF NOT EXISTS roles (
-  id UUID PRIMARY KEY,
+CREATE TABLE roles (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   rol VARCHAR(50) UNIQUE NOT NULL
   -- hay que tener en cuenta que debemos tener solo 3 roles
   -- (cliente, proveedor, admin)
 );
 
-CREATE TABLE IF NOT EXISTS usuarios (
-  id UUID PRIMARY KEY,
+CREATE TABLE usuarios (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   usuario VARCHAR(25) NOT NULL UNIQUE,
   email VARCHAR(50) NOT NULL UNIQUE,
-  contrasena VARCHAR(12) NOT NULL,
-  rol_id UUID,
+  contrasena VARCHAR(255) NOT NULL,
+  rol_id CHAR(36),
   telefono VARCHAR(20),
   fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (rol_id) REFERENCES roles(id)
 );
 
-CREATE TABLE IF NOT EXISTS proveedores (
-  id UUID PRIMARY KEY,
+CREATE TABLE proveedores (
+  id CHAR(36) PRIMARY KEY,
   descripcion VARCHAR(500),
-  FOREIGN KEY (id) REFERENCES usuarios(id)
+  FOREIGN KEY (id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS categorias (
-  id UUID PRIMARY KEY,
+CREATE TABLE categorias (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   nombre VARCHAR(255) NOT NULL UNIQUE,
   descripcion TEXT,
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS servicios (
-  id UUID PRIMARY KEY,
-  proveedor_id UUID NOT NULL,
-  categoria_id UUID NOT NULL,
+CREATE TABLE servicios (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  proveedor_id CHAR(36) NOT NULL,
+  categoria_id CHAR(36) NOT NULL,
   nombre VARCHAR(255) NOT NULL,
   descripcion TEXT,
   imagen INT NOT NULL DEFAULT 1 CHECK (imagen BETWEEN 1 AND 10),
   precio DECIMAL(10,2) NOT NULL,
-  hora_inicio INT CHECK (hora_inicio BETWEEN 1 AND 24),
-  hora_fin INT CHECK (hora_fin BETWEEN 1 AND 24),
-  duracion INT CHECK (duracion BETWEEN 1 AND 12),
+  hora_inicio INT,
+  hora_fin INT,
+  duracion INT,
   fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT check_horas CHECK (hora_fin > hora_inicio),
-  FOREIGN KEY (proveedor_id) REFERENCES proveedores(id),
-  FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+  FOREIGN KEY (proveedor_id) REFERENCES proveedores(id) ON DELETE CASCADE,
+  FOREIGN KEY (categoria_id) REFERENCES categorias(id),
+  CHECK (hora_inicio BETWEEN 1 AND 24),
+  CHECK (hora_fin BETWEEN 1 AND 24),
+  CHECK (duracion BETWEEN 1 AND 12),
+  CHECK (hora_fin > hora_inicio)
 );
 
-CREATE TABLE IF NOT EXISTS reservas (
-  id UUID PRIMARY KEY,
-  usuario_id UUID NOT NULL,
-  servicio_id UUID NOT NULL,
+CREATE TABLE reservas (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  usuario_id CHAR(36) NOT NULL,
+  servicio_id CHAR(36) NOT NULL,
   fecha_reserva DATETIME DEFAULT CURRENT_TIMESTAMP,
   fecha_servicio DATETIME NOT NULL,
   hora_servicio INT NOT NULL,
   direccion VARCHAR(100),
   estado ENUM('pendiente', 'confirmado', 'realizado', 'cancelado') DEFAULT 'pendiente',
   comentarios_cliente TEXT,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id)
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS resenas (
-  id UUID PRIMARY KEY,
-  usuario_id UUID NOT NULL,
-  servicio_id UUID NOT NULL,
-  reserva_id UUID NOT NULL UNIQUE,
-  puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),
+CREATE TABLE resenas (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  usuario_id CHAR(36) NOT NULL,
+  servicio_id CHAR(36) NOT NULL,
+  reserva_id CHAR(36) NOT NULL UNIQUE,
+  puntuacion INT,
   comentarios_cliente TEXT,
   fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-  FOREIGN KEY (servicio_id) REFERENCES servicios(id),
-  FOREIGN KEY (reserva_id) REFERENCES reservas(id)
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
+  FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE,
+  CHECK (puntuacion BETWEEN 1 AND 5)
 );
 
-CREATE TABLE IF NOT EXISTS barrios (
-  id UUID PRIMARY KEY,
+CREATE TABLE barrios (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   nombre VARCHAR(30)
 );
 
 CREATE TABLE IF NOT EXISTS barrios_servicios (
+<<<<<<< HEAD
+<<<<<<<< HEAD:back/db/init_maria.sql
   id UUID PRIMARY KEY,
   servicio_id UUID NOT NULL,
   barrio_id UUID NOT NULL,
+========
+  id VARCHAR(36) PRIMARY KEY,
+  servicio_id VARCHAR(36) NOT NULL,
+  barrio_id VARCHAR(36) NOT NULL,
+>>>>>>>> main:back/db/init_mysql.sql
   UNIQUE KEY unique_servicio_barrio (servicio_id, barrio_id),
   FOREIGN KEY (servicio_id) REFERENCES servicios(id),
+=======
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  servicio_id CHAR(36) NOT NULL,
+  barrio_id CHAR(36) NOT NULL,
+  UNIQUE KEY unique_servicio_barrio (servicio_id, barrio_id),
+  FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE,
+>>>>>>> main
   FOREIGN KEY (barrio_id) REFERENCES barrios(id)
 );
 
@@ -97,7 +115,11 @@ INSERT INTO roles (id, rol) VALUES
 (UUID(), 'proveedor'),
 (UUID(), 'admin');
 
+<<<<<<< HEAD
+-- Insert Users
+=======
 -- Insert Users (fetching role IDs dynamically)
+>>>>>>> main
 INSERT INTO usuarios (id, usuario, email, contrasena, rol_id, telefono, fecha_registro) VALUES
 (UUID(), 'juan_perez', 'juan@gmail.com', 'pass123', (SELECT id FROM roles WHERE rol = 'proveedor'), '11-5555-1234', NOW()),
 (UUID(), 'maria_gomez', 'maria@gmail.com', 'pass456', (SELECT id FROM roles WHERE rol = 'cliente'), '11-5555-2345', NOW()),
@@ -201,12 +223,20 @@ INSERT INTO servicios (id, proveedor_id, categoria_id, nombre, descripcion, imag
 (UUID(), (SELECT id FROM usuarios WHERE usuario = 'luis_martin'), (SELECT id FROM categorias WHERE nombre = 'Pintura'), 'Pintura de fachadas', 'Pintura exterior de edificios y casas', FLOOR(1 + (RAND() * 10)), 18000.00, 8, 20, 10, NOW());
 
 -- ==========================================
+<<<<<<< HEAD
+-- CRITICAL UPDATE: Link Barrios to Services
+=======
 -- 3. CRITICAL UPDATE: Link Barrios to Services
+>>>>>>> main
 -- ==========================================
 -- Guaranteed: EVERY service gets at least 1 random barrio
 INSERT INTO barrios_servicios (id, servicio_id, barrio_id)
 SELECT 
+<<<<<<< HEAD
+  UUID(),
+=======
   UUID(), 
+>>>>>>> main
   s.id, 
   (SELECT id FROM barrios ORDER BY RAND() LIMIT 1)
 FROM servicios s;
@@ -214,6 +244,22 @@ FROM servicios s;
 -- Optional: Add a second random barrio to 30% of services to vary the data
 INSERT INTO barrios_servicios (id, servicio_id, barrio_id)
 SELECT 
+<<<<<<< HEAD
+  UUID(),
+  s.id, 
+  (SELECT id FROM barrios ORDER BY RAND() LIMIT 1)
+FROM servicios s
+WHERE RAND() < 0.3
+AND NOT EXISTS (
+  SELECT 1 FROM barrios_servicios bs2 
+  WHERE bs2.servicio_id = s.id 
+  GROUP BY bs2.servicio_id 
+  HAVING COUNT(*) >= 2
+);
+
+-- ==========================================
+-- INSERT RESERVATIONS & REVIEWS
+=======
   UUID(), 
   s.id, 
   (SELECT id FROM barrios ORDER BY RAND() LIMIT 1)
@@ -222,6 +268,7 @@ WHERE RAND() < 0.3;
 
 -- ==========================================
 -- 4. INSERT RESERVATIONS & REVIEWS
+>>>>>>> main
 -- ==========================================
 
 -- Insert past reservations (completed)
@@ -242,6 +289,29 @@ WHERE u.usuario IN ('maria_gomez', 'ana_lopez', 'sofia_garcia', 'laura_vazquez')
 ORDER BY RAND()
 LIMIT 60;
 
+<<<<<<< HEAD
+-- Insert Reviews (3 per service) - MySQL compatible version
+INSERT INTO resenas (id, usuario_id, servicio_id, reserva_id, puntuacion, comentarios_cliente, fecha)
+SELECT 
+  UUID(),
+  usuario_id,
+  servicio_id,
+  id,
+  FLOOR(3 + (RAND() * 3)),
+  'Excelente trabajo, muy recomendable.',
+  DATE_FORMAT(DATE_ADD(fecha_servicio, INTERVAL 1 DAY), '%Y-%m-%dT%H:%i')
+FROM (
+  SELECT 
+    r.*,
+    @row_num := IF(@servicio = r.servicio_id, @row_num + 1, 1) as rn,
+    @servicio := r.servicio_id
+  FROM reservas r
+  CROSS JOIN (SELECT @row_num := 0, @servicio := NULL) vars
+  WHERE r.estado = 'realizado'
+  ORDER BY r.servicio_id, RAND()
+) ranked_reservations
+WHERE ranked_reservations.rn <= 3;
+=======
 -- Insert Reviews (3 per service)
 INSERT INTO resenas (id, usuario_id, servicio_id, reserva_id, puntuacion, comentarios_cliente, fecha)
 SELECT 
@@ -260,3 +330,4 @@ FROM (
   WHERE r.estado = 'realizado'
 ) ranked_reservations
 WHERE ranked_reservations.rn <= 3;
+>>>>>>> main

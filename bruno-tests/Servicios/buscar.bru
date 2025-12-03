@@ -1,0 +1,19 @@
+meta {
+  name: buscar
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}servicios/buscar?q=plomeria
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: plomeria
+}
+
+settings {
+  encodeUrl: true
+}

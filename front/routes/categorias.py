@@ -21,13 +21,15 @@ def categoria(nombre):
     precio_min_seleccionado = request.args.get('precio_min', '')
     precio_max_seleccionado = request.args.get('precio_max', '')
 
+    print(ubicacion_seleccionada, ordenar_seleccionado, precio_min_seleccionado, precio_max_seleccionado)
+
     # Obtener servicios filtrados
     servicios = obtener_servicios_por_categoria(
         nombre,
         ubicacion=ubicacion_seleccionada if ubicacion_seleccionada else None,
         ordenar=ordenar_seleccionado if ordenar_seleccionado else None,
         precio_min=precio_min_seleccionado if precio_min_seleccionado else None,
-        precio_max=precio_max_seleccionado if precio_max_seleccionado else None
+        precio_max=precio_max_seleccionado if precio_max_seleccionado else None,
     )
     
     ubicaciones = obtener_ubicaciones()

@@ -16,10 +16,10 @@
                     <h3>{{ s.nombre }}</h3>
                     <p>{{ s.descripcion }}</p>
                     <p><strong>Categoría:</strong> {{ s.categoria }}</p>
-                    <p><strong>Proveedor:</strong> {{ s.proveedor_descripcion }}</p>
+                    <p><strong>Proveedor:</strong> {{ s.proveedor }}</p>
                     <p><strong>Precio:</strong> ${{ s.precio }}</p>
 
-                    <a href="" class="btn-ver">
+                    <a href="{{ url_for('servicios.servicio', id=s.id) }}" class="btn-ver">
                         Contratar Servicio
                     </a>
                 </li>

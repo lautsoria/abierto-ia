@@ -15,9 +15,6 @@
 
     <aside class="filters-container">
         <form method="GET" action="{{ url_for('categorias.categoria', nombre=categoria_nombre) }}">
-            {% if request.args.get('ordenar') %}
-            <input type="hidden" name="ordenar" value="{{ request.args.get('ordenar') }}">
-            {% endif %}
 
             <div class="filter-section">
                 <h3 class="filter-title">Filtros</h3>
@@ -40,24 +37,6 @@
                         <input type="number" name="precio_min" placeholder="Mínimo" value="{{ request.args.get('precio_min', '') }}">
                         <span class="separator">—</span>
                         <input type="number" name="precio_max" placeholder="Máximo" value="{{ request.args.get('precio_max', '') }}">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Calificación</label>
-                    <div class="rating-options">
-                        <label class="radio-option">
-                            <input type="radio" name="calificacion" value="" {% if not request.args.get('calificacion') %}checked{% endif %}>
-                            <span>Todas</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="calificacion" value="4" {% if request.args.get('calificacion') == '4' %}checked{% endif %}>
-                            <span>4 estrellas o más</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="calificacion" value="3" {% if request.args.get('calificacion') == '3' %}checked{% endif %}>
-                            <span>3 estrellas o más</span>
-                        </label>
                     </div>
                 </div>
             </div>

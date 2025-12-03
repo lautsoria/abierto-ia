@@ -1,8 +1,11 @@
 import requests
 import logging
-import qrcode
+import os
+from dotenv import load_dotenv
 
-BACKEND_URL = 'Http://abiertoia.pythonanywhere.com/api'
+env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path=env_path)
+BACKEND_URL = os.getenv('BACKEND_URL')
 
 def obtener_servicios_por_categoria(nombre, ubicacion=None, ordenar=None, precio_min=None, precio_max=None):
     """Obtiene servicios por categoría con filtros y ordenamiento """
@@ -16,6 +19,8 @@ def obtener_servicios_por_categoria(nombre, ubicacion=None, ordenar=None, precio
             params['precio_min'] = precio_min
         if precio_max:
             params['precio_max'] = precio_max
+
+        print(params)
 
         response = requests.get(
             f'{BACKEND_URL}/servicios/{nombre}',

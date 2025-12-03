@@ -73,11 +73,8 @@
             {% for servicio in servicios %}
             <div class="service-card">
                 <div class="card-image-container">
-                    {% if servicio.imagen %}
-                        <img src="{{ url_for('static', filename='images/{}.jpg'.format(servicio.imagen)) }}" alt="{{ servicio.nombre }}">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='images/fondo.png') }}"   alt="{{ servicio.nombre }}">
-                    {% endif %}
+                    <img src="{{ url_for('static', filename='images/' ~ servicio.imagen ~ '.jpg') }}"
+                    alt="{{ servicio.nombre }}">
                     {% if servicio.rating and servicio.rating >= 4.5 %}
                     <span class="badge">Destacado</span>
                     {% endif %}
