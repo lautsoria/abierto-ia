@@ -1,58 +1,57 @@
 #!/bin/bash
 
-# Script to stop both frontend and backend services
+# Script para detener los servicios de frontend y backend
 
-echo "Stopping services..."
 
-# Get the project root directory (parent of scripts folder)
+# Obtener el directorio raíz del proyecto (padre de la carpeta scripts)
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-# Check if PID files exist
+# Verificar si existen los archivos PID
 if [ ! -f "$PROJECT_ROOT/logs/backend.pid" ] && [ ! -f "$PROJECT_ROOT/logs/frontend.pid" ]; then
-    echo "No PID files found. Services might not be running."
-    echo "Trying to find and kill processes by port..."
+    echo "No se encontraron archivos PID. Los servicios podrían no estar corriendo."
+    echo "Intentando encontrar y matar procesos por puerto..."
     
-    # Try to kill processes on the ports
-    lsof -ti:5500 | xargs kill -9 2>/dev/null && echo "Killed process on port 5500" || echo "No process found on port 5500"
-    lsof -ti:5000 | xargs kill -9 2>/dev/null && echo "Killed process on port 5000" || echo "No process found on port 5000"
+    # Intentar matar procesos en los puertos
+    lsof -ti:5500 | xargs kill -9 2>/dev/null && echo "Proceso en puerto 5500 terminado" || echo "No se encontró proceso en puerto 5500"
+    lsof -ti:5000 | xargs kill -9 2>/dev/null && echo "Proceso en puerto 5000 terminado" || echo "No se encontró proceso en puerto 5000"
     exit 0
 fi
 
-# Stop backend
+# Detener backend
 if [ -f "$PROJECT_ROOT/logs/backend.pid" ]; then
     BACK_PID=$(cat "$PROJECT_ROOT/logs/backend.pid")
     if ps -p $BACK_PID > /dev/null 2>&1; then
-        echo "Stopping backend (PID: $BACK_PID)..."
+        echo "Deteniendo backend (PID: $BACK_PID)..."
         kill $BACK_PID 2>/dev/null
         sleep 1
-        # Force kill if still running
+        # Forzar kill si sigue corriendo
         if ps -p $BACK_PID > /dev/null 2>&1; then
             kill -9 $BACK_PID 2>/dev/null
         fi
-        echo "Backend stopped"
+        echo "Backend detenido"
     else
-        echo "Backend process not found (might have already stopped)"
+        echo "Proceso del backend no encontrado (podría haberse detenido ya)"
     fi
     rm "$PROJECT_ROOT/logs/backend.pid"
 fi
 
-# Stop frontend
+# Detener frontend
 if [ -f "$PROJECT_ROOT/logs/frontend.pid" ]; then
     FRONT_PID=$(cat "$PROJECT_ROOT/logs/frontend.pid")
     if ps -p $FRONT_PID > /dev/null 2>&1; then
-        echo "Stopping frontend (PID: $FRONT_PID)..."
+        echo "Deteniendo frontend (PID: $FRONT_PID)..."
         kill $FRONT_PID 2>/dev/null
         sleep 1
-        # Force kill if still running
+        # Forzar kill si sigue corriendo
         if ps -p $FRONT_PID > /dev/null 2>&1; then
             kill -9 $FRONT_PID 2>/dev/null
         fi
-        echo "Frontend stopped"
+        echo "Frontend detenido"
     else
-        echo "Frontend process not found (might have already stopped)"
+        echo "Proceso del frontend no encontrado (podría haberse detenido ya)"
     fi
     rm "$PROJECT_ROOT/logs/frontend.pid"
 fi
 
 echo ""
-echo "✓ Services stopped successfully!"
+echo "✓ ¡Servicios detenidos exitosamente!"
