@@ -137,7 +137,39 @@ def get_usuarios():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+@usuarios_bp.route('/editar_perfil', methods=['PATCH'])
+def editar_usuario():
+    try:
+        data = request.json
 
+        conn = db_conn()
+        cursor = conn.cursor()
+
+        update_query = """
+            UPDATE usuarios
+            SET usuario = %s,
+                email = %s,
+                telefono = %s
+            WHERE id = %s
+        """
+
+        cursor.execute(update_query, (
+            data['nombre'],
+            data['email'],
+            data['telefono'],
+            data['id']
+        ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return "", 204
+
+    except Exception as e:
+        print(str(e))
+        return jsonify({'error': 'Error al modificar el usuario'}), 500
+    
 @usuarios_bp.route('/mod', methods=['PATCH'])
 def mod_usuario():
     try:
