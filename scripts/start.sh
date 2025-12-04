@@ -12,14 +12,17 @@ mkdir -p "$PROJECT_ROOT/logs"
 if [ ! -d "$PROJECT_ROOT/.venv" ]; then
     echo "venv no encontrado. Creando uno..."
     python3 -m venv .venv
-    exit 1
 fi
 
 # Lo activamos
 source "$PROJECT_ROOT/.venv/bin/activate"
 
-
 pip install -r "$PROJECT_ROOT/requirements.txt"
+
+if [ ! -f "$PROJECT_ROOT/.env" ]; then
+    echo ".env no encontrado. Por favor incluirlo antes de inicializar el proyecto"
+    exit 1
+fi
 
 # Start backend
 echo "Backend en puerto 5500..."
@@ -30,7 +33,7 @@ echo "Backend corriendo PID: $BACK_PID"
 
 sleep 2
 
-echo "Frontend en puerto 5000..."
+echo "Frontend en puerto 1234..."
 cd "$PROJECT_ROOT/front"
 python app.py > "$PROJECT_ROOT/logs/frontend.log" 2>&1 &
 FRONT_PID=$!
@@ -42,7 +45,7 @@ echo "$FRONT_PID" > "$PROJECT_ROOT/logs/frontend.pid"
 echo ""
 echo "✓ Servicios corriendo correctamente!"
 echo "  - Backend: http://localhost:5500 (PID: $BACK_PID)"
-echo "  - Frontend: http://localhost:5000 (PID: $FRONT_PID)"
+echo "  - Frontend: http://localhost:1234 (PID: $FRONT_PID)"
 echo ""
 echo "Logs en:"
 echo "  - Backend: $PROJECT_ROOT/logs/backend.log"
