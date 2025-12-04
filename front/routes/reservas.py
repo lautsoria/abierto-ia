@@ -123,7 +123,7 @@ def checkout(id):
     data = get_jwt()    
     user_data = data if data else None
     
-    if data['rol'] not in ['cliente', 'admin']:
+    if data['rol'] not in ['cliente']:
         return "Acceso denegado", 401
     
     servicio = obtener_servicio_por_id(id, horarios=True)
