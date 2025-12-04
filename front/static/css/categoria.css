@@ -13,6 +13,23 @@ body {
     padding: 0 1rem 2rem;
 }
 
+.breadcrumb {
+    font-size: 14px;
+    color: #3483fa;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 6px;
+}
+
+.breadcrumb a {
+    text-decoration: none;
+    color: #3483fa;
+}
+
+.breadcrumb span {
+    color: #999;
+}
+
 .categoria-header {
     grid-column: 1 / -1;
     background: none;

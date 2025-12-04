@@ -46,7 +46,6 @@ def home():
     user_data = data if data else None
 
     servicios = obtener_servicios_destacados()
-    print(servicios)
     categorias = obtener_categorias()
     categorias_completas = []
     if categorias:

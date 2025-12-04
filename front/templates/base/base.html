@@ -76,40 +76,40 @@
       <div class="footer-section">
         <h3 class="footer-title">Acerca de</h3>
         <ul class="footer-links">
-          <li><a href="#">Sobre nosotros</a></li>
-          <li><a href="#">Términos y condiciones</a></li>
-          <li><a href="#">Políticas de privacidad</a></li>
-          <li><a href="#">Trabaja con nosotros</a></li>
+          <li><a href="https://github.com/lautsoria/abierto-ia">Sobre nosotros</a></li>
+          <li><a href="https://github.com/lautsoria/abierto-ia">Políticas de privacidad</a></li>
+          <li><a href="https://github.com/lautsoria/abierto-ia">Trabaja con nosotros</a></li>
+          <li><a href="https://introds-web.vercel.app/">Dónde cursar IDS en fiuba?</a></li>
         </ul>
       </div>
 
       <div class="footer-section">
         <h3 class="footer-title">Ayuda</h3>
         <ul class="footer-links">
-          <li><a href="#">Cómo comprar</a></li>
-          <li><a href="#">Cómo vender</a></li>
-          <li><a href="#">Resolución de problemas</a></li>
-          <li><a href="#">Centro de seguridad</a></li>
+          <li><a href="{{ url_for('auth.auth') }}">Cómo reservar</a></li>
+          <li><a href="{{ url_for('auth.auth') }}">Cómo ofrecer servicios</a></li>
+          <li><a href="https://github.com/lautsoria/abierto-ia">Resolución de problemas</a></li>
+          <li><a href="https://github.com/lautsoria/abierto-ia">Centro de seguridad</a></li>
         </ul>
       </div>
 
       <div class="footer-section">
         <h3 class="footer-title">Tu cuenta</h3>
         <ul class="footer-links">
-          <!-- <li><a href="#">Ingresá</a></li> -->
-          <li><a href="#">Mis compras</a></li>
-          <li><a href="#">Favoritos</a></li>
-          <li><a href="#">Vender</a></li>
+          <li><a href="{{ url_for('auth.auth') }}">Ingresá</a></li>
+          <li><a href="{{ url_for('reservas.mis_reservas') }}">Mis reservas</a></li>
+          <li><a href="{{ url_for('home') }}#services-section">Destacados</a></li>
+          <li><a href="{{ url_for('usuarios.perfil') }}">Perfil</a></li>
         </ul>
       </div>
 
       <div class="footer-section">
         <h3 class="footer-title">Redes sociales</h3>
         <ul class="footer-links">
-          <li><a href="#">Facebook</a></li>
-          <li><a href="#">Twitter</a></li>
-          <li><a href="#">Instagram</a></li>
-          <li><a href="#">YouTube</a></li>
+          <li><a href="https://www.facebook.com/ingenieriauba">Facebook</a></li>
+          <li><a href="https://x.com/ingenieriauba">Twitter</a></li>
+          <li><a href="https://www.instagram.com/ingenieriauba/?hl=en">Instagram</a></li>
+          <li><a href="https://www.youtube.com/user/FIUBAoficial">YouTube</a></li>
         </ul>
       </div>
     </div>

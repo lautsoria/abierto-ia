@@ -9,6 +9,11 @@
 {% block content %}
 <div class="main-layout">
     <div class="categoria-header">
+        <div class="breadcrumb">
+            <a href="{{ url_for('home') }}">Inicio</a>
+            <span>></span>
+            <span>{{ categoria_nombre }}</span>
+        </div>
         <h1>{{ categoria_nombre }}</h1>
         <p>{{ total_servicios }} servicios disponibles</p>
     </div>
@@ -24,8 +29,8 @@
                     <select id="ubicacion" name="ubicacion">
                         <option value="">Todas</option>
                         {% for ubicacion in ubicaciones %}
-                        <option value="{{ ubicacion }}" {% if ubicacion_seleccionada == ubicacion %}selected{% endif %}>
-                            {{ ubicacion }}
+                        <option value="{{ ubicacion.nombre }}" {% if ubicacion_seleccionada == ubicacion.nombre %}selected{% endif %}>
+                            {{ ubicacion.nombre }}
                         </option>
                         {% endfor %}
                     </select>

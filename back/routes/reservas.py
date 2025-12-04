@@ -288,7 +288,7 @@ def get_reserva(id):
                 uc.usuario AS cliente_usuario,
                 uc.email AS cliente_email,
                 up.usuario AS proveedor_usuario,
-                uc.telefono AS proveedor_telefono,
+                up.telefono AS proveedor_telefono,
                 b.nombre AS proveedor_ubicacion,
                 c.nombre AS categoria
             FROM reservas r
