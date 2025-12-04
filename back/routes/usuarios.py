@@ -164,7 +164,7 @@ def editar_usuario():
         cursor.close()
         conn.close()
 
-        return "", 204
+        return {"status":"Usuario modificado"}, 204
 
     except Exception as e:
         print(str(e))

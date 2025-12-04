@@ -30,12 +30,11 @@ def editar_perfil(id):
         "email": data.get("email"),
         "telefono": data.get("telefono"),
         "id":id
-        
     }
 
     response = requests.patch(f"{BACKEND_URL}/usuarios/editar_perfil", json=payload)
 
-    if response.status_code != 204:
+    if response.status_code not in [204, 200]:
         return "Error al modificar usuario", 400
 
     return redirect(url_for('usuarios.perfil'))
