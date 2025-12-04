@@ -6,7 +6,7 @@ import random
 servicios_bp = Blueprint('servicios', __name__)
 
 #servicios por categoria y filtros
-@servicios_bp.route('/<string:nombre>')
+@servicios_bp.route('/<string:nombre>', methods=['GET'])
 def servicios_por_categoria(nombre):
 
     print(request.args)
@@ -91,7 +91,7 @@ def servicios_por_categoria(nombre):
 
 
 # buscar servicio con mejor rating, se le pone poner limite o default es 8
-@servicios_bp.route('/top-rating')
+@servicios_bp.route('/top-rating', methods=['GET'])
 def servicios_top_rating():
     try:
         limit = request.args.get('limit', default=8, type=int)
@@ -144,7 +144,7 @@ def servicios_top_rating():
 
 
 # buscar servicio filtrado por precio
-@servicios_bp.route('/precio')
+@servicios_bp.route('/precio' , methods=['GET'])
 def servicios_por_precio():
     try:
         precio_min = request.args.get('min', type=float)
@@ -470,7 +470,7 @@ def eliminar_servicio():
     
 
 
-@servicios_bp.route('/proveedor/<string:id>')
+@servicios_bp.route('/proveedor/<string:id>', methods=['GET'])
 def servicios_proveedor(id):
     try:
         conn = db_conn()

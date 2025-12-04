@@ -3,7 +3,7 @@ from db.db import db_conn
 
 categorias_bp = Blueprint('categorias', __name__)
 
-@categorias_bp.route('/<string:categoria_nombre>')
+@categorias_bp.route('/<string:categoria_nombre>', methods=['GET'])
 def cantidad_por_categoria(categoria_nombre):
     """cantidad de profesionales de una categoria"""
     try:
@@ -40,7 +40,7 @@ def cantidad_por_categoria(categoria_nombre):
         print(e)
         return jsonify({'error': str(e)}), 500
 
-@categorias_bp.route('/')
+@categorias_bp.route('/', methods=['GET'])
 def categorias():
     """categorias existentes"""
     try:

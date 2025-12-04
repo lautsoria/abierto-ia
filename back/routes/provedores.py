@@ -24,7 +24,7 @@ from db.db import db_conn
 
 proveedores_bp = Blueprint('proveedores', __name__)
 
-@proveedores_bp.route('/')
+@proveedores_bp.route('/', methods=['GET'])
 def get_proveedores():
     try:
         conn = db_conn()
@@ -72,7 +72,7 @@ def get_proveedores():
 
 
 # provedor por id
-@proveedores_bp.route('/<string:id>')
+@proveedores_bp.route('/<string:id>', methods=['GET'])
 def get_proveedor(id):
     try:
         conn = db_conn()
@@ -232,7 +232,7 @@ def update_proveedor(id):
         return jsonify({'error': str(e)}), 500
 
 
-@proveedores_bp.route('/ubicaciones')
+@proveedores_bp.route('/ubicaciones', methods=['GET'])
 def get_ubicaciones():
     try:
         conn = db_conn()

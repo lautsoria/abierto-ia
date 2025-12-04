@@ -169,7 +169,7 @@ def get_mis_reservas():
 
 
 # ver todas las reservas,solo admins
-@reservas_bp.route('/todas')
+@reservas_bp.route('/todas', methods=['GET'])
 def get_all_reservas():
     try:
         usuario_id = request.json.values()
@@ -370,7 +370,7 @@ def reserva(id):
 
 
 
-@reservas_bp.route('/servicio/<string:id>')
+@reservas_bp.route('/servicio/<string:id>', methods=['GET'])
 def servicio_reservas(id):
     try:        
         conn = db_conn()
