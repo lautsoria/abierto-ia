@@ -1,0 +1,69 @@
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f9f9f9;
+        color: #333;
+    }
+
+    /* Formulario centrado y simple */
+    form {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Etiquetas de los campos */
+    label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    /* Campo de texto */
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    /* Área de texto */
+    textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    /* Focus en campos */
+    input:focus,
+    textarea:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    /* Botón de envío */
+    button {
+        margin-top: 20px;
+        padding: 10px;
+        width: 100%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
